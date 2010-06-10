@@ -1,0 +1,20 @@
+<phpunit bootstrap="Bootstrap.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="false">
+	<logging>
+		<log type="coverage-html" target="coverage-html/" charset="UTF-8"
+			yui="true" highlight="true"
+			lowUpperBound="35" highLowerBound="70"/>
+	</logging>
+	<filter>
+		  <blacklist>
+				<directory suffix=".php">./</directory>
+		  </blacklist>
+		  <whitelist>
+				<directory suffix=".php">../lib/</directory>
+		  </whitelist>
+	</filter>
+</phpunit>

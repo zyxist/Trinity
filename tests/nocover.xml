@@ -1,0 +1,15 @@
+<phpunit bootstrap="Bootstrap.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         stopOnFailure="false">
+	<filter>
+		  <blacklist>
+				<directory suffix=".php">./</directory>
+		  </blacklist>
+		  <whitelist>
+				<directory suffix=".php">../lib/</directory>
+		  </whitelist>
+	</filter>
+</phpunit>
