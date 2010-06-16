@@ -72,7 +72,8 @@ to the library vendors in your filesystem.
 
 The final step is to configure the sample application. Open `/Application/config/area.ini`
 and specify the correct host of the default area, where the application will be
-accessible from the browser.
+accessible from the browser. Do not forget to create `/Application/cache` directory
+if it does not exist.
 
 Run the application by executing the entry script `index.php`.
 
