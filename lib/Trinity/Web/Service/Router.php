@@ -32,12 +32,14 @@ class Service_Router extends Service
 	{
 		$application = \Trinity\Basement\Application::getApplication();
 		// Initialize the router
-		$router = new Router_Standard($this->routes);
+		$router = new Router_Standard();
+
+		require($this->routes);
 
 		// Connect the router to the broker.
 		$application->getEventManager()->addCallback('web.broker.request.create', function(array $args) use($router)
 		{
-			list($request, $response) = $args;
+			$request = $args['request'];
 			$request->setParams($router->route($request->pathInfo));
 		});
 

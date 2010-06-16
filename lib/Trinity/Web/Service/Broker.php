@@ -27,7 +27,7 @@ class Service_Broker extends Service
 	 */
 	public function toPreload()
 	{
-		return array('web.Visit');
+		return array('web.Visit', 'web.Router');
 	} // end toPreload();
 
 	/**

@@ -4,7 +4,7 @@
  *
  * @author Tomasz Jędrzejewski
  */
-use Trinity\WebUtils\View\Lists as ListView;
+use Trinity\WebUtils\View\Grid as GridView;
 use Trinity\WebUtils\Controller\Action_Group as ControllerActionGroup;
 
 class IndexGroup extends ControllerActionGroup
@@ -18,9 +18,10 @@ class IndexGroup extends ControllerActionGroup
 
 	public function listAction()
 	{
-		$view = new ListView;
+		$view = new GridView($this->getApplication());
 		$view->set('args', $this->getRequest()->getParams());
-		$view->addModel('list', $this->getModel('Application.Main.Model.List'));
+		$view->set('title', 'Some dummy title');
+		$view->addModel('grid', $this->getModel('Application.Main.Model.Grid'));
 
 		return $view;
 	} // end listAction();

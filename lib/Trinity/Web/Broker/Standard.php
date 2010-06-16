@@ -34,7 +34,7 @@ class Broker_Standard extends Broker_Abstract
 	{
 		$this->setRequest($request = new Request_Http($visit));
 
-		$this->_application->getEventManager()->fire('broker.request.create', array(
+		$this->_application->getEventManager()->fire('web.broker.request.create', array(
 			'request' => $request
 		));
 	} // end buildRequest();
@@ -46,7 +46,7 @@ class Broker_Standard extends Broker_Abstract
 	{
 		$this->setResponse($response = new Response_Opt());
 
-		$this->_application->getEventManager()->fire('broker.response.create', array(
+		$this->_application->getEventManager()->fire('web.broker.response.create', array(
 			'response' => $response
 		));
 	} // end buildResponse();

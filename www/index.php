@@ -9,6 +9,7 @@ require($config['libraries']['Opl'].'Opl/Base.php');
 
 $nsLoader = new Opl_Loader;
 $nsLoader->addLibrary('Trinity', $config['libraries']['Trinity']);
+$nsLoader->addLibrary('Doctrine', $config['libraries']['Doctrine']);
 $nsLoader->addLibrary('Application', $config['libraries']['Application']);
 $nsLoader->register();
 
