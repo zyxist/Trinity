@@ -21,6 +21,7 @@ use Trinity\Basement\Service_Builder as Service_Builder;
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
+ * @todo It is not finished.
  */
 class Service_Builder_Standard implements Service_Builder
 {
@@ -49,6 +50,11 @@ class Service_Builder_Standard implements Service_Builder
 	 */
 	public function loadConfig($configFile)
 	{
+		if(!file_exists($configFile))
+		{
+			throw new Service_Builder_Exception('The service definition file '.$configFile.' is not accessible.');
+		}
+
 		$opts = parse_ini_file($configFile, true);
 
 		foreach($opts as $service => $serviceBuild)

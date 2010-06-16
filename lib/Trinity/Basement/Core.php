@@ -16,17 +16,23 @@ namespace Trinity\Basement;
 
 /**
  * The controller interface.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 interface Controller
 {
-	public function setModelLocator(ObjectLocator $locator);
+	public function setModelLocator(Locator_Object $locator);
 	public function getModelLocator();
-	public function setViewLocator(ObjectLocator $locator);
-	public function getViewLocator();
 } // end Controller;
 
 /**
  * The model interface.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 interface Model
 {
@@ -35,6 +41,10 @@ interface Model
 
 /**
  * The view abstract class used for whatever we want.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 abstract class View
 {
@@ -122,14 +132,24 @@ abstract class View
 	 *
 	 * @throws Core_Exception
 	 * @param string $name The model name
+	 * @param string $contract The contract that must be passed.
 	 * @return Model The model object
 	 */
-	public function getModel($name)
+	public function getModel($name, $contract = null)
 	{
 		if(!isset($this->_models[$name]))
 		{
 			throw new Core_Exception('The model '.$name.' does not exist.');
 		}
+
+		if($contract !== null)
+		{
+			if(!is_a($this->_models[$name], $contract))
+			{
+				throw new Core_Exception('The model '.$name.' does not satisfy the contract '.$contract);
+			}
+		}
+
 		return $this->_models[$name];
 	} // end getModel();
 
@@ -160,15 +180,14 @@ abstract class View
 	{
 		$this->_models[$name] = $model;
 	} // end replaceModel();
-
-	/**
-	 * Displays the view.
-	 */
-	abstract public function display();
 } // end View;
 
 /**
  * The basic object locator.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 class Locator
 {
@@ -289,6 +308,10 @@ class Locator
 /**
  * The object locators are used to manage a pool of singleton objects of the
  * specified type.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 class Locator_Object extends Locator
 {
@@ -417,6 +440,14 @@ class Locator_Object extends Locator
 	} // end _objectMissing();
 } // end Locator_Object;
 
+/**
+ * Represents a service which should construct some object for the system and
+ * specify dependencies.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
+ */
 abstract class Service
 {
 	/**
@@ -431,21 +462,59 @@ abstract class Service
 	 */
 	private $_options;
 
-	public function __construct(Locator_Service $serviceLocator)
+	/**
+	 * The service name.
+	 * @var string
+	 */
+	private $_name;
+
+	/**
+	 * Creates a service object.
+	 * 
+	 * @param Locator_Service $serviceLocator
+	 * @param string $name The service name
+	 */
+	public function __construct(Locator_Service $serviceLocator, $name)
 	{
 		$this->_serviceLocator = $serviceLocator;
+		$this->_name = $name;
 	} // end __construct();
 
+	/**
+	 * Returns the service name.
+	 * @return string
+	 */
+	final public function getName()
+	{
+		return $this->_name;
+	} // end getName();
+
+	/**
+	 * Sets the service options
+	 * 
+	 * @param array $options The service options
+	 */
 	public function setOptions(array $options)
 	{
 		$this->_options = $options;
 	} // end setOptions();
 
+	/**
+	 * Returns the service options.
+	 *
+	 * @return array
+	 */
 	public function getOptions()
 	{
 		return $this->_options;
 	} // end getOptions();
 
+	/**
+	 * Returns the service option with the specified name.
+	 *
+	 * @param string $name The option name
+	 * @return mixed
+	 */
 	public function __get($name)
 	{
 		if(!isset($this->_options[$name]))
@@ -455,16 +524,33 @@ abstract class Service
 		return $this->_options[$name];
 	} // end __get();
 
+	/**
+	 * Returns an array of service names that should be preloaded. If
+	 * there are no serivces to preload, an empty array should be returned.
+	 * 
+	 * @return array
+	 */
 	public function toPreload()
 	{
 		return array();
 	} // end toPreload();
 
+	/**
+	 * Returns an array of service names that should be postloaded. If
+	 * there are no serivces to preload, an empty array should be returned.
+	 *
+	 * @return array
+	 */
 	public function toPostload()
 	{
 		return array();
 	} // end toPostload();
 
+	/**
+	 * Constructs the object represented by this service.
+	 *
+	 * @return mixed
+	 */
 	abstract public function getObject();
 
 	/**
@@ -477,14 +563,51 @@ abstract class Service
 	} // end dispose();
 } // end Service;
 
+/**
+ * Allows to build service configurators which provide a configuration
+ * for the services.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
+ */
 interface Service_Configurator
 {
+	/**
+	 * Returns an array of options for the given service.
+	 * 
+	 * @param string $name The service name.
+	 * @return array
+	 */
 	public function getServiceOptions($name);
 } // end Service_Configurator;
 
+/**
+ * Service builders are used to construct a service automatically, using some
+ * rules. We use them, if we do not want to write a separate service class for
+ * each object.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
+ */
 interface Service_Builder
 {
+	/**
+	 * Returns true, if the builder is able to build the specified service.
+	 * 
+	 * @param string $name The service name
+	 * @return boolean
+	 */
 	public function canBuild($name);
+
+	/**
+	 * Builds the service.
+	 *
+	 * @param string $name The service name.
+	 * @param Locator_Service $serviceLocator The service locator.
+	 * @return Service
+	 */
 	public function build($name, Locator_Service $serviceLocator);
 } // end Service_Builder;
 
@@ -493,6 +616,8 @@ interface Service_Builder
  * for discovering the services, initializing them and injecting the configuration.
  *
  * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 class Locator_Service extends Locator
 {
@@ -581,6 +706,15 @@ class Locator_Service extends Locator
 		return $this;
 	} // end removeServiceGroup();
 
+	/**
+	 * Adds an alias for the given service. If case of requesting the service,
+	 * the locator will load the replacement class instead of the original one.
+	 *
+	 * @throws Core_Exception
+	 * @param string $serviceName The service name
+	 * @param string $replacementClass The replacement class name
+	 * @return Locator_Service Fluent interface.
+	 */
 	public function addAlias($serviceName, $replacementClass)
 	{
 		if(isset($this->_aliases[$serviceName]))
@@ -592,11 +726,26 @@ class Locator_Service extends Locator
 		return $this;
 	} // end addAlias();
 
+	/**
+	 * Returns true, if the specified service is aliased.
+	 * 
+	 * @param string $serviceName The service name to check
+	 * @return boolean
+	 */
 	public function isAlias($serviceName)
 	{
 		return isset($this->_aliases[$serviceName]);
 	} // end isAlias();
 
+	/**
+	 * Removes the alias for the given service. The operation has no effect, if
+	 * the service has already been loaded. If there is no alias defined for
+	 * the given service, an exception is thrown.
+	 *
+	 * @throws Core_Exception
+	 * @param string $serviceName
+	 * @return Locator_Service Fluent interface.
+	 */
 	public function removeAlias($serviceName)
 	{
 		if(!isset($this->_aliases[$serviceName]))
@@ -607,6 +756,15 @@ class Locator_Service extends Locator
 		return $this;
 	} // end removeAlias();
 
+	/**
+	 * Registers a new service configurator under the given name. If the configurator
+	 * is already defined, an exception is thrown.
+	 *
+	 * @throws Core_Exception
+	 * @param string $name The configurator name
+	 * @param Service_Configurator $configurator The configurator object
+	 * @return Locator_Service Fluent interface
+	 */
 	public function addConfigurator($name, Service_Configurator $configurator)
 	{
 		if(isset($this->_configurators[$name]))
@@ -618,11 +776,25 @@ class Locator_Service extends Locator
 		return $this;
 	} // end addConfigurator();
 
+	/**
+	 * Returns true, if the specified configurator is defined.
+	 * 
+	 * @param string $name The configurator name
+	 * @return boolean
+	 */
 	public function hasConfigurator($name)
 	{
 		return isset($this->_configurators[$name]);
 	} // end hasConfigurator();
 
+	/**
+	 * Removes the configurator with the given name. If the configurator
+	 * is already defined, an exception is thrown.
+	 *
+	 * @throws Core_Exception
+	 * @param string $name The configurator name.
+	 * @return Locator_Service Fluent interface
+	 */
 	public function removeConfigurator($name)
 	{
 		if(!isset($this->_configurators[$name]))
@@ -633,21 +805,53 @@ class Locator_Service extends Locator
 		return $this;
 	} // end removeConfigurator();
 
+	/**
+	 * Sets the name of the default configurator. The configurator does not have
+	 * to exist at the moment of the call, but must be defined later in order to
+	 * work.
+	 *
+	 * @param string $name The configurator name
+	 * @return Locator_Service Fluent interface
+	 */
 	public function setDefaultConfigurator($name)
 	{
 		$this->_defaultConfigurator = $name;
+		return $this;
 	} // end setDefaultConfigurator();
 
+	/**
+	 * Returns the name of the default configurator.
+	 * 
+	 * @return string
+	 */
 	public function getDefaultConfigurator()
 	{
 		return $this->_defaultConfigurator;
 	} // end getDefaultConfigurator();
 
+	/**
+	 * Requests using the specified configurator to the specified service instead
+	 * of the default configurator. The method has no effect if the service has
+	 * already been loaded.
+	 *
+	 * @param string $configurator The configurator name
+	 * @param string $service The service name.
+	 * @return Locator_Service Fluent interface.
+	 */
 	public function useConfigurator($configurator, $service)
 	{
-		$this->_serviceConfigurators[$service] = $configurator;
+		$this->_serviceConfigurators[(string)$service] = (string)$configurator;
+
+		return $this;
 	} // end useConfigurator();
 
+	/**
+	 * Returns the configurator object for the given service.
+	 *
+	 * @throws Core_Exception
+	 * @param string $serviceName The service name
+	 * @return Service_Configurator
+	 */
 	public function getServiceConfigurator($serviceName)
 	{
 		$configurator = $this->_defaultConfigurator;
@@ -662,12 +866,23 @@ class Locator_Service extends Locator
 		return $this->_configurators[$configurator];
 	} // end getServiceConfigurator();
 
+	/**
+	 * Sets the service builder.
+	 * 
+	 * @param Service_Builder $builder The builder object.
+	 * @return Locator_Service Fluent interface.
+	 */
 	public function setServiceBuilder(Service_Builder $builder)
 	{
 		$this->_builder = $builder;
 		return $this;
 	} // end setServiceBuilder();
 
+	/**
+	 * Returns the current service builder.
+	 *
+	 * @return Service_Builder
+	 */
 	public function getServiceBuilder()
 	{
 		return $this->_builder;
@@ -689,7 +904,11 @@ class Locator_Service extends Locator
 	} // end _verify();
 
 	/**
-	 * Discovers the service.
+	 * Returns the object represented by a given service. If the object is not
+	 * defined, it asks the service for creating it.
+	 *
+	 * @param string $name Service name
+	 * @return mixed
 	 */
 	public function get($name)
 	{
@@ -699,28 +918,37 @@ class Locator_Service extends Locator
 			return $this->_pool[$name];
 		}
 		// Discover the service
-		$toExecute = new \SplStack;
+		$waitsForExecution = new \SplStack;
 
 		$service = $this->_serviceLoad($name);
-		$this->_resolveDependencies($service, $toExecute);
-		$toExecute->push($service);
+		$waitsForExecution->push($service);
+		$this->_resolveDependencies($service, $waitsForExecution);
 
 		// Execute the bootstraping routines
-		foreach($toExecute as $item)
+		while($waitsForExecution !== null)
 		{
-			$this->_pool[$name] = $item->getObject();
-			$postLoading = $item->toPostload();
-			$item->dispose();
-			// Add the post-selected hooks.
-			if(is_array($postLoading) && sizeof($postLoading) > 0)
+			$toExecute = $waitsForExecution;
+			$waitsForExecution = null;
+			foreach($toExecute as $item)
 			{
-				foreach($postLoading as $postloadedServiceName)
+				$this->_pool[$item->getName()] = $item->getObject();
+				$postLoading = $item->toPostload();
+				$item->dispose();
+				// Add the post-selected hooks.
+				if(is_array($postLoading) && sizeof($postLoading) > 0)
 				{
-					if(!isset($this->_pool[(string)$postloadedServiceName]))
+					foreach($postLoading as $postloadedServiceName)
 					{
-						$postloadedService = $this->_serviceLoad($postloadedServiceName);
-						$this->_resolveDependencies($postloadedService, $toExecute);
-						$toExecute->push($postloadedService);
+						if(!isset($this->_pool[(string)$postloadedServiceName]))
+						{
+							if($waitsForExecution === null)
+							{
+								$waitsForExecution = new \SplStack;
+							}
+							$postloadedService = $this->_serviceLoad($postloadedServiceName);
+							$waitsForExecution->push($postloadedService);
+							$this->_resolveDependencies($postloadedService, $waitsForExecution);
+						}
 					}
 				}
 			}
@@ -750,10 +978,6 @@ class Locator_Service extends Locator
 					$service = $this->_serviceLoad($dependency);
 					$toResolve->enqueue($service);
 					$toExecute->push($service);
-				}
-				else
-				{
-					$toExecute->push($this->_service[$dependency]);
 				}
 			}
 		}
@@ -794,7 +1018,7 @@ class Locator_Service extends Locator
 		}
 
 		// Create the service and inject the configuration.
-		$service = new $className($this);
+		$service = new $className($this, $name);
 		$this->_verify($service);
 		$service->setOptions($this->getServiceConfigurator($name)->getServiceOptions($name));
 
@@ -804,23 +1028,46 @@ class Locator_Service extends Locator
 
 /**
  * An event listener interface. Allows to receive events.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 interface EventListener
 {
+	/**
+	 * Dispatches the specified event.
+	 * 
+	 * @param string $event Event name
+	 * @param array $args Event arguments
+	 */
 	public function dispatchEvent($event, $args);
 } // end EventListener;
 
 /**
  * An event subscriber interface. Allows to receive events
  * and specify what events to subscribe.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 interface EventSubscriber extends EventListener
 {
+	/**
+	 * Returns an array of the events to subscribe.
+	 *
+	 * @return array
+	 */
 	public function getSubscribedEvents();
 } // end EventSubscriber;
 
 /**
  * The class for managing events and event-based programming.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 class EventManager
 {
@@ -843,6 +1090,7 @@ class EventManager
 	 *
 	 * @param array $events The events to listen.
 	 * @param EventSubscriber $listener The listener to add.
+	 * @return EventManager Fluent interface.
 	 */
 	public function addListener($events, EventListener $listener)
 	{
@@ -856,6 +1104,7 @@ class EventManager
 			}
 			$this->_listeners[$event][$hash] = $listener;
 		}
+		return $this;
 	} // end addListener();
 
 	/**
@@ -863,6 +1112,7 @@ class EventManager
 	 *
 	 * @param array $events The list of events the listener should not receive.
 	 * @param EventListener $listener The listener to remove.
+	 * @return EventManager Fluent interface.
 	 */
 	public function removeListener($events, EventListener $listener)
 	{
@@ -875,12 +1125,14 @@ class EventManager
 				unset($this->_listeners[$event][$hash]);
 			}
 		}
+		return $this;
 	} // end removeListener();
 
 	/**
 	 * Registers a new event subscriber.
 	 *
 	 * @param EventSubscriber $subscriber The subscriber to add.
+	 * @return EventManager Fluent interface.
 	 */
 	public function addSubscriber(EventSubscriber $subscriber)
 	{
@@ -894,12 +1146,14 @@ class EventManager
 			}
 			$this->_listeners[$event][$hash] = $subscriber;
 		}
+		return $this;
 	} // end addSubscriber();
 
 	/**
 	 * Removes the specified subscriber from the subscribed events.
 	 *
 	 * @param EventSubscriber $subscriber The subscriber to remove.
+	 * @return EventManager Fluent interface.
 	 */
 	public function removeSubscriber(EventSubscriber $subscriber)
 	{
@@ -912,6 +1166,7 @@ class EventManager
 				unset($this->_listeners[$event][$hash]);
 			}
 		}
+		return $this;
 	} // end removeSubscriber();
 
 	/**
@@ -923,6 +1178,7 @@ class EventManager
 	 * @throws Core_Exception
 	 * @param string $event The event name.
 	 * @param callback $callback The callback to fire.
+	 * @return EventManager Fluent interface.
 	 */
 	public function addCallback($event, $callback)
 	{
@@ -936,6 +1192,7 @@ class EventManager
 			$this->_callbacks[$event] = array();
 		}
 		$this->_callbacks[$event][] = $callback;
+		return $this;
 	} // end addCallback();
 
 	/**
@@ -943,6 +1200,7 @@ class EventManager
 	 *
 	 * @param string $eventName The name of the event.
 	 * @param array $args The optional event params.
+	 * @return EventManager Fluent interface.
 	 */
 	public function fire($eventName, $args = array())
 	{
@@ -963,17 +1221,22 @@ class EventManager
 				$listener->dispatchEvent($eventName, $args);
 			}
 		}
+		return $this;
 	} // end fire();
 } // end EventManager;
 
 /**
  * The base application class.
+ *
+ * @author Tomasz Jędrzejewski
+ * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
+ * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
 abstract class Application
 {
 	/**
 	 * The event manager used by the application
-	 * @var EventManager;
+	 * @var EventManager
 	 */
 	private $_eventManager;
 
@@ -982,6 +1245,18 @@ abstract class Application
 	 * @var Locator_Service
 	 */
 	private $_serviceLocator;
+
+	/**
+	 * The list of currently loaded modules.
+	 * @var array
+	 */
+	private $_modules;
+
+	/**
+	 * The module path.
+	 * @var string
+	 */
+	private $_path;
 
 	/**
 	 * The current application object.
@@ -996,7 +1271,7 @@ abstract class Application
 	 */
 	static public function setApplication(Application $application)
 	{
-		$this->_application = $application;
+		self::$_application = $application;
 	} // end setApplication();
 
 	/**
@@ -1006,7 +1281,7 @@ abstract class Application
 	 */
 	static public function getApplication()
 	{
-		return $this->_application;
+		return self::$_application;
 	} // end getApplication();
 
 	/**
@@ -1014,21 +1289,24 @@ abstract class Application
 	 */
 	public function initialize()
 	{
-		$this->_application = $this;
+		self::$_application = $this;
 
 		$this->_eventManager = new EventManager;
 		$this->_serviceLocator = new Locator_Service('services', $this->_eventManager);
-		$this->_serviceLocator->addServiceGroup('garage', '\Trinity\Garage\Service_');
-		$this->_serviceLocator->addServiceGroup('hall', '\Trinity\Hall\Service_');
+		$this->_serviceLocator->addServiceGroup('utils', '\Trinity\Utils\Service_');
+		$this->_serviceLocator->addServiceGroup('model', '\Trinity\Model\Service_');
 
 		$this->_launch();
 	} // end initialize();
 
+	/**
+	 * Custom launching procedures.
+	 */
 	abstract protected function _launch();
 
 	/**
 	 * Returns the event handler.
-	 * @return EventHandler;
+	 * @return EventHandler
 	 */
 	public function getEventManager()
 	{
@@ -1044,4 +1322,80 @@ abstract class Application
 	{
 		return $this->_serviceLocator;
 	} // end getServiceLocator();
+
+	/**
+	 * Sets the path to the application modules.
+	 * 
+	 * @param string $path The module path.
+	 * @return Application Fluent interface.
+	 */
+	public function setModulePath($path)
+	{
+		if($path[strlen($path) - 1] != '/')
+		{
+			$path .= $path;
+		}
+
+		$this->_path = $path;
+		return $this;
+	} // end setModulePath();
+
+	/**
+	 * Returns the current module path.
+	 *
+	 * @return string
+	 */
+	public function getModulePath()
+	{
+		return $this->_path;
+	} // end getModulePath();
+
+	/**
+	 * Sets a hand-built module.
+	 *
+	 * @throws Core_Exception
+	 * @param Module $module The module to add.
+	 * @param boolean $replace Allow replacing an existing module?
+	 */
+	public function setModule(Module $module, $replace = true)
+	{
+		$name = str_replace('\\', '.', get_class($module));
+
+		if(isset($this->_modules[$name]) && !$replace)
+		{
+			throw new Core_Exception('Cannot replace module '.$name);
+		}
+		$this->_modules[$name] = $module;
+	} // end setModule();
+
+	/**
+	 * Attempts to load an application module.
+	 *
+	 * @param string $moduleName The name of the module to load.
+	 * @return Module
+	 */
+	public function loadModule($moduleName)
+	{
+		if(isset($this->_modules[$moduleName]))
+		{
+			return $this->_modules[$moduleName];
+		}
+		$path = $this->_path.str_replace('.', '/', $moduleName);
+		if(file_exists($path.'Module.php'))
+		{
+			$className = str_replace('.', '\\', $moduleName).'\\Module';
+
+			$object = new $className($moduleName, $path);
+
+			if(!$object instanceof Module)
+			{
+				throw new Core_Exception('Invalid interface for module '.$moduleName);
+			}
+		}
+		else
+		{
+			$object = new Module($moduleName, $path);
+		}
+		return $this->_modules[$moduleName] = $object;
+	} // end loadModule();
 } // end Application;
