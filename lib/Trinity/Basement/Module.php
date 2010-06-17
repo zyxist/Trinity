@@ -10,6 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Basement;
+use \Trinity\Basement\Application as BaseApplication;
 
 /**
  * Represents a single module. The class is not obligatory for the modules,
@@ -48,6 +49,8 @@ class Module
 			$path .= '/';
 		}
 		$this->_path = $path;
+
+		$this->onInit(BaseApplication::getApplication());
 	} // end __construct();
 
 	/**
@@ -81,4 +84,14 @@ class Module
 	{
 		return $this->_path.$item.'/';
 	} // end getFilePath();
+
+	/**
+	 * The method is called during the module initialization.
+	 * 
+	 * @param BaseApplication $application The application link.
+	 */
+	public function onInit(BaseApplication $application)
+	{
+		/* empty */
+	} // end onInit();
 } // end Module;

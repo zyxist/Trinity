@@ -3,7 +3,7 @@
 define('APP_ENVIRONMENT', 'production');
 define('APP_PATH', '../Application/');
 
-// Configure the autoloader
+// Configure the autoloaders
 $config = parse_ini_file(dirname(__FILE__).'/../paths.ini', true);
 require($config['libraries']['Opl'].'Opl/Base.php');
 
@@ -21,10 +21,16 @@ $oplLoader->register();
 
 require($config['libraries']['Trinity'].'Trinity/Basement/Core.php');
 
-// Run everything
+// Create application object
 $application = new \Trinity\Web\Application(
+	'Application',
 	APP_ENVIRONMENT,
 	APP_PATH.'config/config.ini',
 	'../Application/'
 );
+// Bind autoloaders, so that they could be accessed
+$application->addLoader('default', $nsLoader);
+$application->addLoader('legacy', $oplLoader);
+
+// Run everything
 $application->initialize();

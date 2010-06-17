@@ -51,11 +51,80 @@ Event-driven programming
 According to Wikipedia, event-driven programming is a programming paradigm in
 which the flow of the program is determined by events.
 
+In Trinity, events are fired by various components on different situations. Other
+components may listen for the specified event in order to perform some action
+when it occurs. Such approach reduces the dependencies and the number of necessary
+interfaces.
+
+A nice example is binding the router to the application. In Trinity, the request
+broker does not even have to know that there exists such thing, as "router". Router
+simply listens for a request creation event. When it is fired, by the broker,
+the router executes a tiny, anonymous function which parses the GET arguments and
+populates the request object with the extracted data.
+
 Loose dependencies
 ------------------
 
+One of the primary goals of Trinity is to verify, how loose the dependencies
+between the framework components could be, so that the framework could still
+work and do its tasks fast. Loose dependencies ease to replace some components
+with custom implementation and change the system behaviour.
+
+Loose dependencies are achieved with several techniques:
+
++ Dependency injection
++ Event-driven programming
++ Service bootstraping mechanism
++ Massive use of external libraries
++ Splitting the framework into several layers
+
+Layer structure
+---------------
+
+The framework consists of several layers
+built one on top another. For example, in order to build a web application, we
+use the `Web` layer which implements the necessary controller and view interfaces
+for HTTP environment. However, it does not still provide concrete controllers and
+concrete views, because they are provided by another layer: `WebUtils`. If we
+do not like the classic two-step *controller - action* layout, we simply abandon
+`WebUtils` layer and build our own controller with the interfaces from `Web`.
+
+Elements of contract programming
+--------------------------------
+
+This point primarily refers to the communication between views and models. A single
+view can be used to render different models, and a single model should work with
+several views in different places. With such assumptions, we face a problem, how
+to communicate one with another and satisfy these requirements.
+
+A contract is a formal and verificable interface specification and assumption,
+what behaviour we expect from it and what benefits we could get. In Trinity,
+contracts define various model interfaces. By implementing them in your models,
+you are guaranteed to get a certain kind of behaviour from views.
+
+A classic example is a table with some rows from the database provided by the predefined
+`Grid` view. We do not have to write all the presentation logic (i.e. pagination,
+filtering, sorting) on our own, if we implement the proper interfaces in our models:
+
++ `Interface_Grid` is the critical interface - it specifies, how the view can
+  read the column header titles and the rows from the model.
++ `Interface_Paginable` - after implementing it, our view displays us a complete
+  pagination for our list.
++ `Interface_Sortable` - provides the ability to sort the rows by columns.
++ `Interface_Filterable` - provides the ability to filter the data with some criteria.
+
+All the time, we only play at the model level, because if we just implement one
+of the interfaces, the view will get us a concrete functionality immediately.
+
 Use of external libraries
 -------------------------
+
+Trinity uses lots of external, third party libraries rather than implementing the
+certain components in its own fashion. The reason is simple: why to bother with
+implementing a custom ORM, if we have great Doctrine? Actually, this framework
+is intended to provide the MVC stack and some basic services, such as configuration
+handling and sessions. Other issues, like database management, form processing,
+template engine should be provided by third-party components and be easily exchangeable.
 
 Installation
 ============
@@ -64,6 +133,8 @@ Project requirements are:
 
 + PHP 5.3.x
 + [Open Power Libs 2.1](http://www.invenzzia.org/en/projects/open-power-libraries)
++ [Doctrine ORM 2.0](http://www.doctrine-project.org/)
++ APC is recommended
 
 Open Power Libs can be obtained from Github (see "OPL" user). In order to install
 the project, copy the OPL project directories to the `/lib` directory. Rename

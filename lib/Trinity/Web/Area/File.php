@@ -27,7 +27,13 @@ class Area_File extends Area_Abstract
 	 * The area module
 	 * @var Module
 	 */
-	private $_module;
+	private $_areaModule;
+
+	/**
+	 * The selected module.
+	 * @var Module
+	 */
+	private $_primaryModule;
 
 	/**
 	 * Performs an area discovery from a file.
@@ -78,7 +84,8 @@ class Area_File extends Area_Abstract
 	 */
 	public function setModule($moduleName)
 	{
-		$this->_module = $this->_application->loadModule($this->_name.'.'.ucfirst($moduleName));
+		$this->_primaryModule = $this->_application->loadModule($this->_name);
+		$this->_areaModule = $this->_application->loadModule($this->_name.'.'.ucfirst($moduleName));
 	} // end setModule();
 
 	/**
@@ -89,9 +96,9 @@ class Area_File extends Area_Abstract
 	 */
 	public function getCodePath($item)
 	{
-		if($this->_module !== null)
+		if($this->_areaModule !== null)
 		{
-			return $this->_module->getCodePath($item);
+			return $this->_areaModule->getCodePath($item);
 		}
 		return parent::getCodePath($item);
 	} // end getCodePath();
@@ -104,12 +111,22 @@ class Area_File extends Area_Abstract
 	 */
 	public function getFilePath($item)
 	{
-		if($this->_module !== null)
+		if($this->_areaModule !== null)
 		{
-			return $this->_module->getFilePath($item);
+			return $this->_areaModule->getFilePath($item);
 		}
 		return parent::getFilePath($item);
 	} // end getFilePath();
+
+	/**
+	 * Returns the primary module.
+	 *
+	 * @return Module
+	 */
+	public function getPrimaryModule()
+	{
+		return $this->_primaryModule;
+	} // end getPrimaryModule();
 
 	/**
 	 * Returns the name of the service controller to be used by

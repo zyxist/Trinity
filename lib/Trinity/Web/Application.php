@@ -41,15 +41,16 @@ class Application extends Base_Application implements Service_Configurator
 	/**
 	 * Initializes a web application.
 	 *
+	 * @param string $appName The application name
 	 * @param string $environment The environment name to use
 	 * @param string $configPath The path to the configuration
 	 * @param string $modulePath The path to modules.
 	 */
-	public function __construct($environment, $configPath, $modulePath)
+	public function __construct($appName, $environment, $configPath, $modulePath)
 	{
 		$this->_environment = $environment;
 		$this->_configPath = $configPath;
-		$this->setModulePath($modulePath);
+		$this->setModulePath($appName, $modulePath);
 	} // end __construct();
 
 	/**

@@ -1259,6 +1259,18 @@ abstract class Application
 	private $_path;
 
 	/**
+	 * The module namespace.
+	 * @var string
+	 */
+	private $_namespace = '\Application';
+
+	/**
+	 * The list of autoloaders.
+	 * @var array
+	 */
+	private $_loaders;
+
+	/**
 	 * The current application object.
 	 * @var Application
 	 */
@@ -1325,15 +1337,23 @@ abstract class Application
 
 	/**
 	 * Sets the path to the application modules.
-	 * 
+	 *
+	 * @param string $name The module namespace.
 	 * @param string $path The module path.
 	 * @return Application Fluent interface.
 	 */
-	public function setModulePath($path)
+	public function setModulePath($name, $path)
 	{
+		if($name[0] != '\\')
+		{
+			$name = '\\'.$name;
+		}
+		$this->_moduleNamespace = $name;
+
+
 		if($path[strlen($path) - 1] != '/')
 		{
-			$path .= $path;
+			$path .= '/';
 		}
 
 		$this->_path = $path;
@@ -1380,10 +1400,11 @@ abstract class Application
 		{
 			return $this->_modules[$moduleName];
 		}
-		$path = $this->_path.str_replace('.', '/', $moduleName);
+		$path = $this->_path.str_replace('.', '/', $moduleName).'/';
 		if(file_exists($path.'Module.php'))
 		{
-			$className = str_replace('.', '\\', $moduleName).'\\Module';
+			
+			$className = $this->_namespace.'\\'.str_replace('.', '\\', $moduleName).'\\Module';
 
 			$object = new $className($moduleName, $path);
 
@@ -1398,4 +1419,40 @@ abstract class Application
 		}
 		return $this->_modules[$moduleName] = $object;
 	} // end loadModule();
+
+	/**
+	 * Registers a new autoloader. In order not to reduce flexibility, it
+	 * has no limitations over the interfaces, leaving the compatibility task
+	 * to the programmer.
+	 * 
+	 * @param string $name The autoloader name.
+	 * @param object $loader The loader object.
+	 * @return boolean
+	 */
+	public function addLoader($name, $loader)
+	{
+		if(!is_object($loader))
+		{
+			return false;
+		}
+		$this->_loaders[(string)$name] = $loader;
+		return true;
+	} // end addLoader();
+
+	/**
+	 * Returns the autoloader object. In order not to reduce flexibility, it
+	 * has no limitations over the interfaces, leaving the compatibility task
+	 * to the programmer.
+	 *
+	 * @param string $name The autoloader name.
+	 * @return object
+	 */
+	public function getLoader($name)
+	{
+		if(!isset($this->_loaders[$name]))
+		{
+			return null;
+		}
+		return $this->_loaders[$name];
+	} // end getLoader();
 } // end Application;
