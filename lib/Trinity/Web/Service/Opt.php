@@ -49,6 +49,13 @@ class Service_Opt extends Service
 			'area.layouts' => $area->getFilePath('layouts')
 		);
 
+		$options = $this->getOptions();
+		if(!isset($options['stripWhitespaces']))
+		{
+			$options['stripWhitespaces'] = false;
+		}
+		$opt->loadConfig($options);
+
 		return $opt;
 	} // end getObject();
 } // end Service_Opt;

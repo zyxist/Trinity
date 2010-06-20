@@ -10,41 +10,41 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Web;
+use \Trinity\Basement\Application as BaseApplication;
 use \Trinity\Basement\Service as Service;
 
 /**
- * Launches the layout manager for views.
+ * Initializes the session service.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Layout extends Service
+class Service_Session extends Service
 {
-
 	/**
-	 * List of services to preload.
-	 * @return array
-	 */
-	public function toPreload()
-	{
-		return array('web.Broker', 'web.Opt');
-	} // end toPreload();
-
-	/**
-	 * Builds the layout object.
+	 * Preconfigures and initializes the session service.
+	 *
+	 * @return Session
 	 */
 	public function getObject()
 	{
-		$application = \Trinity\Basement\Application::getApplication();
-		$broker = $this->_serviceLocator->get('web.Broker');
-		$layout = new Layout($application);
-		$layout->setLayout($this->layout);
+		$application = BaseApplication::getApplication();
+		$session = new Session($application);
 
-		// TODO: Replace with something more clever.
-		$response = $broker->getResponse();
-		$response->setHeader('Content-type', 'text/html;charset=utf-8');
+		$eventManager = $application->getEventManager();
+		$eventManager->addCallback('controller.web.dispatch.begin', function($args) use($session) {
+			$session->start();
 
-		return $layout;
+			return true;
+		});
+
+		$eventManager->addCallback('controller.web.dispatch.end', function($args) use($session) {
+			$session->writeClose();
+
+			return true;
+		});
+
+		return $session;
 	} // end getObject();
-} // end Service_Layout;
+} // end Service_Session;

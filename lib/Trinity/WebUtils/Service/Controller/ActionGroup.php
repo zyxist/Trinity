@@ -31,7 +31,7 @@ class Service_Controller_ActionGroup extends Service
 	 */
 	public function toPreload()
 	{
-		return array('web.Router', 'web.Area', 'model.ModelLocator');
+		return array('web.Router', 'web.Area', 'web.Session', 'model.ModelLocator');
 	} // end toPreload();
 
 	/**

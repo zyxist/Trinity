@@ -53,6 +53,8 @@ class Service_Area extends Service
 
 		$this->_controllerName = $area->getController();
 
+
+
 		return $area;
 	} // end getObject();
 

@@ -123,6 +123,17 @@ class Action_Group
 	} // end getModel();
 
 	/**
+	 * A syntactic sugar for loading the service.
+	 * 
+	 * @param string $name Service name
+	 * @return object
+	 */
+	public function getService($name)
+	{
+		return $this->_application->getServiceLocator()->get($name);
+	} // end getService();
+
+	/**
 	 * Returns the group name.
 	 *
 	 * @return string
