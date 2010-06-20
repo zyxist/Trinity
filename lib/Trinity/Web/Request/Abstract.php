@@ -28,7 +28,7 @@ abstract class Request_Abstract
 
 	/**
 	 * The request area
-	 * @var \Trinity\Web\Area
+	 * @var \Trinity\Web\Area_Standard
 	 */
 	private $_area = null;
 
@@ -60,7 +60,7 @@ abstract class Request_Abstract
 	/**
 	 * Returns the request area
 	 *
-	 * @return \Trinity\Web\Area
+	 * @return \Trinity\Web\Area_Standard
 	 */
 	public function getArea()
 	{
@@ -70,9 +70,9 @@ abstract class Request_Abstract
 	/**
 	 * Sets the request area.
 	 *
-	 * @param \Trinity\Web\Area_Abstract $area
+	 * @param \Trinity\Web\Area_Standard $area
 	 */
-	public function setArea(Area_Abstract $area)
+	public function setArea(Area_Standard $area)
 	{
 		$this->_area = $area;
 	} // end setArea();

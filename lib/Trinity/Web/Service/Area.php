@@ -11,6 +11,7 @@
  */
 namespace Trinity\Web;
 use \Trinity\Basement\Service as Service;
+use \Trinity\Web\Area\Strategy_File;
 
 /**
  * The area selector.
@@ -45,15 +46,17 @@ class Service_Area extends Service
 	{
 		$application = \Trinity\Basement\Application::getApplication();
 		$request = $this->_serviceLocator->get('web.Broker')->getRequest();
+		// Initialize the area discovery strategy
+		$strategy = new Strategy_File($this->areaList);
+		$strategy->setDiscoveryType($this->discoveryType, $this->_serviceLocator->get('web.Visit'));
+
 		// Initialize the area
-		// TODO: Replace with Opc_Visit data!
-		$area = new Area_File($application, $this->areaList, $_SERVER['SERVER_NAME']);
+		$area = new Area_Standard($application, $strategy);
 		$area->setModule($request->getParam('module', $this->defaultModule));
 		$request->setArea($area);
 
+		// Get the controller name
 		$this->_controllerName = $area->getController();
-
-
 
 		return $area;
 	} // end getObject();
