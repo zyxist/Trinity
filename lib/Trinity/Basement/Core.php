@@ -921,6 +921,8 @@ class Locator_Service extends Locator
 		$waitsForExecution = new \SplStack;
 
 		$service = $this->_serviceLoad($name);
+
+		// Check the service dependencies in order to load them first.
 		$waitsForExecution->push($service);
 		$this->_resolveDependencies($service, $waitsForExecution);
 
@@ -931,7 +933,11 @@ class Locator_Service extends Locator
 			$waitsForExecution = null;
 			foreach($toExecute as $item)
 			{
+				// Load the service object
 				$this->_pool[$item->getName()] = $item->getObject();
+				$this->_eventManager->fire('locator.'.$item->getName().'.new',
+					array('name' => $item->getName(), 'object' => $this->_pool[$item->getName()])
+				);
 				$postLoading = $item->toPostload();
 				$item->dispose();
 				// Add the post-selected hooks.
@@ -956,7 +962,7 @@ class Locator_Service extends Locator
 
 		// Return the object created by this service.
 		return $this->_pool[$name];
-	} // end _objectMissing();
+	} // end get();
 
 	/**
 	 * Resolve dependencies and preload them in the requested order.
