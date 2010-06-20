@@ -26,6 +26,6 @@ class Module extends TrinityModule
 	public function onInit(BaseApplication $application)
 	{
 		$dm = $application->getServiceLocator()->get('model.Doctrine_Manager');
-		$dm->addEntityRepository('Ent_Main', $this->getCodePath('Model/Entity'));
+		$dm->addEntityRepository('MainEntity', $this->getCodePath('Model'));
 	} // end onInit();
 } // end Module;

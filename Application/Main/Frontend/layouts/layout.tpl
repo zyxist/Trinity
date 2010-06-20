@@ -13,6 +13,8 @@
 		<opt:section name="content">
 			<opt:include from="content" />
 		</opt:section>
+
+		<p>{u:entity('copy')} Tomasz Jędrzejewski 2010</p>
 	</body>
 </html>
 </opt:root>

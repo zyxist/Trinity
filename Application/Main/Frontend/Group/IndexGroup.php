@@ -11,7 +11,30 @@ class IndexGroup extends ControllerActionGroup
 {
 	public function indexAction()
 	{
+		$session = $this->getService('web.Session');
+
+		$fooNs = $session->getNamespace('foo');
+		if(!isset($fooNs->counter))
+		{
+			$fooNs->counter = 5;
+		}
+		else
+		{
+			$fooNs->counter--;
+		}
+
+		if(!isset($fooNs->counter2))
+		{
+			$fooNs->counter2 = 5;
+			$fooNs->setLifetime('counter2', 3);
+		}
+		else
+		{
+			$fooNs->counter2--;
+		}
+
 		$this->view->addModel('date', $this->getModel('Application.Main.Model.CurrentDate'));
+		$this->view->addModel('session', $fooNs);
 
 		return $this->view;
 	} // end indexAction();
@@ -25,4 +48,4 @@ class IndexGroup extends ControllerActionGroup
 
 		return $view;
 	} // end listAction();
-} // end IndexController;
+} // end IndexGroup;

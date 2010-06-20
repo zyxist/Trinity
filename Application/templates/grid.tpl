@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <opt:root xmlns:opt="http://xml.invenzzia.org/opt">
 
-	<h1>{$title}</h1>
+	<h3>{$title}</h3>
 
 	<opt:show name="items">
 		<table class="list" width="100%" border="1">
