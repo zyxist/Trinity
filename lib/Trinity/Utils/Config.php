@@ -78,6 +78,10 @@ class Config implements Service_Configurator
 				{
 					if($id == $lastIdx)
 					{
+						if($opt == '')
+						{
+							$opt = false;
+						}
 						$aggregator->_options[$item] = $opt;
 					}
 					elseif(!isset($aggregator->_options[$item]) || !$aggregator->_options[$item] instanceof Config)
