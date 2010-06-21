@@ -14,7 +14,7 @@ use Trinity\Basement\Application as BaseApplication;
 use Trinity\Web\Controller_Exception as Web_Controller_Exception;
 use Trinity\Web\Request_Abstract as Request_Abstract;
 use Trinity\Web\Response_Abstract as Response_Abstract;
-use Trinity\WebUtils\View\ActionGroup as ActionGroupView;
+// use Trinity\WebUtils\View\ActionGroup as View_ActionGroup;
 
 /**
  * Represents a single action group for the ActionGroup controller.

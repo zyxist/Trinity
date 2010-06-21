@@ -21,7 +21,7 @@ use \Trinity\Web\View_Broker as View_Broker;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Controller_ActionGroup extends Service
+class Service_Controller_Action extends Service
 {
 	/**
 	 * List of the required dependencies.
@@ -35,19 +35,19 @@ class Service_Controller_ActionGroup extends Service
 	/**
 	 * Preconfigures and initializes the controller object.
 	 *
-	 * @return \Trinity\WebUtils\Controller\ActionGroup
+	 * @return \Trinity\WebUtils\Controller\Action
 	 */
 	public function getObject()
 	{
 		$area = $this->_serviceLocator->get('web.Area');
 		$broker = $this->_serviceLocator->get('web.Broker');
 
-		$controller = new Controller\ActionGroup(BaseApplication::getApplication());
-		$controller->setGroupDirectory($area->getCodePath('Group'));
-		$controller->setDefaults($this->defaultGroup, $this->defaultAction);
+		$controller = new Controller\Action(BaseApplication::getApplication());
+		$controller->setActionDirectory($area->getCodePath('Action'));
+		$controller->setDefaults($this->defaultAction);
 		$controller->setModelLocator($this->_serviceLocator->get('model.ModelLocator'));
 
 		$controller->dispatch($broker->getRequest(), $broker->getResponse());
 		return $controller;
 	} // end getObject();
-} // end Service_Controller_ActionGroup;
+} // end Service_Controller_Action;
