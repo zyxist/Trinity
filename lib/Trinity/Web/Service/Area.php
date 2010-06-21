@@ -49,6 +49,10 @@ class Service_Area extends Service
 		// Initialize the area discovery strategy
 		$strategy = new Strategy_File($this->areaList);
 		$strategy->setDiscoveryType($this->discoveryType, $this->_serviceLocator->get('web.Visit'));
+		if($this->defaultArea !== null)
+		{
+			$strategy->setDefaultArea($this->defaultArea);
+		}
 
 		// Initialize the area
 		$area = new Area_Standard($application, $strategy);

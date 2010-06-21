@@ -149,7 +149,7 @@ class Area_Standard extends Module
 	public function setModule($moduleName)
 	{
 		$this->_primaryModule = $this->_application->loadModule($this->_name);
-		$this->_areaModule = $this->_application->loadModule($this->_name.'.'.ucfirst($moduleName));
+		$this->_areaModule = $this->_application->loadModule(ucfirst($moduleName).'.'.$this->_name);
 	} // end setModule();
 
 	/**

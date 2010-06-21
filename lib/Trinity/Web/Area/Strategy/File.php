@@ -50,6 +50,12 @@ class Strategy_File implements Strategy_Interface
 	 */
 	private $_fileName;
 
+	/**
+	 * The name of the default area.
+	 * @var string
+	 */
+	private $_defaultArea = null;
+
 
 	/**
 	 * Constructs the strategy object.
@@ -67,10 +73,23 @@ class Strategy_File implements Strategy_Interface
 	} // end __construct();
 
 	/**
+	 * Sets the name of the default area.
+	 *
+	 * @param string $defaultArea Default area name
+	 * @return Strategy_File Fluent interface.
+	 */
+	public function setDefaultArea($defaultArea)
+	{
+		$this->_defaultArea = (string)$defaultArea;
+		return $this;
+	} // end setDefaultArea();
+
+	/**
 	 * Sets the requested discovery type.
 	 *
 	 * @param int $type Discovery type
 	 * @param Opc_Visit $visit Visit object used to grab the discovery type data.
+	 * @return Strategy_File Fluent interface.
 	 */
 	public function setDiscoveryType($type, \Opc_Visit $visit)
 	{
@@ -87,6 +106,7 @@ class Strategy_File implements Strategy_Interface
 			default:
 				throw new Area_Exception('Unknown discovery type: '.$type.'.');
 		}
+		return $this;
 	} // end setDiscoveryType();
 
 	/**
@@ -136,8 +156,18 @@ class Strategy_File implements Strategy_Interface
 			{
 				return array($name, $area);
 			}
+
+			if($name == $this->_defaultArea)
+			{
+				$store = array($name, $area);
+			}
 		}
-		throw new Area_Exception('No area matches the host '.$this->_discoveryData);
+		// Throw an exception or return the default area.
+		if(!isset($store))
+		{
+			throw new Area_Exception('No area matches the host '.$this->_discoveryData);
+		}
+		return $store;
 	} // end _discoveryHost();
 
 	/**
@@ -150,15 +180,24 @@ class Strategy_File implements Strategy_Interface
 	{
 		foreach($data as $name => $area)
 		{
-			if(!isset($area['host']))
+			if(!isset($area['path']))
 			{
-				throw new Area_Exception('Missing \'host\' attribute in '.$name.' area.');
+				throw new Area_Exception('Missing \'path\' attribute in '.$name.' area.');
 			}
-			if(stripos($this->_discoveryData, '/'.$name) === 0)
+			if(stripos($this->_discoveryData, '/'.$area['path']) === 0)
 			{
 				return array($name, $area);
 			}
+			if($name == $this->_defaultArea)
+			{
+				$store = array($name, $area);
+			}
 		}
-		throw new Area_Exception('No area matches the query path '.$this->_discoveryData);
+		// Throw an exception or return the default area.
+		if(!isset($store))
+		{
+			throw new Area_Exception('No area matches the query path '.$this->_discoveryData);
+		}
+		return $store;
 	} // end _discoveryHost();
 } // end Area_File;
