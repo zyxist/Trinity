@@ -21,6 +21,14 @@ namespace Trinity\Web\Area;
 interface Strategy_Interface
 {
 	/**
+	 * Returns the information about the specified area.
+	 *
+	 * @param string $name Area name
+	 * @return array
+	 */
+	public function getAreaOptions($name);
+
+	/**
 	 * Discoveries the area and returns the area data in a form of list(name, data).
 	 *
 	 * @return list(name, data)

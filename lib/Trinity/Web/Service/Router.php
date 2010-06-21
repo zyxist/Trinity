@@ -43,6 +43,9 @@ class Service_Router extends Service
 			$request->setParams($router->route($request->pathInfo));
 		});
 
+		// Connect to the view helpers.
+		\Trinity\Template\Helper_Url::setRouter($router);
+
 		return $router;
 	} // end getObject();
 } // end Service_Config;

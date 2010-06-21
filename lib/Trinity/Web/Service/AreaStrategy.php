@@ -14,27 +14,21 @@ use \Trinity\Basement\Service as Service;
 use \Trinity\Web\Area\Strategy_File;
 
 /**
- * The area selector.
+ * Initializes the area selection strategy.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Area extends Service
+class Service_AreaStrategy extends Service
 {
-	/**
-	 * The controller name requested by the area.
-	 * @var string
-	 */
-	private $_controllerName = null;
-
 	/**
 	 * List of services to preload.
 	 * @return array
 	 */
 	public function toPreload()
 	{
-		return array('utils.Config', 'web.Visit', 'web.Broker', 'web.AreaStrategy');
+		return array('utils.Config', 'web.Visit');
 	} // end toPreload();
 
 	/**
@@ -44,30 +38,17 @@ class Service_Area extends Service
 	 */
 	public function getObject()
 	{
-		$application = \Trinity\Basement\Application::getApplication();
-		$request = $this->_serviceLocator->get('web.Broker')->getRequest();
-
-		// Initialize the area
-		$area = new Area_Standard($application, $this->_serviceLocator->get('web.AreaStrategy'));
-		$area->setModule($request->getParam('module', $this->defaultModule));
-		$request->setArea($area);
-
-		// Get the controller name
-		$this->_controllerName = $area->getController();
-
-		return $area;
-	} // end getObject();
-
-	/**
-	 * List of services to postload.
-	 * @return array
-	 */
-	public function toPostload()
-	{
-		if($this->_controllerName !== null)
+		// Initialize the area discovery strategy
+		$strategy = new Strategy_File($this->areaList);
+		$strategy->setDiscoveryType($this->discoveryType, $this->_serviceLocator->get('web.Visit'));
+		if($this->defaultArea !== null)
 		{
-			return array($this->_controllerName);
+			$strategy->setDefaultArea($this->defaultArea);
 		}
-		return array();
-	} // end toPostload();
-} // end Service_Config;
+
+		// Connect to the view helpers.
+		\Trinity\Template\Helper_Url::setStrategy($strategy);
+
+		return $strategy;
+	} // end getObject();
+} // end Service_AreaStrategy;

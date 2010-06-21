@@ -11,6 +11,7 @@
  */
 namespace Trinity\Web;
 use \Trinity\Basement\Service as Service;
+use \Opt_Class;
 
 /**
  * The Open Power Template instance builder.
@@ -39,7 +40,8 @@ class Service_Opt extends Service
 	{
 		$area = $this->_serviceLocator->get('web.Area');
 
-		$opt = new \Opt_Class;
+		// Create the OPT instance.
+		$opt = new Opt_Class;
 		$opt->compileDir = $this->compileDir;
 		$opt->sourceDir = array(
 			'file' => $this->appTemplates,
@@ -55,6 +57,10 @@ class Service_Opt extends Service
 			$options['stripWhitespaces'] = false;
 		}
 		$opt->loadConfig($options);
+
+		// Register helpers.
+		$opt->register(Opt_Class::PHP_FUNCTION, 'baseUrl', '\Trinity\Template\Helper_Url::baseUrl');
+		$opt->register(Opt_Class::PHP_FUNCTION, 'url', '\Trinity\Template\Helper_Url::url');
 
 		return $opt;
 	} // end getObject();

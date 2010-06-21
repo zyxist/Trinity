@@ -8,8 +8,6 @@
  *
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
- *
- * $Id$
  */
 
 namespace Trinity\Web;
@@ -84,6 +82,9 @@ class Application extends Base_Application implements Service_Configurator
 		// Ensure that the configuration will always be loaded in the first place in
 		// order to configure it as a new configurator.
 		$this->getServiceLocator()->get('utils.Config');
+
+		// Load the application module.
+		$module = $this->loadModule('');
 
 		// Now you can do the rest.
 		$obj = $this->getServiceLocator()->get('web.Area');

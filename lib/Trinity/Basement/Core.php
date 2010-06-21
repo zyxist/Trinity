@@ -1354,7 +1354,7 @@ abstract class Application
 		{
 			$name = '\\'.$name;
 		}
-		$this->_moduleNamespace = $name;
+		$this->_namespace = $name;
 
 
 		if($path[strlen($path) - 1] != '/')
@@ -1409,9 +1409,14 @@ abstract class Application
 		$path = $this->_path.str_replace('.', '/', $moduleName).'/';
 		if(file_exists($path.'Module.php'))
 		{
-			
-			$className = $this->_namespace.'\\'.str_replace('.', '\\', $moduleName).'\\Module';
-
+			if($moduleName == '')
+			{
+				$className = $this->_namespace.'\\Module';
+			}
+			else
+			{
+				$className = $this->_namespace.'\\'.str_replace('.', '\\', $moduleName).'\\Module';
+			}
 			$object = new $className($moduleName, $path);
 
 			if(!$object instanceof Module)

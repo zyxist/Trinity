@@ -56,6 +56,17 @@ class Strategy_File implements Strategy_Interface
 	 */
 	private $_defaultArea = null;
 
+	/**
+	 * Name of the discoveried area.
+	 */
+	private $_discoveriedArea = null;
+
+	/**
+	 * The list of available areas.
+	 * @var array
+	 */
+	private $_areas;
+
 
 	/**
 	 * Constructs the strategy object.
@@ -120,32 +131,58 @@ class Strategy_File implements Strategy_Interface
 	} // end getDiscoveryType();
 
 	/**
+	 * Returns the information about the specified area.
+	 *
+	 * @throws Area_Exception
+	 * @param string $name Area name
+	 * @return array
+	 */
+	public function getAreaOptions($name)
+	{
+		if($this->_areas === null)
+		{
+			$this->_loadAreas();
+		}
+		if(!isset($this->_areas[$name]))
+		{
+			throw new Area_Exception('Unknown area: '.$name.'.');
+		}
+		return $this->_areas[$name];
+	} // end getAreaOptions();
+
+	/**
 	 * Discoveries the area from a file.
 	 *
 	 * @return array
 	 */
 	public function discoverArea()
 	{
-		$data = parse_ini_file($this->_fileName, true);
+		if($this->_areas === null)
+		{
+			$this->_loadAreas();
+		}
+		if($this->_discoveriedArea !== null)
+		{
+			return array($name, $this->_areas[$this->_discoveriedArea]);
+		}
 		if($this->_discoveryType == self::DISCOVERY_HOST)
 		{
-			return $this->_discoveryHost($data);
+			return $this->_discoveryHost();
 		}
 		else
 		{
-			return $this->_discoveryQueryPath($data);
+			return $this->_discoveryQueryPath();
 		}
 	} // end discoverArea();
 
 	/**
 	 * Discoveries the area from host.
 	 *
-	 * @param string $data The loaded area description file.
 	 * @return array
 	 */
-	private function _discoveryHost($data)
+	private function _discoveryHost()
 	{
-		foreach($data as $name => $area)
+		foreach($this->_areas as $name => $area)
 		{
 			if(!isset($area['host']))
 			{
@@ -154,6 +191,7 @@ class Strategy_File implements Strategy_Interface
 
 			if(preg_match($area['host'], $this->_discoveryData))
 			{
+				$this->_discoveriedArea = $name;
 				return array($name, $area);
 			}
 
@@ -167,18 +205,18 @@ class Strategy_File implements Strategy_Interface
 		{
 			throw new Area_Exception('No area matches the host '.$this->_discoveryData);
 		}
+		$this->_discoveriedArea = $name;
 		return $store;
 	} // end _discoveryHost();
 
 	/**
 	 * Discoveries the area from query path.
 	 *
-	 * @param string $data The loaded area description file.
 	 * @return array
 	 */
-	private function _discoveryQueryPath($data)
+	private function _discoveryQueryPath()
 	{
-		foreach($data as $name => $area)
+		foreach($this->_areas as $name => $area)
 		{
 			if(!isset($area['path']))
 			{
@@ -186,6 +224,7 @@ class Strategy_File implements Strategy_Interface
 			}
 			if(stripos($this->_discoveryData, '/'.$area['path']) === 0)
 			{
+				$this->_discoveriedArea = $name;
 				return array($name, $area);
 			}
 			if($name == $this->_defaultArea)
@@ -198,6 +237,16 @@ class Strategy_File implements Strategy_Interface
 		{
 			throw new Area_Exception('No area matches the query path '.$this->_discoveryData);
 		}
+		$this->_discoveriedArea = $name;
 		return $store;
 	} // end _discoveryHost();
+
+	private function _loadAreas()
+	{
+		$this->_areas = parse_ini_file($this->_fileName, true);
+		if(!is_array($this->_areas))
+		{
+			throw new Area_Exception('Error while loading the area definition file.');
+		}
+	} // end _loadAreas();
 } // end Area_File;
