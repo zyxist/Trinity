@@ -51,6 +51,12 @@ abstract class Response_Abstract
 	private $_headersSent = false;
 
 	/**
+	 * Body generator
+	 * @var callback
+	 */
+	private $_bodyGenerator = null;
+
+	/**
 	 * If set to true, an exception is throw if the headers
 	 * have already been sent.
 	 * @var boolean
@@ -150,6 +156,33 @@ abstract class Response_Abstract
 	} // end getResponseCode();
 
 	/**
+	 * Sets the body generator.
+	 *
+	 * @param callback $generator Body generator callback
+	 * @return Response_Abstract Fluent interface.
+	 */
+	public function setBodyGenerator($generator)
+	{
+		if(!is_callable($generator))
+		{
+			throw new Response_Exception('The specified body generator is not a valid callback.');
+		}
+		$this->_bodyGenerator = $generator;
+
+		return $this;
+	} // end setBodyGenerator;
+
+	/**
+	 * Returns the current body generator.
+	 *
+	 * @return callback
+	 */
+	public function getBodyGenerator()
+	{
+		return $this->_bodyGenerator;
+	} // end getBodyGenerator();
+
+	/**
 	 * Sets the HTTP body.
 	 * @param string $body The HTTP body
 	 */
@@ -211,7 +244,15 @@ abstract class Response_Abstract
 	public function sendBody()
 	{
 		$this->_headersSent = true;
-		echo $this->_body;
+
+		if($this->_bodyGenerator === null)
+		{
+			echo $this->_body;
+		}
+		else
+		{
+			call_user_func($this->_bodyGenerator);
+		}
 	} // end sendBody();
 
 	/**

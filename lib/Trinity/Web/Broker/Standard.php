@@ -44,7 +44,7 @@ class Broker_Standard extends Broker_Abstract
 	 */
 	public function buildResponse()
 	{
-		$this->setResponse($response = new Response_Opt());
+		$this->setResponse($response = new Response_Http());
 
 		$this->_application->getEventManager()->fire('web.broker.response.create', array(
 			'response' => $response

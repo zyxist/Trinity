@@ -88,7 +88,7 @@ abstract class View_Html extends View
 	{
 		if($this->_layout === null)
 		{
-			$this->_layout = $this->_application->getServiceLocator()->get('web.Layout');
+			$this->_layout = $this->_application->getServiceLocator()->get('template.Layout');
 		}
 		return $this->_layout;
 	} // end getViewBroker();

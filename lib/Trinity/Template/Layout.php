@@ -10,8 +10,13 @@
  * and other contributors. See website for details.
  */
 
-namespace Trinity\Web;
+namespace Trinity\Template;
 use Trinity\Basement\Application as BaseApplication;
+use Trinity\Web\View_Broker;
+use Trinity\Web\Request_Abstract;
+use Trinity\Web\Response_Abstract;
+use Opt_View;
+use Opt_Output_Interface;
 
 /**
  * The layout manager for Open Power Template.
@@ -66,7 +71,7 @@ class Layout implements View_Broker
 	 * Disables the layout services. The programmer must render the views
 	 * manually. Implements fluent interface.
 	 *
-	 * @return Trinity\Web\Layout Fluent interface.
+	 * @return Trinity\Template\Layout Fluent interface.
 	 */
 	public function disableLayout()
 	{
@@ -79,12 +84,11 @@ class Layout implements View_Broker
 	 * Enables the layout services. Implements
 	 * fluent interface.
 	 *
-	 * @return Trinity\Web\Layout Fluent interface.
+	 * @return Trinity\Template\Layout Fluent interface.
 	 */
 	public function enableLayout()
 	{
-		$opt = \Opl_Registry::get('opt');
-		self::$_mvc->_layout = new \Opt_View($this->_layoutName);
+		$this->_layout = new Opt_View($this->_layoutName);
 
 		return $this;
 	} // end enableLayout();
@@ -115,7 +119,7 @@ class Layout implements View_Broker
 		}
 		else
 		{
-			$this->_layout = new \Opt_View($name.'.tpl');
+			$this->_layout = new Opt_View($name.'.tpl');
 		}
 	} // end setLayout();
 
@@ -139,9 +143,9 @@ class Layout implements View_Broker
 	 *
 	 * @param \Opt_View $view View object.
 	 * @param string $placeholder optional Placeholder name.
-	 * @return Trinity\Web\Layout
+	 * @return Trinity\Template\Layout Fluent interface.
 	 */
-	public function appendView(\Opt_View $view, $placeholder = 'content')
+	public function appendView(Opt_View $view, $placeholder = 'content')
 	{
 		if(!isset($this->_placeholders[$placeholder]))
 		{
@@ -160,9 +164,9 @@ class Layout implements View_Broker
 	 *
 	 * @param \Opt_View $view View object.
 	 * @param string $placeholder optional Placeholder name.
-	 * @return Trinity\Web\Layout
+	 * @return Trinity\Template\Layout
 	 */
-	public function prependView(\Opt_View $view, $placeholder = 'content')
+	public function prependView(Opt_View $view, $placeholder = 'content')
 	{
 		if(!isset($this->_placeholders[$placeholder]))
 		{
@@ -177,38 +181,28 @@ class Layout implements View_Broker
 	} // end prependView();
 
 	/**
-	 * Sets the OPT output system used to render the page.
+	 * Not needed in this particular case.
 	 *
-	 * @param \Opt_Output_Interface $output New output interface
+	 * @param Request_Abstract $request
 	 */
-	public function setOutput(\Opt_Output_Interface $output)
-	{
-		$this->_output = $output;
-	} // end setOutput();
-
-	/**
-	 * Returns the current output system used to render the page.
-	 *
-	 * @return \Opt_Output_Interface
-	 */
-	public function getOutput()
-	{
-		if($this->_output === null)
-		{
-			$this->_output = new \Opt_Output_Http;
-		}
-
-		return $this->_output;
-	} // end getOutput();
-
 	public function setRequest(Request_Abstract $request)
 	{
-
+		/* null */
 	} // end setRequest();
 
+	/**
+	 * Configures the response object to capture the output from this
+	 * view broker.
+	 *
+	 * @param Response_Abstract $response The response object.
+	 */
 	public function setResponse(Response_Abstract $response)
 	{
-
+		$this->_output = $output = new Output;
+		$response->setBodyGenerator(function() use($output)
+		{
+			$output->sendBody();
+		});
 	} // end setResponse();
 
 	/**
@@ -223,16 +217,16 @@ class Layout implements View_Broker
 		$eventManager = $this->_application->getEventManager();
 
 		// Finish configuring Open Power Template
-		$opt = $serviceLocator->get('web.Opt');
+		$opt = $serviceLocator->get('template.Opt');
 
-		$eventManager->fire('web.layout.template.configure',
+		$eventManager->fire('template.layout.template.configure',
 			array('opt' => $opt)
 		);
 
 		$opt->setup();
 
 		// Configure the layout view
-		$eventManager->fire('web.layout.configure',
+		$eventManager->fire('template.layout.configure',
 			array('layout' => $this->_layout)
 		);
 
@@ -249,8 +243,9 @@ class Layout implements View_Broker
 
 		// Render everything. Actually, this is redirected to events, so
 		// that we can easily change the exact rendering procedure.
-		$eventManager->fire('web.layout.render',
+		$eventManager->fire('template.layout.render',
 			array('layout' => $this->_layout)
 		);
+		$this->_output->render($this->_layout);
 	} // end display();
 } // end Layout;

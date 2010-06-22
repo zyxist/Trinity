@@ -9,16 +9,20 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+
+namespace Trinity\Template;
+use \Opt_Output_Interface;
 
 /**
- * The response object integrated with Open Power Template.
+ * The output interface for Open Power Template that redirects the rendered
+ * template to the response object. It should be injected as a body generator
+ * to the response.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Response_Opt extends Response_Abstract implements \Opt_Output_Interface
+class Output implements Opt_Output_Interface
 {
 	/**
 	 * The template mode used by OPT.
@@ -44,7 +48,7 @@ class Response_Opt extends Response_Abstract implements \Opt_Output_Interface
 
 	/**
 	 * Stores the OPT view object for further rendering.
-	 * 
+	 *
 	 * @param Opt_View $view The view object to render.
 	 */
 	public function render(\Opt_View $view)
@@ -54,6 +58,7 @@ class Response_Opt extends Response_Abstract implements \Opt_Output_Interface
 
 	/**
 	 * Sends the body to the browser.
+	 *
 	 * @return mixed
 	 */
 	public function sendBody()
@@ -72,4 +77,4 @@ class Response_Opt extends Response_Abstract implements \Opt_Output_Interface
 
 		return $result;
 	} // end render();
-} // end Response_Opt;
+} // end Output;

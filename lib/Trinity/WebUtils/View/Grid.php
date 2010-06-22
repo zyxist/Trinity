@@ -57,7 +57,7 @@ class Grid extends View_Html
 			$view->noDataMessage = $model->getMessage('noData');
 		}
 
-		$layout = $this->_application->getServiceLocator()->get('web.Layout');
+		$layout = $this->_application->getServiceLocator()->get('template.Layout');
 		$layout->appendView($view);
 	} // end dispatch();
 

@@ -58,7 +58,7 @@ class ActionGroup extends View_Html
 
 		$view = $this->getTemplateObject();
 
-		$layout = $this->_application->getServiceLocator()->get('web.Layout');
+		$layout = $this->_application->getServiceLocator()->get('template.Layout');
 		$layout->appendView($view);
 	} // end dispatch();
 } // end ActionGroup;

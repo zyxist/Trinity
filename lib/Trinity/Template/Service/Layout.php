@@ -9,7 +9,7 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Template;
 use \Trinity\Basement\Service as Service;
 
 /**
@@ -28,7 +28,7 @@ class Service_Layout extends Service
 	 */
 	public function toPreload()
 	{
-		return array('web.Broker', 'web.Opt');
+		return array('web.Broker', 'template.Opt');
 	} // end toPreload();
 
 	/**

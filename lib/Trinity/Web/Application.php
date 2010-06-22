@@ -72,6 +72,7 @@ class Application extends Base_Application implements Service_Configurator
 	protected function _launch()
 	{
 		$locator = $this->getServiceLocator();
+		$locator->addServiceGroup('template', '\Trinity\Template\Service_');
 		$locator->addServiceGroup('web', '\Trinity\Web\Service_');
 		$locator->addServiceGroup('webUtils', '\Trinity\WebUtils\Service_');
 

@@ -44,13 +44,6 @@ class Service_Broker extends Service
 		$broker->buildResponse();
 
 		// Connect some broker events
-		$application->getEventManager()->addCallback('web.layout.render', function($args) use($broker){
-			$response = $broker->getResponse();
-			if($response instanceof Response_Opt)
-			{
-				$response->render($args['layout']);
-			}
-		});
 		$application->getEventManager()->addCallback('controller.web.dispatch.end', function($args) use($broker){
 			$viewBroker = $args['controller']->getViewBroker();
 			$viewBroker->setRequest($args['request']);
