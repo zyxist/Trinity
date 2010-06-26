@@ -45,4 +45,11 @@ interface Router_Interface
 	 * @param mixed $value The variable value.
 	 */
 	public function setParam($name, $value);
+
+	/**
+	 * Sets the predefined router variables.
+	 *
+	 * @param mixed $variables The list of router variables.
+	 */
+	public function setParams(array $variables);
 } // end Router_Interface;

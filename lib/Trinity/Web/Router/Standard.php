@@ -56,15 +56,22 @@ class Router_Standard implements Router_Interface
 	private $_queryPath;
 
 	/**
+	 * The base URL.
+	 * @var string
+	 */
+	private $_baseUrl;
+
+	/**
 	 * Creates the router.
 	 *
 	 * @param \Trinity\Web\Area\Strategy_Interface $areaStrategy Area strategy
 	 * @param string $queryPath The query path
 	 */
-	public function __construct($areaStrategy, $queryPath)
+	public function __construct($areaStrategy, $queryPath, $baseUrl)
 	{
 		$this->_areaStrategy = $areaStrategy;
 		$this->_queryPath = $queryPath;
+		$this->_baseUrl = $baseUrl;
 	} // end __construct();
 
 	/**
@@ -197,9 +204,10 @@ class Router_Standard implements Router_Interface
 	 * @throws Router_Exception
 	 * @param array $sVars An array of parameters
 	 * @param string $area The area name.
+	 * @param boolean $fullyQualified Use fully qualified paths?
 	 * @return string
 	 */
-	public function assemble(array $sVars, $area = null)
+	public function assemble(array $sVars, $area = null, $fullyQualified = false)
 	{
 		if(!is_array($sVars))
 		{
@@ -208,7 +216,15 @@ class Router_Standard implements Router_Interface
 		$sVars = array_merge($this->_params, $sVars);
 
 		$address = '/';
-		$baseUrl = ltrim($this->_queryPath, '/');
+		if($fullyQualified)
+		{
+			$baseUrl = $this->_baseUrl.ltrim($this->_queryPath, '/');
+		}
+		else
+		{
+			$baseUrl = ltrim($this->_queryPath, '/');
+		}
+		
 
 		// Route to other area
 		if($area !== null)
@@ -313,4 +329,17 @@ class Router_Standard implements Router_Interface
 	{
 		$this->_params[(string)$name] = $value;
 	} // end setParam();
+
+	/**
+	 * Sets the predefined router variables.
+	 *
+	 * @param mixed $variables The list of router variables.
+	 */
+	public function setParams(array $variables)
+	{
+		foreach($variables as $name => $value)
+		{
+			$this->_params[(string)$name] = $value;
+		}
+	} // end setParams();
 } // end Router_Standard;
