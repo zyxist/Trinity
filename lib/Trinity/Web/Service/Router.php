@@ -24,6 +24,15 @@ use \Trinity\Basement\Service as Service;
 class Service_Router extends Service
 {
 	/**
+	 * List of services to preload.
+	 * @return array
+	 */
+	public function toPreload()
+	{
+		return array('web.AreaStrategy', 'utils.Config');
+	} // end toPreload();
+
+	/**
 	 * Preconfigures and initializes the configuration object.
 	 *
 	 * @return Config
@@ -31,8 +40,10 @@ class Service_Router extends Service
 	public function getObject()
 	{
 		$application = \Trinity\Basement\Application::getApplication();
+
+		$config = $this->_serviceLocator->get('utils.Config');
 		// Initialize the router
-		$router = new Router_Standard();
+		$router = new Router_Standard($this->_serviceLocator->get('web.AreaStrategy'), $config->queryPath);
 
 		require($this->routes);
 

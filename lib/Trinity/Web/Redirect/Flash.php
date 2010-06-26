@@ -17,6 +17,6 @@ class Redirect_Flash extends Redirect_Exception
 
 	public function __construct($route, $message)
 	{
-		parent::__construct($router, 303, $message);
+		parent::__construct($route, 303, $message);
 	} // end __construct();
 } // end Redirect_Flash;

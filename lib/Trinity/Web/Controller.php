@@ -100,6 +100,9 @@ abstract class Controller implements CoreController
 	public function dispatch(Request_Abstract $request, Response_Abstract $response)
 	{
 		$eventManager = $this->_application->getEventManager();
+		$router = $this->_application->getServiceLocator()->get('web.Router');
+		$area = $this->_application->getServiceLocator()->get('web.Area');
+		$router->setParam('area', $area->getName());
 
 		$eventManager->fire('controller.web.dispatch.begin', array(
 			'controller' => $this,
@@ -119,6 +122,8 @@ abstract class Controller implements CoreController
 		}
 		catch(Redirect_Exception $redirect)
 		{
+			$url = $redirect->getRoute();
+			$response->setRedirect($url, $redirect->getCode());
 			// TODO: Add a true redirection here
 			$eventManager->fire('controller.web.dispatch.redirect', array(
 				'controller' => $this,

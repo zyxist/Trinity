@@ -28,7 +28,7 @@ interface Router_Interface
 	 * @param array $vars The route variables.
 	 * @return string
 	 */
-	public function assemble(array $vars);
+	public function assemble(array $vars, $area = null);
 
 	/**
 	 * Matches the path to the routing rules and extracts the arguments.
@@ -37,4 +37,12 @@ interface Router_Interface
 	 * @return array
 	 */
 	public function route($path);
+
+	/**
+	 * Sets the predefined router var.
+	 *
+	 * @param string $name The variable name
+	 * @param mixed $value The variable value.
+	 */
+	public function setParam($name, $value);
 } // end Router_Interface;

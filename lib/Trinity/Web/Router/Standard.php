@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\Web;
+use \Trinity\Web\Area\Strategy_Interface;
 
 /**
  * The standard router implementation.
@@ -37,21 +38,34 @@ class Router_Standard implements Router_Interface
 	private $_path = null;
 
 	/**
-	 * Should we generate an URL with the fully qualified path?
-	 * @var boolean
+	 * The router predefined parameters.
+	 * @var array
 	 */
-	private $_fqPath;
+	private $_params = array();
 
 	/**
-	 * Sets the fully qualified path status, i.e. for generating URL-s
-	 * for redirection.
-	 *
-	 * @param boolean $fqPath The new status
+	 * The area strategy used for building inter-area routes.
+	 * @var \Trinity\Web\Area\Strategy_Interface
 	 */
-	public function setFullyQualifiedPath($fqPath)
+	private $_areaStrategy;
+
+	/**
+	 * The query path.
+	 * @var string
+	 */
+	private $_queryPath;
+
+	/**
+	 * Creates the router.
+	 *
+	 * @param \Trinity\Web\Area\Strategy_Interface $areaStrategy Area strategy
+	 * @param string $queryPath The query path
+	 */
+	public function __construct($areaStrategy, $queryPath)
 	{
-		$this->_fqPath = (boolean)$fqPath;
-	} // end setFullyQualifiedPath();
+		$this->_areaStrategy = $areaStrategy;
+		$this->_queryPath = $queryPath;
+	} // end __construct();
 
 	/**
 	 * Adds a routing pattern to the router.
@@ -176,19 +190,46 @@ class Router_Standard implements Router_Interface
 	} // end createParams();
 
 	/**
-	 * Returns an URL for the specified parameter list.
+	 * Returns an URL for the specified parameter list. If the area name
+	 * is not specified, we assume that the route links to the current
+	 * area.
 	 *
-	 * @param Router_Exception
+	 * @throws Router_Exception
 	 * @param array $sVars An array of parameters
+	 * @param string $area The area name.
 	 * @return string
 	 */
-	public function assemble(array $sVars)
+	public function assemble(array $sVars, $area = null)
 	{
 		if(!is_array($sVars))
 		{
 			throw new Router_Exception('The variable list passed to router is not an array.');
 		}
+		$sVars = array_merge($this->_params, $sVars);
+
 		$address = '/';
+		$baseUrl = ltrim($this->_queryPath, '/');
+
+		// Route to other area
+		if($area !== null)
+		{
+			$opts = $this->_areaStrategy->getAreaOptions($area);
+
+			if(isset($opts['baseUrl']))
+			{
+				if($opts['baseUrl'][strlen($opts['baseUrl']) - 1] == '/')
+				{
+					$address = '';
+					$baseUrl = $opts['baseUrl'];
+				}
+			}
+			else
+			{
+				$sVars['area'] = $area;
+			}
+		}
+
+		// Build the argument list
 		foreach($this->patterns as $pattern)
 		{
 			$vars = $sVars;
@@ -249,24 +290,27 @@ class Router_Standard implements Router_Interface
 			}
 			break;
 		}
-		if($address[0] == '/')
-		{
-			$path = rtrim($this->_path, '/');
-		}
-		else
-		{
-			$path = $this->_path;
-		}
 
 		if($address == '/')
 		{
-			return $path.'?'.http_build_query($vars, '');
+			return $baseUrl.'?'.http_build_query($vars, '');
 		}
 
 		if(sizeof($vars) > 0)
 		{
-			return $path.$address.'?'.http_build_query($vars, '');
+			return $baseUrl.$address.'?'.http_build_query($vars, '');
 		}
-		return $path.$address;
+		return $baseUrl.$address;
 	} // end assemble();
+
+	/**
+	 * Sets the default router parameter.
+	 *
+	 * @param string $name
+	 * @param string $value
+	 */
+	public function setParam($name, $value)
+	{
+		$this->_params[(string)$name] = $value;
+	} // end setParam();
 } // end Router_Standard;

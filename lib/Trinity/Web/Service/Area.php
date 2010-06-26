@@ -34,7 +34,7 @@ class Service_Area extends Service
 	 */
 	public function toPreload()
 	{
-		return array('utils.Config', 'web.Visit', 'web.Broker', 'web.AreaStrategy');
+		return array('web.AreaStrategy', 'utils.Config', 'web.Visit', 'web.Broker');
 	} // end toPreload();
 
 	/**

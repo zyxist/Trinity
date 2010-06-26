@@ -132,6 +132,28 @@ abstract class Response_Abstract
 	} // end removeHeader();
 
 	/**
+	 * Produces the redirect.
+	 *
+	 * @param string $url A fully qualified URL
+	 * @param int $responseCode The response code.
+	 */
+	public function setRedirect($url, $responseCode = 302)
+	{
+		$this->setHeader('Location', $url, true)
+			->setResponseCode($responseCode);
+	} // end setRedirect();
+
+	/**
+	 * Checks, if the response is a redirection.
+	 *
+	 * @return boolean
+	 */
+	public function isRedirect()
+	{
+		return isset($this->_headers['Location']);
+	} // end isRedirect();
+
+	/**
 	 * Sets the response code for this response.
 	 * 
 	 * @param int $code The HTTP response code.
@@ -261,7 +283,10 @@ abstract class Response_Abstract
 	public function sendResponse()
 	{
 		$this->sendHeaders();
-		$this->sendBody();
+		if(!$this->isRedirect())
+		{
+			$this->sendBody();
+		}
 	} // end sendResponse();
 
 	/**
