@@ -43,7 +43,7 @@ class Service_Router extends Service
 
 		$config = $this->_serviceLocator->get('utils.Config');
 		// Initialize the router
-		$router = new Router_Standard($this->_serviceLocator->get('web.AreaStrategy'), $config->queryPath);
+		$router = new Router_Standard($this->_serviceLocator->get('web.AreaStrategy'), $config->queryPath, $config->baseUrl);
 
 		require($this->routes);
 
