@@ -110,6 +110,7 @@ abstract class Controller implements CoreController
 			'response' => $response
 		));
 
+		$router->setParams($request->getParams());
 		try
 		{
 			$this->_dispatch($request, $response);
@@ -123,6 +124,12 @@ abstract class Controller implements CoreController
 		catch(Redirect_Exception $redirect)
 		{
 			$url = $redirect->getRoute();
+
+			if($redirect instanceof Redirect_Flash)
+			{
+				$this->_processFlashMessage($redirect);
+			}
+
 			$response->setRedirect($url, $redirect->getCode());
 			// TODO: Add a true redirection here
 			$eventManager->fire('controller.web.dispatch.redirect', array(
@@ -154,6 +161,21 @@ abstract class Controller implements CoreController
 
 		$view->dispatch();
 	} // end _processView();
+
+	/**
+	 * Processes the flash message.
+	 * 
+	 * @param Redirect_Flash $flash The flash redirection
+	 */
+	protected function _processFlashMessage(Redirect_Flash $flash)
+	{
+		$session = $this->_application->getServiceLocator()->get('web.Session');
+		$ns = $session->getNamespace('flash');
+		$ns->message = $flash->getMessage();
+		$ns->type = $flash->getType();
+		$ns->setLifetime('message', 1);
+		$ns->setLifetime('type', 1);
+	} // end _processFlashMessage();
 
 	/**
 	 * The concrete dispatching procedure should go here.

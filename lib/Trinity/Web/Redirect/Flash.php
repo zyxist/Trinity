@@ -14,9 +14,16 @@ namespace Trinity\Web;
 
 class Redirect_Flash extends Redirect_Exception
 {
+	private $_type;
 
-	public function __construct($route, $message)
+	public function __construct($route, $message, $type = null)
 	{
 		parent::__construct($route, 303, $message);
+		$this->_type = $type;
 	} // end __construct();
+
+	public function getType()
+	{
+		return $this->_type;
+	} // end getType();
 } // end Redirect_Flash;

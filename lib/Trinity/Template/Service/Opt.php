@@ -11,6 +11,7 @@
  */
 namespace Trinity\Template;
 use \Trinity\Basement\Service as Service;
+use \Trinity\Basement\Application as BaseApplication;
 use \Opt_Class;
 
 /**
@@ -61,6 +62,15 @@ class Service_Opt extends Service
 		// Register helpers.
 		$opt->register(Opt_Class::PHP_FUNCTION, 'baseUrl', '\Trinity\Template\Helper_Url::baseUrl');
 		$opt->register(Opt_Class::PHP_FUNCTION, 'url', '\Trinity\Template\Helper_Url::url');
+
+		$eventManager = BaseApplication::getApplication()->getEventManager();
+		$serviceLocator = $this->_serviceLocator;
+		$eventManager->addCallback('template.layout.configure', function($args) use($serviceLocator)
+		{
+			$session = $serviceLocator->get('web.Session');
+			\Opt_View::assignGlobal('flash', $session->getNamespace('flash'));
+			\Opt_View::setFormatGlobal('flash', 'Global/Objective', false);
+		});
 
 		return $opt;
 	} // end getObject();
