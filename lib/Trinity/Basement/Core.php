@@ -103,9 +103,9 @@ abstract class View
 	 *
 	 * @throws Core_Exception
 	 * @param string $name The name of the model
-	 * @param Model $model The concrete model object.
+	 * @param $model The concrete model object.
 	 */
-	public function addModel($name, Model $model)
+	public function addModel($name, $model)
 	{
 		if(isset($this->_models[$name]))
 		{
