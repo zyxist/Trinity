@@ -41,6 +41,9 @@ class Service_ModelLocator extends Service
 			}
 		);
 
+		// Preload the model interfaces.
+		spl_autoload_call('\\Trinity\\Model\\Interfaces');
+
 		return $locator;
 	} // end getObject();
 } // end Service_ModelLocator;

@@ -12,13 +12,13 @@
 namespace Trinity\Model\Report;
 
 /**
- * Informs that the requested item has not been found.
+ * Reports integrity errors.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class NotFound extends \Trinity\Model\Report
+class Integrity extends \Trinity\Model\Report
 {
 	/* null */
-} // end NotFound;
+} // end Integrity;
