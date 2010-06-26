@@ -9,11 +9,5 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Model;
 
-interface Interface_Grid
-{
-	public function getColumnHeaders();
-	public function getItems();
-	public function getMessage($name);
-} // end Interface_Grid;
+spl_autoload_call('\\Trinity\\Model\\Interfaces');

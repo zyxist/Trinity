@@ -9,9 +9,4 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Model;
-
-interface Interface_PersistentIdentity
-{
-	public function getPersistentIdentity($id, $accountType);
-} // end Interface_PersistentIdentity;
+spl_autoload_call('\\Trinity\\Model\\Interfaces');
