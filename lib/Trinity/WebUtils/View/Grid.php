@@ -15,6 +15,10 @@ use \Trinity\Basement\Application as BaseApplication;
 use \Trinity\Web\View as WebView;
 use \Trinity\Web\View_Html as View_Html;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
+use \Trinity\Model\Interfaces\Addable as Interface_Addable;
+use \Trinity\Model\Interfaces\Editable as Interface_Editable;
+use \Trinity\Model\Interfaces\Removable as Interface_Removable;
+use \Trinity\Model\Interfaces\Movable as Interface_Movable;
 
 /**
  * This view represents a grid table of rows imported from a
@@ -46,7 +50,7 @@ class Grid extends View_Html
 	{
 		$view = $this->getTemplateObject();
 
-		$model = $this->getModel('grid', '\\Trinity\\Model\\Interface_Grid');
+		$model = $this->getModel('grid', '\\Trinity\\Model\\Interfaces\\Grid');
 
 		$view->title = $this->get('title');
 		$view->headers = $model->getColumnHeaders();
@@ -54,7 +58,24 @@ class Grid extends View_Html
 
 		if(sizeof($items) == 0)
 		{
-			$view->noDataMessage = $model->getMessage('noData');
+			$view->noDataMessage = $model->getMessage('grid.no-data');
+		}
+
+		if($model instanceof Interface_Addable)
+		{
+			$view->addAction = true;
+		}
+		if($model instanceof Interface_Editable)
+		{
+			$view->editAction = true;
+		}
+		if($model instanceof Interface_Removable)
+		{
+			$view->removeAction = true;
+		}
+		if($model instanceof Interface_Movable)
+		{
+			$view->moveActions = true;
 		}
 
 		$layout = $this->_application->getServiceLocator()->get('template.Layout');

@@ -17,23 +17,23 @@ use \Trinity\Web\View_Html as View_Html;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
 
 /**
- * This view renders a Open Power Forms form.
+ * Creates a confirmation form.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Form extends View_Html
+class Question extends View_Html
 {
 	/**
-	 * Creates the grid view.
+	 * Creates the question view.
 	 *
 	 * @param BaseApplication $application Application link.
 	 */
 	public function __construct(BaseApplication $application)
 	{
 		parent::__construct($application);
-		$this->setTemplate('app.templates:form.tpl');
+		$this->setTemplate('app.templates:question.tpl');
 	} // end __construct();
 
 	/**
@@ -42,13 +42,10 @@ class Form extends View_Html
 	public function dispatch()
 	{
 		$view = $this->getTemplateObject();
-
-		$model = $this->getModel('form', '\\Opf_Form');
-		$model->setView($view);
-		$model->render();
-		$view->title = $this->get('title');
-		$view->formName = $model->getName();
+		$model = $this->getModel('item', '\\Trinity\\Model\\Interfaces\\Brief');
+		$data = $model->getBriefInformation();
+		$view->question = 'Czy na pewno chcesz usunąć '.$data['entityName'].' "'.$data['title'].'"? Przywrócenie nie będzie możliwe!';
 		$layout = $this->_application->getServiceLocator()->get('template.Layout');
 		$layout->appendView($view);
 	} // end dispatch();
-} // end Form;
+} // end Question;
