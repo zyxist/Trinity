@@ -19,6 +19,8 @@ use \Trinity\Model\Interfaces\Addable as Interface_Addable;
 use \Trinity\Model\Interfaces\Editable as Interface_Editable;
 use \Trinity\Model\Interfaces\Removable as Interface_Removable;
 use \Trinity\Model\Interfaces\Movable as Interface_Movable;
+use \Trinity\Model\Interfaces\Paginable as Interface_Paginable;
+use \Opc_Paginator;
 
 /**
  * This view represents a grid table of rows imported from a
@@ -52,6 +54,19 @@ class Grid extends View_Html
 
 		$model = $this->getModel('grid', '\\Trinity\\Model\\Interfaces\\Grid');
 
+		// Add pagination
+		if($model instanceof Interface_Paginable)
+		{
+			$paginator = Opc_Paginator::create($model->count());
+			$paginator->page = $this->get('page');
+
+			$model->setLimit($paginator->limit, $paginator->offset);
+			$view->paginator = $paginator;
+			$view->setFormat('paginator', 'Objective/Array');
+			$view->setFormat('paginator.decorator', 'Objective');
+		}
+
+		// Get the rows
 		$view->title = $this->get('title');
 		$view->headers = $model->getColumnHeaders();
 		$view->items = $items = $model->getItems();
@@ -61,6 +76,7 @@ class Grid extends View_Html
 			$view->noDataMessage = $model->getMessage('grid.no-data');
 		}
 
+		// Check extra stuff
 		if($model instanceof Interface_Addable)
 		{
 			$view->addAction = true;
@@ -78,6 +94,7 @@ class Grid extends View_Html
 			$view->moveActions = true;
 		}
 
+		// Display the layout
 		$layout = $this->_application->getServiceLocator()->get('template.Layout');
 		$layout->appendView($view);
 	} // end dispatch();

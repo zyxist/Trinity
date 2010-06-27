@@ -29,7 +29,7 @@ class Service_Controller_ActionGroup extends Service
 	 */
 	public function toPreload()
 	{
-		return array('web.Router', 'web.Area', 'web.Session', 'model.ModelLocator', 'template.Opf');
+		return array('web.Router', 'web.Area', 'web.Session', 'model.ModelLocator', 'template.Opf', 'utils.Opc');
 	} // end toPreload();
 
 	/**
