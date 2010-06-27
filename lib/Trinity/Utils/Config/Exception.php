@@ -9,7 +9,7 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Model;
+namespace Trinity\Utils;
 use \Trinity\Basement\Exception as Core_Exception;
 
 /**
