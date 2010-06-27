@@ -91,6 +91,7 @@ abstract class Crud extends Controller_Action_Group
 
 		$view->addModel('grid', $model);
 		$view->set('title', $model->getMessage('crud.title'));
+		$view->set('page', $this->getRequest()->getParam('page', 1));
 		return $view;
 	} // end indexAction();
 
@@ -116,10 +117,6 @@ abstract class Crud extends Controller_Action_Group
 			catch(\Trinity\Model\Report $report)
 			{
 				$flashMessage = $report->getMessage();
-			}
-			catch(\Exception $exception)
-			{
-				var_dump(get_class($exception));
 			}
 			throw new Redirect_Flash($router->assemble(array('action' => 'index'), null, true),
 				$flashMessage
