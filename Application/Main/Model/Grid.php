@@ -6,7 +6,7 @@
  */
 namespace Application\Main\Model;
 use \Trinity\Basement\Model as Model;
-use \Trinity\Model\Interface_Grid as Interface_Grid;
+use \Trinity\Model\Interfaces\Grid as Interface_Grid;
 
 class Grid implements Model, Interface_Grid
 {

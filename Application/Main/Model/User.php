@@ -6,7 +6,7 @@
  */
 namespace Application\Main\Model;
 use \Trinity\Basement\Model as Model;
-use \Trinity\Model\Interface_Grid as Interface_Grid;
+use \Trinity\Model\Interfaces\Grid as Interface_Grid;
 use Doctrine\ORM\Query;
 
 class User implements Model, Interface_Grid
@@ -30,7 +30,6 @@ class User implements Model, Interface_Grid
 	public function getItems()
 	{
 		$entityManager = $this->_application->getServiceLocator()->get('model.Doctrine_ORM');
-
 		$query = $entityManager->createQuery('SELECT u.id, u.name, u.age FROM MainEntity\User u');
 		return $query->getResult(Query::HYDRATE_ARRAY);
 	} // end getItems();
