@@ -44,7 +44,7 @@ class Question extends View_Html
 		$view = $this->getTemplateObject();
 		$model = $this->getModel('item', '\\Trinity\\Model\\Interfaces\\Brief');
 		$data = $model->getBriefInformation();
-		$view->question = 'Czy na pewno chcesz usunąć '.$data['entityName'].' "'.$data['title'].'"? Przywrócenie nie będzie możliwe!';
+		$view->question = sprintf($model->getMessage('crud.question'), $data['title']);
 		$layout = $this->_application->getServiceLocator()->get('template.Layout');
 		$layout->appendView($view);
 	} // end dispatch();
