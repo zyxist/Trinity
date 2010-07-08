@@ -193,6 +193,15 @@ class Router_Standard implements Router_Interface
 				break;
 			}
 		}
+
+		// TODO: FIX!
+		foreach($_GET as $name => $value)
+		{
+			if(!isset($params[$name]))
+			{
+				$params[$name] = $value;
+			}
+		}
 		return $params;
 	} // end createParams();
 
@@ -218,11 +227,11 @@ class Router_Standard implements Router_Interface
 		$address = '/';
 		if($fullyQualified)
 		{
-			$baseUrl = $this->_baseUrl.ltrim($this->_queryPath, '/');
+			$baseUrl = $this->_baseUrl.trim($this->_queryPath, '/');
 		}
 		else
 		{
-			$baseUrl = ltrim($this->_queryPath, '/');
+			$baseUrl = rtrim($this->_queryPath, '/');
 		}
 		
 
