@@ -1,1 +1,4 @@
 paths.ini
+nbproject
+nbproject/*
+Application/cache/*
