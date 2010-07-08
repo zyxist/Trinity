@@ -15,6 +15,7 @@ use \Trinity\Basement\Application as BaseApplication;
 use \Trinity\Web\View as WebView;
 use \Trinity\Web\View_Html as View_Html;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
+use \Trinity\Model\Interfaces\Previewable as Interface_Previewable;
 use \Trinity\Model\Interfaces\Addable as Interface_Addable;
 use \Trinity\Model\Interfaces\Editable as Interface_Editable;
 use \Trinity\Model\Interfaces\Removable as Interface_Removable;
@@ -77,6 +78,10 @@ class Grid extends View_Html
 		}
 
 		// Check extra stuff
+		if($model instanceof Interface_Previewable)
+		{
+			$view->previewAction = true;
+		}
 		if($model instanceof Interface_Addable)
 		{
 			$view->addAction = true;

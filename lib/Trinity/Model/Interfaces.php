@@ -76,6 +76,40 @@ interface PersistentIdentity
 
 /**
  * Interface for communicating with CRUD controllers. It represents entities
+ * that can be previewed.
+ *
+ * @author Tomasz Jędrzejewski
+ */
+interface Previewable
+{
+	public function previewItem();
+} // end Previewable;
+
+/**
+ * Interface for interaction with forms and various select boxes.
+ *
+ * @author Tomasz Jędrzejewski
+ */
+interface Selectable
+{
+	/**
+	 * Returns the array of available choices.
+	 *
+	 * @return array
+	 */
+	public function getSelectOptions();
+
+	/**
+	 * Verifies if the selected choice exists.
+	 *
+	 * @param int $id The identifier to check.
+	 * @return boolean
+	 */
+	public function selectionExists($id);
+} // end Previewable;
+
+/**
+ * Interface for communicating with CRUD controllers. It represents entities
  * that allow to add new rows.
  *
  * @author Tomasz Jędrzejewski
