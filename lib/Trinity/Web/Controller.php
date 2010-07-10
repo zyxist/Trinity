@@ -12,8 +12,9 @@
 
 namespace Trinity\Web;
 use \Trinity\Basement\Controller as CoreController;
-use \Trinity\Basement\Locator_Object as ObjectLocator;
+use \Trinity\Basement\Locator_Object;
 use \Trinity\Basement\Application as BaseApplication;
+use \Trinity\Web\Controller\Manager;
 
 /**
  * The default web controller.
@@ -26,20 +27,16 @@ abstract class Controller implements CoreController
 {
 	/**
 	 * The model locator.
-	 * @var ObjectLocator
+	 * @var \Trinity\Basement\Locator_Object
 	 */
 	protected $_modelLocator;
 	/**
 	 * The application link.
-	 * @var BaseApplication
+	 * @var \Trinity\Basement\Application
 	 */
 	protected $_application;
 
-	/**
-	 * The view broker.
-	 * @var View_Broker
-	 */
-	protected $_viewBroker;
+
 
 	/**
 	 * Initializes the controller.
@@ -54,9 +51,9 @@ abstract class Controller implements CoreController
 	/**
 	 * Assigns a new model locator to the controller.
 	 *
-	 * @param ObjectLocator $locator The model locator
+	 * @param \Trinity\Basement\Locator_Object $locator The model locator
 	 */
-	public function setModelLocator(ObjectLocator $locator)
+	public function setModelLocator(Locator_Object $locator)
 	{
 		$this->_modelLocator = $locator;
 	} // end setModelLocator();
@@ -64,32 +61,12 @@ abstract class Controller implements CoreController
 	/**
 	 * Returns the current model locator.
 	 *
-	 * @return ObjectLocator
+	 * @return \Trinity\Basement\Locator_Object
 	 */
 	public function getModelLocator()
 	{
 		return $this->_modelLocator;
 	} // end getModelLocator();
-
-	/**
-	 * Sets the view broker used by this controller.
-	 *
-	 * @param View_Broker $broker The new view broker.
-	 */
-	public function setViewBroker(View_Broker $broker)
-	{
-		$this->_viewBroker = $broker;
-	} // end setViewBroker();
-
-	/**
-	 * Returns the current view broker.
-	 *
-	 * @return \Trinity\Web\View_Broker
-	 */
-	public function getViewBroker()
-	{
-		return $this->_viewBroker;
-	} // end getViewBroker();
 
 	/**
 	 * Dispatches the specified request and response.
@@ -99,26 +76,22 @@ abstract class Controller implements CoreController
 	 */
 	public function dispatch(Request_Abstract $request, Response_Abstract $response)
 	{
-		$eventManager = $this->_application->getEventManager();
-		$router = $this->_application->getServiceLocator()->get('web.Router');
-		$area = $this->_application->getServiceLocator()->get('web.Area');
-		$router->setParam('area', $area->getName());
+		$manager = new Manager($this->_application, $request, $response, $this->_modelLocator);
+		$manager->router->setParam('area', $manager->area->getName());
 
-		$eventManager->fire('controller.web.dispatch.begin', array(
+		$manager->events->fire('controller.web.dispatch.begin', array(
 			'controller' => $this,
-			'request' => $request,
-			'response' => $response
+			'manager' => $manager
 		));
 
-		$router->setParams($request->getParams());
+		$manager->router->setParams($request->getParams());
 		try
 		{
-			$this->_dispatch($request, $response);
+			$this->_dispatch($manager);
 
-			$eventManager->fire('controller.web.dispatch.end', array(
+			$manager->events->fire('controller.web.dispatch.end', array(
 				'controller' => $this,
-				'request' => $request,
-				'response' => $response
+				'manager' => $manager
 			));
 		}
 		catch(Redirect_Exception $redirect)
@@ -132,57 +105,19 @@ abstract class Controller implements CoreController
 
 			$response->setRedirect($url, $redirect->getCode());
 			// TODO: Add a true redirection here
-			$eventManager->fire('controller.web.dispatch.redirect', array(
+			$manager->events->fire('controller.web.dispatch.redirect', array(
 				'controller' => $this,
-				'request' => $request,
-				'response' => $response,
+				'manager' => $manager,
 				'redirect' => $redirect
 			));
 		}
 	} // end dispatch();
 
 	/**
-	 * Performs a view processing.
-	 * 
-	 * @param \Trinity\Web\View $view The view to process.
-	 */
-	protected function _processView(View $view)
-	{
-		$broker = $this->getViewBroker();
-
-		if($broker === null)
-		{
-			$this->setViewBroker($view->getViewBroker());
-		}
-		else
-		{
-			$view->setViewBroker($broker);
-		}
-
-		$view->dispatch();
-	} // end _processView();
-
-	/**
-	 * Processes the flash message.
-	 * 
-	 * @param Redirect_Flash $flash The flash redirection
-	 */
-	protected function _processFlashMessage(Redirect_Flash $flash)
-	{
-		$session = $this->_application->getServiceLocator()->get('web.Session');
-		$ns = $session->getNamespace('flash');
-		$ns->message = $flash->getMessage();
-		$ns->type = $flash->getType();
-		$ns->setLifetime('message', 1);
-		$ns->setLifetime('type', 1);
-	} // end _processFlashMessage();
-
-	/**
 	 * The concrete dispatching procedure should go here.
 	 *
 	 * @throws Redirect_Exception
-	 * @param Request_Abstract $request
-	 * @param Response_Abstract $response
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager.
 	 */
-	abstract protected function _dispatch(Request_Abstract $request, Response_Abstract $response);
+	abstract protected function _dispatch(Manager $manager);
 } // end Controller;

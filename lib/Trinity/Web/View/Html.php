@@ -10,6 +10,8 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Web;
+use \Trinity\Web\View;
+use \Trinity\Template\Layout;
 
 
 /**
@@ -102,7 +104,7 @@ abstract class View_Html extends View
 	{
 		if(!$broker instanceof Layout)
 		{
-			throw new View_Exception('Cannot process a HTML view: layout engine missing.');
+			throw new View\Exception('Cannot process a HTML view: layout engine missing.');
 		}
 		$this->_layout = $broker;
 	} // end getViewBroker();

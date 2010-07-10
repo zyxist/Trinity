@@ -12,10 +12,11 @@
 
 namespace Trinity\WebUtils\Controller;
 use \Trinity\Web\Controller as WebController;
-use \Trinity\Web\View as View;
+use \Trinity\Web\View;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
 use \Trinity\Web\Request_Abstract as Request_Abstract;
 use \Trinity\Web\Response_Abstract as Response_Abstract;
+use \Trinity\Web\Controller\Manager;
 use \Trinity\WebUtils\View\ActionGroup as View_ActionGroup;
 
 /**
@@ -118,35 +119,33 @@ class ActionGroup extends WebController
 	/**
 	 * Dispatches the request.
 	 * 
-	 * @param Request_Abstract $request The request to dispatch.
-	 * @param Response_Abstract $response The sent response.
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager.
 	 */
-	protected function _dispatch(Request_Abstract $request, Response_Abstract $response)
+	protected function _dispatch(Manager $manager)
 	{
 		if($this->_groupDirectory === null)
 		{
 			throw new Web_Controller_Exception('Cannot dispatch the request: the group directory is not set.');
 		}
-		$group = $request->getParam('group', $this->_defaultGroup);
-		$action = $request->getParam('action', $this->_defaultAction);
+		$group = $manager->request->getParam('group', $this->_defaultGroup);
+		$action = $manager->request->getParam('action', $this->_defaultAction);
 
-		$groupObj = $this->_loadGroup($group);
-		$groupObj->setRequest($request);
-		$groupObj->setResponse($response);
+		$groupObj = $this->_loadGroup($group, $manager);
 		$view = $groupObj->dispatch($action);
 
 		if($view instanceof View)
 		{
-			$this->_processView($view);
+			$manager->processView($view);
 		}
 	} // end _dispatch();
 
 	/**
 	 * Loads the specified group object.
 	 * @param string $name The group name.
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager.
 	 * @return Action\Group
 	 */
-	protected function _loadGroup($name)
+	protected function _loadGroup($name, Manager $manager)
 	{
 		$name = ucfirst($name).'Group';
 
@@ -158,7 +157,7 @@ class ActionGroup extends WebController
 			}
 
 			require($this->_groupDirectory.$name.'.php');
-			$grp = new $name($this->_application, $this);
+			$grp = new $name($manager, $this);
 			if(!$grp instanceof Action_Group)
 			{
 				throw new Web_Controller_Exception('Group '.$name.' does not have a proper interface.');

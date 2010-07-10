@@ -10,10 +10,11 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\WebUtils\Controller;
-use Trinity\Basement\Application as BaseApplication;
-use Trinity\Web\Controller_Exception as Web_Controller_Exception;
-use Trinity\Web\Request_Abstract as Request_Abstract;
-use Trinity\Web\Response_Abstract as Response_Abstract;
+use \Trinity\Basement\Application as BaseApplication;
+use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
+use \Trinity\Web\Controller\Manager;
+use \Trinity\Web\Request_Abstract;
+use \Trinity\Web\Response_Abstract;
 // use Trinity\WebUtils\View\ActionGroup as View_ActionGroup;
 
 /**
@@ -61,9 +62,9 @@ class Action_Group
 
 	/**
 	 * The application link.
-	 * @var \Trinity\Basement\Application
+	 * @var \Trinity\Web\Controller\Manager
 	 */
-	private $_application;
+	private $_manager;
 
 	/**
 	 * Constructs the group object.
@@ -71,13 +72,13 @@ class Action_Group
 	 * @param BaseApplication $application The application link.
 	 * @param ActionGroup $controller The controller that dispatches the request.
 	 */
-	public function __construct(BaseApplication $application, ActionGroup $controller)
+	public function __construct(Manager $manager, ActionGroup $controller)
 	{
 		if(!preg_match('/^([a-zA-Z0-9]+)Group$/', get_class($this), $matches))
 		{
 			throw new Web_Controller_Exception('Cannot instantiate bare Action_Group class.');
 		}
-		$this->_application = $application;
+		$this->_manager = $manager;
 		$this->_controller = $controller;
 		$this->_groupName = $matches[1];
 	} // end __construct();
@@ -123,17 +124,6 @@ class Action_Group
 	} // end getModel();
 
 	/**
-	 * A syntactic sugar for loading the service.
-	 * 
-	 * @param string $name Service name
-	 * @return object
-	 */
-	public function getService($name)
-	{
-		return $this->_application->getServiceLocator()->get($name);
-	} // end getService();
-
-	/**
 	 * Returns the group name.
 	 *
 	 * @return string
@@ -142,56 +132,6 @@ class Action_Group
 	{
 		return $this->_groupName;
 	} // end getGroupName();
-
-	/**
-	 * Returns the application link.
-	 *
-	 * @return \Trinity\Basement\Application
-	 */
-	public function getApplication()
-	{
-		return $this->_application;
-	} // end getApplication();
-
-	/**
-	 * Sets the request.
-	 * 
-	 * @param \Trinity\Web\Request_Abstract $request The request.
-	 */
-	public function setRequest(Request_Abstract $request)
-	{
-		$this->_request = $request;
-	} // end getRequest();
-
-	/**
-	 * Returns the request object.
-	 *
-	 * @return \Trinity\Web\Request_Abstract
-	 */
-	public function getRequest()
-	{
-		return $this->_request;
-	} // end getRequest();
-
-	/**
-	 * Sets the response.
-	 *
-	 * @param \Trinity\Web\Response_Abstract
-	 */
-	public function setResponse(Response_Abstract $response)
-	{
-		$this->_response = $response;
-	} // end setResponse();
-
-	/**
-	 * Returns the response.
-	 *
-	 * @return \Trinity\Web\Response_Abstract
-	 */
-	public function getResponse()
-	{
-		return $this->_response;
-	} // end getResponse();
 
 	/**
 	 * Dispatches the action and returns the view to display.
@@ -212,15 +152,15 @@ class Action_Group
 		}
 		$actionMethod = $actionName.'Action';
 
-		$this->_application->getEventManager()->fire('controller.actionGroup.dispatch', array(
+		$this->_manager->events->fire('controller.actionGroup.dispatch', array(
 			'groupObj' => $this,
 			'group' => $this->_groupName,
 			'action' => $actionName
 		));
 
-		$view = $this->$actionMethod();
+		$view = $this->$actionMethod($this->_manager);
 
-		$this->_application->getEventManager()->fire('controller.actionGroup.dispatched', array(
+		$this->_manager->events->fire('controller.actionGroup.dispatched', array(
 			'groupObj' => $this,
 			'group' => $this->_groupName,
 			'action' => $actionName

@@ -4,9 +4,9 @@
  *
  * @author Tomasz Jędrzejewski
  */
-use Trinity\WebUtils\View\ActionGroup as ActionGroupView;
+use Trinity\WebUtils\View\ActionGroup;
 
-class IndexView extends ActionGroupView
+class IndexView extends ActionGroup
 {
 	public function indexAction()
 	{
@@ -17,4 +17,9 @@ class IndexView extends ActionGroupView
 		$template->counter = $counter->counter;
 		$template->counter2 = $counter->counter2;
 	} // end indexAction();
+
+	public function brickAction()
+	{
+		$template = $this->getTemplateObject();
+	} // end brickAction();
 } // end IndexView;
