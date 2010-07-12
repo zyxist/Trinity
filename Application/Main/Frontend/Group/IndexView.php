@@ -4,6 +4,7 @@
  *
  * @author Tomasz Jędrzejewski
  */
+namespace Application\Main\Frontend\Group;
 use Trinity\WebUtils\View\ActionGroup;
 
 class IndexView extends ActionGroup

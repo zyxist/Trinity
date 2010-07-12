@@ -1376,6 +1376,11 @@ abstract class Application
 		return $this->_path;
 	} // end getModulePath();
 
+	public function getNamespace()
+	{
+		return $this->_namespace;
+	} // end getNamespace();
+
 	/**
 	 * Sets a hand-built module.
 	 *
@@ -1415,9 +1420,10 @@ abstract class Application
 			}
 			else
 			{
-				$className = $this->_namespace.'\\'.str_replace('.', '\\', $moduleName).'\\Module';
+				$namespaceName = $this->_namespace.'\\'.str_replace('.', '\\', $moduleName);
+				$className = $namespaceName.'\\Module';
 			}
-			$object = new $className($moduleName, $path);
+			$object = new $className($moduleName, $path, $this->_namespace);
 
 			if(!$object instanceof Module)
 			{
@@ -1426,7 +1432,7 @@ abstract class Application
 		}
 		else
 		{
-			$object = new Module($moduleName, $path);
+			$object = new Module($moduleName, $path, $this->_namespace);
 		}
 		return $this->_modules[$moduleName] = $object;
 	} // end loadModule();

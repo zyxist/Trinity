@@ -4,6 +4,7 @@
  *
  * @author Tomasz Jędrzejewski
  */
+namespace Application\Main\Frontend\Group;
 use \Trinity\Web\Controller\Manager;
 use Trinity\WebUtils\Controller\Action_Group as ControllerActionGroup;
 

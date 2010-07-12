@@ -73,6 +73,7 @@ class Area_Standard extends Module
 
 		$this->_name = $name;
 		$this->_options = $data;
+		$this->_namespacePrefix = $application->getNamespace();
 		$this->_path = $application->getModulePath();
 	} // end __construct();
 
@@ -191,6 +192,17 @@ class Area_Standard extends Module
 	{
 		return $this->_primaryModule;
 	} // end getPrimaryModule();
+
+
+	/**
+	 * Returns the module.
+	 *
+	 * @return Module
+	 */
+	public function getModule()
+	{
+		return $this->_areaModule;
+	} // end getModule();
 
 	/**
 	 * Returns the name of the service controller to be used by

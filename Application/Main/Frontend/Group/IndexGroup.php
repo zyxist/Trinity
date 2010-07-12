@@ -4,6 +4,7 @@
  *
  * @author Tomasz Jędrzejewski
  */
+namespace Application\Main\Frontend\Group;
 use \Trinity\Web\Controller\Manager;
 use \Trinity\WebUtils\View\Grid;
 use \Trinity\WebUtils\Controller\Action_Group as ControllerActionGroup;
@@ -32,10 +33,12 @@ class IndexGroup extends ControllerActionGroup
 			$fooNs->counter2--;
 		}
 
-		$this->view->addModel('date', $manager->getModel('Application.Main.Model.CurrentDate'));
-		$this->view->addModel('session', $fooNs);
+		$view = $this->getActionView();
 
-		return $this->view;
+		$view->addModel('date', $manager->getModel('Application.Main.Model.CurrentDate'));
+		$view->addModel('session', $fooNs);
+
+		return $view;
 	} // end indexAction();
 
 	public function listAction(Manager $manager)
@@ -53,6 +56,6 @@ class IndexGroup extends ControllerActionGroup
 		$brick = $manager->getBrick('Application.Main.Brick.Test');
 		$brick->dispatch();
 
-		return $this->view;
+		return $this->getActionView();
 	} // end brickAction();
 } // end IndexGroup;

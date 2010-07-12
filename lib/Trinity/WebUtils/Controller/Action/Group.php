@@ -11,8 +11,9 @@
  */
 namespace Trinity\WebUtils\Controller;
 use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
+use \Trinity\Web\Controller_Exception;
 use \Trinity\Web\Controller\Manager;
+use \Trinity\Web\Controller as Web_Controller;
 use \Trinity\Web\Request_Abstract;
 use \Trinity\Web\Response_Abstract;
 // use Trinity\WebUtils\View\ActionGroup as View_ActionGroup;
@@ -31,6 +32,12 @@ use \Trinity\Web\Response_Abstract;
 class Action_Group
 {
 	/**
+	 * The brick action mapping.
+	 * @var array
+	 */
+	private $_brickActions = array();
+
+	/**
 	 * The group name.
 	 * @var string.
 	 */
@@ -40,19 +47,14 @@ class Action_Group
 	 * The default group view
 	 * @var \Trinity\WebUtils\View\ActionGroup
 	 */
-	private $_view;
+	private $_view = false;
 
 	/**
-	 * The request object.
-	 * @var \Trinity\Web\Request_Abstract
+	 * The action that is expected to be run.
+	 *
+	 * @var string
 	 */
-	private $_request;
-
-	/**
-	 * The response object.
-	 * @var \Trinity\Web\Response_Abstract
-	 */
-	private $_response;
+	private $_actionName = null;
 
 	/**
 	 * The controller for the action group.
@@ -69,59 +71,31 @@ class Action_Group
 	/**
 	 * Constructs the group object.
 	 *
-	 * @param BaseApplication $application The application link.
-	 * @param ActionGroup $controller The controller that dispatches the request.
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager.
+	 * @param \Trinity\WebUtils\Controller\Group $controller The controller that dispatches the request.
+	 * @param string The action that is expected to be run.
 	 */
-	public function __construct(Manager $manager, ActionGroup $controller)
+	public function __construct(Manager $manager, Group $controller, $action)
 	{
-		if(!preg_match('/^([a-zA-Z0-9]+)Group$/', get_class($this), $matches))
+		if(!preg_match('/\\\\([a-zA-Z0-9]+)Group$/', get_class($this), $matches))
 		{
-			throw new Web_Controller_Exception('Cannot instantiate bare Action_Group class.');
+			throw new Controller_Exception('Cannot instantiate bare Action_Group class.');
 		}
 		$this->_manager = $manager;
 		$this->_controller = $controller;
 		$this->_groupName = $matches[1];
+		$this->_actionName = $action;
+
+		$this->init();
 	} // end __construct();
 
 	/**
-	 * Returns and optionally constructs the default group view object.
-	 * 
-	 * @param string $name The attribute name.
-	 * @return \Trinity\WebUtils\View\ActionGroup
+	 * Here the programmer may store various custom group-related code.
 	 */
-	public function __get($name)
+	public function init()
 	{
-		if($name == 'view')
-		{
-			if($this->_view === null)
-			{
-				$this->_view = $this->_controller->_loadGroupView($this->_groupName);
-			}
-			return $this->_view;
-		}
-		return null;
-	} // end __get();
-
-	/**
-	 * A syntactic sugar that speeds up model loading.
-	 * 
-	 * @param string $model The model name.
-	 * @param string $contract The contract the model must pass.
-	 * @return \Trinity\Basement\Model
-	 */
-	public function getModel($model, $contract = null)
-	{
-		$model = $this->_controller->getModelLocator()->get($model);
-
-		if($contract !== null)
-		{
-			if(!is_a($model, $contract))
-			{
-				throw new \Trinity\Utils\Model_Exception('The requested model '.$model.' does not satisfy the contract '.$contract);
-			}
-		}
-		return $model;
-	} // end getModel();
+		/* null */
+	} // end init();
 
 	/**
 	 * Returns the group name.
@@ -134,38 +108,81 @@ class Action_Group
 	} // end getGroupName();
 
 	/**
-	 * Dispatches the action and returns the view to display.
-	 * 
-	 * @param string $actionName The action to dispatch.
-	 * @return \Trinity\Web\View
+	 * Registers a new brick action. The specified action will be directly
+	 * mapped to an external brick, so that the programmer does not have
+	 * to create a special method for it.
+	 *
+	 * @param string $actionName The action name
+	 * @param string $brickName The fully qualified brick name.
 	 */
-	public function dispatch($actionName)
+	public function addBrickAction($actionName, $brickName)
 	{
-		if(!ctype_alnum($actionName))
+		$this->_brickActions[$actionName] = (string)$brickName;
+	} // end addBrickAction();
+
+	/**
+	 * Checks if the specified action is a brick action.
+	 *
+	 * @param string $actionName The action name to check
+	 * @return boolean
+	 */
+	public function hasBrickAction($actionName)
+	{
+		return isset($this->_brickActions[$actionName]);
+	} // end hasBrickAction();
+
+	/**
+	 * Returns the name of the brick associated with the action.
+	 *
+	 * @param string $actionName The action name.
+	 * @return string
+	 */
+	public function getBrickAction($actionName)
+	{
+		if(!isset($this->_brickActions[$actionName]))
 		{
-			throw new Web_Controller_Exception('Invalid action name: '.$actionName);
+			throw new Controller_Exception('The specified brick action: '.$actionName.' does not exist.');
 		}
+		return $this->_brickActions[$actionName];
+	} // end getBrickAction();
 
-		if(!method_exists($this, $actionName.'Action'))
+	/**
+	 * Checks if the specified action exists in the action group.
+	 *
+	 * @param string $actionName The action name.
+	 * @return boolean
+	 */
+	public function hasAction($actionName)
+	{
+		return isset($this->_brickActions[$actionName]) || method_exists($this, $actionName.'Action');
+	} // end hasAction();
+
+	/**
+	 * Returns and optionally constructs the action group view accompanying
+	 * the group.
+	 * 
+	 * @param string $name The attribute name.
+	 * @return \Trinity\WebUtils\View\ActionGroup
+	 */
+	public function getActionView()
+	{
+		if($this->_view === false)
 		{
-			throw new Web_Controller_Exception('Action '.$actionName.' does not exist.');
+			$className = $this->_controller->getGroupModule()->getClassName($this->_groupName.'View');
+			if($this->_controller->getGroupModule()->loadFile($this->_groupName.'View') && class_exists($className, false))
+			{
+				$this->_view = new $className($this->_manager->application);
+				if(!$this->_view instanceof \Trinity\WebUtils\View\ActionGroup)
+				{
+					throw new Controller_Exception('The loaded view class is not an instance of \Trinity\WebUtils\View\ActionGroup');
+				}
+				$this->_view->bind($this->_groupName, $this->_actionName);
+			}
+			else
+			{
+				$this->_view = null;
+			}
 		}
-		$actionMethod = $actionName.'Action';
-
-		$this->_manager->events->fire('controller.actionGroup.dispatch', array(
-			'groupObj' => $this,
-			'group' => $this->_groupName,
-			'action' => $actionName
-		));
-
-		$view = $this->$actionMethod($this->_manager);
-
-		$this->_manager->events->fire('controller.actionGroup.dispatched', array(
-			'groupObj' => $this,
-			'group' => $this->_groupName,
-			'action' => $actionName
-		));
-
-		return $view;
-	} // end dispatch();
+		return $this->_view;
+	} // end getActionView();
 } // end Action_Group;
