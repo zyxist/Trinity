@@ -52,21 +52,45 @@ class Manager
 		$this->_basePath = $basePath;
 	} // end __construct();
 
+	/**
+	 * Returns the namespace applied for all the modules created
+	 * by this module manager.
+	 *
+	 * @return string
+	 */
 	public function getNamespace()
 	{
 		return $this->_namespace;
 	} // end getNamespace();
 
+	/**
+	 * Returns the base path applied for all the modules created
+	 * by this module manager.
+	 *
+	 * @return string
+	 */
 	public function getBasePath()
 	{
 		return $this->_basePath;
 	} // end getBasePath();
 
+	/**
+	 * Installs a manually created module within the manager.
+	 *
+	 * @param Module $module The manually created module.
+	 */
 	public function setModule(Module $module)
 	{
 		$this->_modules[$module->getName()] = $module;
 	} // end setModule();
 
+	/**
+	 * Returns the requested module object. If the module provides a custom
+	 * implementation, it is loaded from the module directory.
+	 *
+	 * @param string $module The module name.
+	 * @return \Trinity\Basement\Module
+	 */
 	public function getModule($module)
 	{
 		if(isset($this->_modules[$module]))
