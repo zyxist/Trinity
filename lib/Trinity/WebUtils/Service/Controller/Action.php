@@ -44,7 +44,7 @@ class Service_Controller_Action extends Service
 
 		$controller = new Controller\Action(BaseApplication::getApplication());
 
-		$controller->setActionModule($area->getModule()->getSubmodule('Action'));
+		$controller->setActionModule($area->getAreaModule()->getSubmodule('Action'));
 		$controller->setDefaults($this->defaultAction);
 		$controller->setModelLocator($this->_serviceLocator->get('model.ModelLocator'));
 
