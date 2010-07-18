@@ -67,7 +67,8 @@ class Service_Doctrine_ORM extends Service
 		}
 		$driverImpl = $config->newDefaultAnnotationDriver($this->defaultEntityPath);
 		$config->setMetadataDriverImpl($driverImpl);
-		
+
+		$config->setAutoGenerateProxyClasses((bool)$this->autogenerateProxyClasses);
 		$config->setProxyDir($this->proxyDir);
 		$config->setProxyNamespace($this->proxyNamespace);
 
