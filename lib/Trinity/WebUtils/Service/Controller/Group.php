@@ -45,7 +45,7 @@ class Service_Controller_Group extends Service
 
 		$controller = new Controller\Group(BaseApplication::getApplication());
 
-		$controller->setGroupModule($area->getModule()->getSubmodule('Group'));
+		$controller->setGroupModule($area->getAreaModule()->getSubmodule('Group'));
 		$controller->setDefaults($this->defaultGroup, $this->defaultAction);
 		$controller->setModelLocator($this->_serviceLocator->get('model.ModelLocator'));
 

@@ -11,10 +11,11 @@
  */
 namespace Trinity\Basement;
 use \Trinity\Basement\Application as BaseApplication;
+use \Trinity\Basement\Module\Manager;
 
 /**
- * Represents a single module. The class is not obligatory for the modules,
- * but can be used to store some extra operations.
+ * Represents a single module and provides utilities for managing them. The
+ * concrete modules may extend this class to provide some extra utilities.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
@@ -29,10 +30,10 @@ class Module
 	private $_name;
 
 	/**
-	 * The fully qualified module namespace.
+	 * The module namespace.
 	 * @var string
 	 */
-	private $_namespacePrefix;
+	private $_namespace;
 
 	/**
 	 * The module path.
@@ -41,28 +42,31 @@ class Module
 	private $_path;
 
 	/**
+	 * The module manager.
+	 * @var \Trinity\Basement\Module\Manager
+	 */
+	private $_manager;
+
+	/**
 	 * Creates the module.
-	 * 
+	 *
+	 * @param \Trinity\Basement\Module\Manager $manager The module manager.
 	 * @param string $name The module name
-	 * @param string $namespace The module fully qualified namespace prefix
+	 * @param string $namespace The module fully qualified namespace
 	 * @param string $path The path to the module files.
 	 */
-	public function __construct($name, $path, $namespacePrefix = '')
+	public function __construct(Manager $manager, $name, $namespace, $path)
 	{
+		$this->_manager = $manager;
 		$this->_name = $name;
+		$this->_namespace = $namespace;
 
 		if($path[strlen($path) - 1] != '/')
 		{
 			$path .= '/';
 		}
+
 		$this->_path = $path;
-		$this->_namespacePrefix = $namespacePrefix;
-
-		if($this->_namespacePrefix !== '' && $namespacePrefix[strlen($namespacePrefix) - 1] != '\\')
-		{
-			$this->_namespacePrefix .= '\\';
-		}
-
 		$this->onInit(BaseApplication::getApplication());
 	} // end __construct();
 
@@ -87,14 +91,14 @@ class Module
 	} // end getName();
 
 	/**
-	 * Returns the namespace prefix of this module.
+	 * Returns the namespace of this module.
 	 *
 	 * @return string
 	 */
-	public function getNamespacePrefix()
+	public function getNamespace()
 	{
-		return $this->_namespacePrefix;
-	} // end getNamespacePrefix();
+		return $this->_namespace;
+	} // end getNamespace();
 
 	/**
 	 * Returns the path to the code directory within a module.
@@ -126,7 +130,14 @@ class Module
 	 */
 	public function getSubmodule($item)
 	{
-		return new Module($this->getName().'.'.$item, $this->getPath().'/'.$item.'/', $this->_namespacePrefix);
+		if($this->_name != '')
+		{
+			return $this->_manager->getModule($this->_name.'.'.$item);
+		}
+		else
+		{
+			return $this->_manager->getModule($item);
+		}
 	} // end getSubmodule();
 
 	/**
@@ -155,7 +166,7 @@ class Module
 	 */
 	public function getClassName($className)
 	{
-		return $this->_namespacePrefix.str_replace('.', '\\', $this->_name).'\\'.$className;
+		return $this->_namespace.'\\'.$className;
 	} // end getClassName();
 
 	/**
@@ -167,4 +178,12 @@ class Module
 	{
 		/* empty */
 	} // end onInit();
+
+	/**
+	 * Allows to free the memory.
+	 */
+	public function dispose()
+	{
+		$this->_manager = null;
+	} // end dispose();
 } // end Module;

@@ -32,7 +32,7 @@ $application = new \Trinity\Web\Application(
 	'Application',
 	APP_ENVIRONMENT,
 	APP_PATH.'config/config.ini',
-	'../Application/'
+	'../'
 );
 // Bind autoloaders, so that they could be accessed
 $application->addLoader('default', $nsLoader);

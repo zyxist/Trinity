@@ -46,10 +46,12 @@ class Service_Area extends Service
 	{
 		$application = \Trinity\Basement\Application::getApplication();
 		$request = $this->_serviceLocator->get('web.Broker')->getRequest();
+		$moduleManager = $application->getModuleManager();
 
 		// Initialize the area
 		$area = new Area_Standard($application, $this->_serviceLocator->get('web.AreaStrategy'));
-		$area->setModule($request->getParam('module', $this->defaultModule));
+		$area->setPrimaryModule($module = $moduleManager->getModule($request->getParam('module', $this->defaultModule)));
+		$area->setAreaModule($module->getSubmodule($area->getName()));
 		$request->setArea($area);
 
 		// Get the controller name
