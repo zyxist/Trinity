@@ -14,6 +14,7 @@ use \Trinity\Model\Interfaces\Grid as Interface_Grid;
 use \Trinity\Web\Controller_Exception;
 use \Trinity\Web\Redirect_Exception;
 use \Trinity\Web\Redirect_Flash;
+use \Trinity\Web\Controller\Manager;
 use \Trinity\WebUtils\View\Grid as View_Grid;
 use \Trinity\WebUtils\View\Form as View_Form;
 use \Trinity\WebUtils\View\Question as View_Question;
@@ -43,25 +44,30 @@ abstract class Crud extends Controller_Action_Group
 	/**
 	 * The CRUD initializer. It should return the model used by the CRUD.
 	 *
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
 	 * @return \Trinity\Basement\Model
 	 */
-	abstract public function initCrud();
+	abstract public function initCrud(Manager $manager);
 
 	/**
 	 * Should provide forms.
 	 *
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
+	 * @param string $type The form type to return
 	 * @return \Opf_Form
 	 */
-	abstract public function getForm($type);
+	abstract public function getForm(Manager $manager, $type);
 
 	/**
 	 * Tests the CRUD contract.
-	 * 
+	 *
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
 	 * @param string $actionInterface The action interface name.
+	 * @return \Trinity\Basement\Model
 	 */
-	protected function _getCrud($actionInterface = null)
+	protected function _getCrud(Manager $manager, $actionInterface = null)
 	{
-		$model = $this->initCrud();
+		$model = $this->initCrud($manager);
 
 		if(!$model instanceof Interface_Grid)
 		{
@@ -77,12 +83,14 @@ abstract class Crud extends Controller_Action_Group
 
 	/**
 	 * The index action displays a list of rows.
+	 *
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
 	 * @return View
 	 */
-	public function indexAction()
+	public function indexAction(Manager $manager)
 	{
-		$model = $this->_getCrud();
-		$view = new View_Grid($this->getApplication());
+		$model = $this->_getCrud($manager);
+		$view = $manager->getView('Trinity.WebUtils.View.Grid');
 
 		if($this->templates['index'] !== null)
 		{
@@ -91,23 +99,25 @@ abstract class Crud extends Controller_Action_Group
 
 		$view->addModel('grid', $model);
 		$view->set('title', $model->getMessage('crud.title'));
-		$view->set('page', $this->getRequest()->getParam('page', 1));
+		$view->set('page', $manager->request->getParam('page', 1));
 		return $view;
 	} // end indexAction();
 
 	/**
 	 * This action processes the row adding.
+	 *
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
 	 * @return View
 	 */
-	public function addAction()
+	public function addAction(Manager $manager)
 	{
-		$model = $this->_getCrud('\\Trinity\\Model\\Interfaces\\Addable');
-		$form = $this->getForm('add');
+		$model = $this->_getCrud($manager, '\\Trinity\\Model\\Interfaces\\Addable');
+		$form = $this->getForm($manager, 'add');
 		$form->setName('add');
 
 		if($form->execute() == \Opf_Form::ACCEPTED)
 		{
-			$router = $this->getService('web.Router');
+			$router = $manager->services->get('web.Router');
 			$flashMessage = '';
 			try
 			{
@@ -124,7 +134,7 @@ abstract class Crud extends Controller_Action_Group
 		}
 		else
 		{
-			$view = new View_Form($this->getApplication());
+			$view = $manager->getView('Trinity.WebUtils.View.Form');
 			if($this->templates['add'] !== null)
 			{
 				$view->setTemplate($this->templates['add']);
@@ -137,29 +147,30 @@ abstract class Crud extends Controller_Action_Group
 
 	/**
 	 * This action processes the row editing.
+	 *
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
 	 * @return View
 	 */
-	public function editAction()
+	public function editAction(Manager $manager)
 	{
-		$model = $this->_getCrud('\\Trinity\\Model\\Interfaces\\Editable');
+		$model = $this->_getCrud($manager, '\\Trinity\\Model\\Interfaces\\Editable');
 		try
 		{
-			$model->id = $this->getRequest()->getParam('id');
-			$form = $this->getForm('edit');
+			$model->id = $manager->request->getParam('id');
+			$form = $this->getForm($manager, 'edit');
 			$form->setName('edit');
 
 			if($form->execute() == \Opf_Form::ACCEPTED)
 			{
-				$router = $this->getService('web.Router');
 				$model->editItem($form->getValue());
 
-				throw new Redirect_Flash($router->assemble(array('action' => 'index'), null, true),
+				throw new Redirect_Flash($manager->router->assemble(array('action' => 'index'), null, true),
 					$model->getMessage('crud.message.edited')
 				);
 			}
 			else
 			{
-				$view = new View_Form($this->getApplication());
+				$view = $manager->getView('Trinity.WebUtils.View.Form');
 				if($this->templates['add'] !== null)
 				{
 					$view->setTemplate($this->templates['edit']);
@@ -174,8 +185,7 @@ abstract class Crud extends Controller_Action_Group
 		}
 		catch(\Trinity\Model\Report $report)
 		{
-			$router = $this->getService('web.Router');
-			throw new Redirect_Flash($router->assemble(array('action' => 'index'), null, true),
+			throw new Redirect_Flash($manager->router->assemble(array('action' => 'index'), null, true),
 				$report->getMessage(),
 				'error'
 			);
@@ -184,14 +194,15 @@ abstract class Crud extends Controller_Action_Group
 
 	/**
 	 * This action processes the row removal.
+	 *
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
 	 * @return View
 	 */
-	public function removeAction()
+	public function removeAction(Manager $manager)
 	{
-		$model = $this->_getCrud('\\Trinity\\Model\\Interfaces\\Removable');
-		$model->id = $this->getRequest()->getParam('id');
-		$answer = $this->getRequest()->getParam('answer');
-		$router = $this->getService('web.Router');
+		$model = $this->_getCrud($manager, '\\Trinity\\Model\\Interfaces\\Removable');
+		$model->id = $manager->request->getParam('id');
+		$answer = $manager->request->getParam('answer');
 		switch((string)$answer)
 		{
 			case 'yes':
@@ -204,14 +215,14 @@ abstract class Crud extends Controller_Action_Group
 				{
 					$flashMessage = $report->getMessage();
 				}
-				throw new Redirect_Flash($router->assemble(array('action' => 'index'), null, true),
+				throw new Redirect_Flash($manager->router->assemble(array('action' => 'index'), null, true),
 					$flashMessage
 				);
 				break;
 			case 'no':
-				throw new Redirect_Exception($router->assemble(array('action' => 'index'), null, true));
+				throw new Redirect_Exception($manager->router->assemble(array('action' => 'index'), null, true));
 			default:
-				$view = new View_Question($this->getApplication());
+				$view = $manager->getView('Trinity.WebUtils.View.Question');
 				$view->set('title', $model->getMessage('crud.remove'));
 				$view->addModel('item', $model);
 				return $view;
