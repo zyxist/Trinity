@@ -2,3 +2,5 @@ paths.ini
 nbproject
 nbproject/*
 Application/cache/*
+Application/config/area.ini
+Application/config/config.ini
