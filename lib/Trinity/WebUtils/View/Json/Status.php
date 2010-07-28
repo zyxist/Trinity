@@ -27,11 +27,10 @@ class Status extends View_Json
 
 	private $_status;
 
-	public function __construct(BaseApplication $application, $status)
+	public function setStatus($status)
 	{
-		parent::__construct($application);
 		$this->_status = (int)$status;
-	} // end __construct();
+	} // end setStatus();
 
 	public function dispatch()
 	{

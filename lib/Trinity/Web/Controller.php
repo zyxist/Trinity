@@ -143,6 +143,21 @@ abstract class Controller implements CoreController
 	} // end dispatch();
 
 	/**
+	 * Processes the flash message.
+	 *
+	 * @param Redirect_Flash $flash The flash redirection
+	 */
+	protected function _processFlashMessage(Redirect_Flash $flash)
+	{
+		$session = $this->_application->getServiceLocator()->get('web.Session');
+		$ns = $session->getNamespace('flash');
+		$ns->message = $flash->getMessage();
+		$ns->type = $flash->getType();
+		$ns->setLifetime('message', 1);
+		$ns->setLifetime('type', 1);
+	} // end _processFlashMessage();
+
+	/**
 	 * The concrete dispatching procedure should go here.
 	 *
 	 * @throws Redirect_Exception
