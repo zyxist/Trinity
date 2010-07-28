@@ -11,7 +11,7 @@
  */
 namespace Trinity\Web;
 use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Basement\Module as Module;
+use \Trinity\Basement\Module;
 use \Trinity\Web\Area\Strategy_Interface;
 
 /**
@@ -22,7 +22,7 @@ use \Trinity\Web\Area\Strategy_Interface;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Area_Standard extends Module
+class Area_Standard
 {
 	/**
 	 * The application link.
@@ -73,7 +73,6 @@ class Area_Standard extends Module
 
 		$this->_name = $name;
 		$this->_options = $data;
-		$this->_path = $application->getModulePath();
 	} // end __construct();
 
 	/**
@@ -142,15 +141,24 @@ class Area_Standard extends Module
 	} // end hasOption();
 
 	/**
+	 * Selects the primary module.
+	 *
+	 * @param \Trinity\Basement\Module $module The new primary module.
+	 */
+	public function setPrimaryModule(Module $module)
+	{
+		$this->_primaryModule = $module;
+	} // end setModule();
+
+	/**
 	 * Selects the area module.
 	 *
-	 * @param string $moduleName The name of the module
+	 * @param \Trinity\Basement\Module $module The new area module.
 	 */
-	public function setModule($moduleName)
+	public function setAreaModule(Module $module)
 	{
-		$this->_primaryModule = $this->_application->loadModule(ucfirst($moduleName));
-		$this->_areaModule = $this->_application->loadModule(ucfirst($moduleName).'.'.$this->_name);
-	} // end setModule();
+		$this->_areaModule = $module;
+	} // end setAreaModule();
 
 	/**
 	 * Returns the path for the code within the given area.
@@ -164,7 +172,7 @@ class Area_Standard extends Module
 		{
 			return $this->_areaModule->getCodePath($item);
 		}
-		return parent::getCodePath($item);
+		return $this->_primaryModule->getCodePath($item);
 	} // end getCodePath();
 
 	/**
@@ -179,18 +187,29 @@ class Area_Standard extends Module
 		{
 			return $this->_areaModule->getFilePath($item);
 		}
-		return parent::getFilePath($item);
+		return $this->_primaryModule->getFilePath($item);
 	} // end getFilePath();
 
 	/**
 	 * Returns the primary module.
 	 *
-	 * @return Module
+	 * @return \Trinity\Basement\Module
 	 */
 	public function getPrimaryModule()
 	{
 		return $this->_primaryModule;
 	} // end getPrimaryModule();
+
+
+	/**
+	 * Returns the area module.
+	 *
+	 * @return \Trinity\Basement\Module
+	 */
+	public function getAreaModule()
+	{
+		return $this->_areaModule;
+	} // end getModule();
 
 	/**
 	 * Returns the name of the service controller to be used by

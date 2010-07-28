@@ -4,16 +4,16 @@
  *
  * @author Tomasz Jędrzejewski
  */
-use Trinity\WebUtils\View\Grid as GridView;
-use Trinity\WebUtils\Controller\Action_Group as ControllerActionGroup;
+namespace Application\Main\Frontend\Group;
+use \Trinity\Web\Controller\Manager;
+use \Trinity\WebUtils\View\Grid;
+use \Trinity\WebUtils\Controller\Action_Group as ControllerActionGroup;
 
 class IndexGroup extends ControllerActionGroup
 {
-	public function indexAction()
+	public function indexAction(Manager $manager)
 	{
-		$session = $this->getService('web.Session');
-
-		$fooNs = $session->getNamespace('foo');
+		$fooNs = $manager->session->getNamespace('foo');
 		if(!isset($fooNs->counter))
 		{
 			$fooNs->counter = 5;
@@ -33,19 +33,29 @@ class IndexGroup extends ControllerActionGroup
 			$fooNs->counter2--;
 		}
 
-		$this->view->addModel('date', $this->getModel('Application.Main.Model.CurrentDate'));
-		$this->view->addModel('session', $fooNs);
+		$view = $this->getActionView();
 
-		return $this->view;
+		$view->addModel('date', $manager->getModel('Application.Main.Model.CurrentDate'));
+		$view->addModel('session', $fooNs);
+
+		return $view;
 	} // end indexAction();
 
-	public function listAction()
+	public function listAction(Manager $manager)
 	{
-		$view = new GridView($this->getApplication());
-		$view->set('args', $this->getRequest()->getParams());
+		$view = $manager->getView('Trinity.WebUtils.View.Grid');
+		$view->set('args', $manager->request->getParams());
 		$view->set('title', 'Some dummy title');
-		$view->addModel('grid', $this->getModel('Application.Main.Model.Grid'));
+		$view->addModel('grid', $manager->getModel('Application.Main.Model.Grid'));
 
 		return $view;
 	} // end listAction();
+
+	public function brickAction(Manager $manager)
+	{
+		$brick = $manager->getBrick('Application.Main.Brick.Test');
+		$brick->dispatch();
+
+		return $this->getActionView();
+	} // end brickAction();
 } // end IndexGroup;

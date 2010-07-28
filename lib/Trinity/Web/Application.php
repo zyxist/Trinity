@@ -11,9 +11,10 @@
  */
 
 namespace Trinity\Web;
-use Trinity\Basement\Application as Base_Application;
-use Trinity\Basement\Service_Configurator as Service_Configurator;
-use Trinity\Basement\Service_Builder_Standard as Service_Builder_Standard;
+use \Trinity\Basement\Application as Base_Application;
+use \Trinity\Basement\Service_Configurator as Service_Configurator;
+use \Trinity\Basement\Service_Builder_Standard as Service_Builder_Standard;
+use \Trinity\Basement\Module\Manager as Module_Manager;
 
 /**
  * An interface for web applications.
@@ -48,7 +49,7 @@ class Application extends Base_Application implements Service_Configurator
 	{
 		$this->_environment = $environment;
 		$this->_configPath = $configPath;
-		$this->setModulePath($appName, $modulePath);
+		$this->setModuleManager(new Module_Manager($appName, $modulePath));
 	} // end __construct();
 
 	/**
@@ -85,7 +86,7 @@ class Application extends Base_Application implements Service_Configurator
 		$this->getServiceLocator()->get('utils.Config');
 
 		// Load the application module.
-		$module = $this->loadModule('');
+		$module = $this->getModuleManager()->getModule('');
 
 		// Now you can do the rest.
 		$obj = $this->getServiceLocator()->get('web.Area');

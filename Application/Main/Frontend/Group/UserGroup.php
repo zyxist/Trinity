@@ -4,17 +4,18 @@
  *
  * @author Tomasz Jędrzejewski
  */
-use Trinity\WebUtils\View\Grid as GridView;
+namespace Application\Main\Frontend\Group;
+use \Trinity\Web\Controller\Manager;
 use Trinity\WebUtils\Controller\Action_Group as ControllerActionGroup;
 
 class UserGroup extends ControllerActionGroup
 {
-	public function indexAction()
+	public function indexAction(Manager $manager)
 	{
-		$view = new GridView($this->getApplication());
-		$view->set('args', $this->getRequest()->getParams());
+		$view = $manager->getView('Trinity.WebUtils.View.Grid');
+		$view->set('args', $manager->request->getParams());
 		$view->set('title', 'User list');
-		$view->addModel('grid', $this->getModel('Application.Main.Model.User'));
+		$view->addModel('grid', $manager->getModel('Application.Main.Model.User'));
 
 		return $view;
 	} // end indexAction();

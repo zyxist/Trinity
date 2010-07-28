@@ -12,8 +12,10 @@
 
 namespace Trinity\Web;
 use \Trinity\Basement\Controller as CoreController;
-use \Trinity\Basement\Locator_Object as ObjectLocator;
+use \Trinity\Basement\Locator_Object;
 use \Trinity\Basement\Application as BaseApplication;
+use \Trinity\Web\Controller\Manager;
+use \Trinity\Web\Controller\State;
 
 /**
  * The default web controller.
@@ -24,22 +26,28 @@ use \Trinity\Basement\Application as BaseApplication;
  */
 abstract class Controller implements CoreController
 {
+	const ERROR_GENERIC = 0;
+	const ERROR_NOT_FOUND = 1;
+	const ERROR_CONFIGURATION = 2;
+	const ERROR_INTEGRITY = 3;
+	const ERROR_VALIDATION = 4;
+
 	/**
 	 * The model locator.
-	 * @var ObjectLocator
+	 * @var \Trinity\Basement\Locator_Object
 	 */
 	protected $_modelLocator;
 	/**
 	 * The application link.
-	 * @var BaseApplication
+	 * @var \Trinity\Basement\Application
 	 */
 	protected $_application;
 
 	/**
-	 * The view broker.
-	 * @var View_Broker
+	 * The name of the brick used, if a 404 error occurs.
+	 * @var string
 	 */
-	protected $_viewBroker;
+	protected $_errorBrick = null;
 
 	/**
 	 * Initializes the controller.
@@ -54,9 +62,9 @@ abstract class Controller implements CoreController
 	/**
 	 * Assigns a new model locator to the controller.
 	 *
-	 * @param ObjectLocator $locator The model locator
+	 * @param \Trinity\Basement\Locator_Object $locator The model locator
 	 */
-	public function setModelLocator(ObjectLocator $locator)
+	public function setModelLocator(Locator_Object $locator)
 	{
 		$this->_modelLocator = $locator;
 	} // end setModelLocator();
@@ -64,7 +72,7 @@ abstract class Controller implements CoreController
 	/**
 	 * Returns the current model locator.
 	 *
-	 * @return ObjectLocator
+	 * @return \Trinity\Basement\Locator_Object
 	 */
 	public function getModelLocator()
 	{
@@ -72,24 +80,22 @@ abstract class Controller implements CoreController
 	} // end getModelLocator();
 
 	/**
-	 * Sets the view broker used by this controller.
+	 * Sets the name of the brick used if a controller error occurs.
 	 *
-	 * @param View_Broker $broker The new view broker.
+	 * @param string $brickName The name of the brick
 	 */
-	public function setViewBroker(View_Broker $broker)
+	public function setErrorBrick($brickName)
 	{
-		$this->_viewBroker = $broker;
-	} // end setViewBroker();
+		$this->_errorBrick = (string)$brickName;
+	} // end setErrorBrick();
 
 	/**
-	 * Returns the current view broker.
-	 *
-	 * @return \Trinity\Web\View_Broker
+	 * Returns the name of the brick used if a controller error occurs.
 	 */
-	public function getViewBroker()
+	public function getErrorBrick()
 	{
-		return $this->_viewBroker;
-	} // end getViewBroker();
+		return $this->_errorBrick;
+	} // end getErrorBrick();
 
 	/**
 	 * Dispatches the specified request and response.
@@ -99,26 +105,22 @@ abstract class Controller implements CoreController
 	 */
 	public function dispatch(Request_Abstract $request, Response_Abstract $response)
 	{
-		$eventManager = $this->_application->getEventManager();
-		$router = $this->_application->getServiceLocator()->get('web.Router');
-		$area = $this->_application->getServiceLocator()->get('web.Area');
-		$router->setParam('area', $area->getName());
+		$manager = new Manager($this->_application, $request, $response, $this->_modelLocator);
+		$manager->router->setParam('area', $manager->area->getName());
 
-		$eventManager->fire('controller.web.dispatch.begin', array(
+		$manager->events->fire('controller.web.dispatch.begin', array(
 			'controller' => $this,
-			'request' => $request,
-			'response' => $response
+			'manager' => $manager
 		));
 
-		$router->setParams($request->getParams());
+		$manager->router->setParams($request->getParams());
 		try
 		{
-			$this->_dispatch($request, $response);
+			$this->_dispatch($manager);
 
-			$eventManager->fire('controller.web.dispatch.end', array(
+			$manager->events->fire('controller.web.dispatch.end', array(
 				'controller' => $this,
-				'request' => $request,
-				'response' => $response
+				'manager' => $manager
 			));
 		}
 		catch(Redirect_Exception $redirect)
@@ -132,39 +134,17 @@ abstract class Controller implements CoreController
 
 			$response->setRedirect($url, $redirect->getCode());
 			// TODO: Add a true redirection here
-			$eventManager->fire('controller.web.dispatch.redirect', array(
+			$manager->events->fire('controller.web.dispatch.redirect', array(
 				'controller' => $this,
-				'request' => $request,
-				'response' => $response,
+				'manager' => $manager,
 				'redirect' => $redirect
 			));
 		}
 	} // end dispatch();
 
 	/**
-	 * Performs a view processing.
-	 * 
-	 * @param \Trinity\Web\View $view The view to process.
-	 */
-	protected function _processView(View $view)
-	{
-		$broker = $this->getViewBroker();
-
-		if($broker === null)
-		{
-			$this->setViewBroker($view->getViewBroker());
-		}
-		else
-		{
-			$view->setViewBroker($broker);
-		}
-
-		$view->dispatch();
-	} // end _processView();
-
-	/**
 	 * Processes the flash message.
-	 * 
+	 *
 	 * @param Redirect_Flash $flash The flash redirection
 	 */
 	protected function _processFlashMessage(Redirect_Flash $flash)
@@ -181,8 +161,34 @@ abstract class Controller implements CoreController
 	 * The concrete dispatching procedure should go here.
 	 *
 	 * @throws Redirect_Exception
-	 * @param Request_Abstract $request
-	 * @param Response_Abstract $response
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager.
 	 */
-	abstract protected function _dispatch(Request_Abstract $request, Response_Abstract $response);
+	abstract protected function _dispatch(Manager $manager);
+
+	/**
+	 * Raises an internal controller error. If an error brick is defined, it executes
+	 * it, otherwise it throws a controller exception.
+	 *
+	 * @throws \Trinity\Web\Controller_Exception
+	 * @param Manager $manager The controller manager.
+	 * @param int $errorType The error type
+	 */
+	public function raiseControllerError(Manager $manager, $errorType = self::ERROR_GENERIC)
+	{
+		$messageMap = array(
+			self::ERROR_GENERIC => 'internal problem.',
+			self::ERROR_NOT_FOUND => 'the requested controller action has not been found.',
+			self::ERROR_CONFIGURATION => 'invalid or missing controller configuration.',
+			self::ERROR_INTEGRITY => 'controller data integrity problem.',
+			self::ERROR_VALIDATION => 'input data validation error.',
+		);
+		if($this->_errorBrick === null)
+		{
+			throw new Controller_Exception('A controller error occured: '.$messageMap[$errorType]);
+		}
+		$state = new State;
+		$state->errorType = $errorType;
+		$brick = $manager->getBrick($this->_errorBrick, $state);
+		$brick->dispatch();
+	} // end raiseControllerError();
 } // end Controller;

@@ -43,7 +43,8 @@ class Service_Controller_Action extends Service
 		$broker = $this->_serviceLocator->get('web.Broker');
 
 		$controller = new Controller\Action(BaseApplication::getApplication());
-		$controller->setActionDirectory($area->getCodePath('Action'));
+
+		$controller->setActionModule($area->getAreaModule()->getSubmodule('Action'));
 		$controller->setDefaults($this->defaultAction);
 		$controller->setModelLocator($this->_serviceLocator->get('model.ModelLocator'));
 

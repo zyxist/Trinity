@@ -8,20 +8,18 @@
  *
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
- *
- * $Id$
  */
-
-namespace Trinity\Basement\Core;
+namespace Trinity\Basement\Module;
+use \Trinity\Basement\Core\Exception as Core_Exception;
 
 /**
- * The Trinity Core exception class.
+ * Exception class for module issues.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Exception extends \Exception
+class Exception extends Core_Exception
 {
 	/* null */
 } // end Exception;

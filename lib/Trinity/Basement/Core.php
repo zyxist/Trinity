@@ -13,6 +13,7 @@
  */
 
 namespace Trinity\Basement;
+use \Trinity\Basement\Core\Exception as Core_Exception;
 
 /**
  * The controller interface.
@@ -1253,22 +1254,15 @@ abstract class Application
 	private $_serviceLocator;
 
 	/**
-	 * The list of currently loaded modules.
-	 * @var array
+	 * The application module manager
+	 * @var \Trinity\Basement\Module\Manager
 	 */
-	private $_modules;
+	private $_moduleManager;
 
 	/**
-	 * The module path.
-	 * @var string
+	 * The module manager.
+	 * @var \Trinity\Basement\Module\Manager
 	 */
-	private $_path;
-
-	/**
-	 * The module namespace.
-	 * @var string
-	 */
-	private $_namespace = '\Application';
 
 	/**
 	 * The list of autoloaders.
@@ -1342,94 +1336,27 @@ abstract class Application
 	} // end getServiceLocator();
 
 	/**
-	 * Sets the path to the application modules.
+	 * Returns the module manager.
 	 *
-	 * @param string $name The module namespace.
-	 * @param string $path The module path.
-	 * @return Application Fluent interface.
+	 * @return \Trinity\Basement\Module\Manager
 	 */
-	public function setModulePath($name, $path)
+	public function getModuleManager()
 	{
-		if($name[0] != '\\')
-		{
-			$name = '\\'.$name;
-		}
-		$this->_namespace = $name;
+		return $this->_moduleManager;
+	} // end getModuleManager();
 
+	/**
+	 * Installs a new instance of a module manager in the application.
+	 *
+	 * @param \Trinity\Basement\Module\Manager $manager The new module manager
+	 * @return \Trinity\Basement\Application Fluent interface.
+	 */
+	public function setModuleManager(\Trinity\Basement\Module\Manager $manager)
+	{
+		$this->_moduleManager = $manager;
 
-		if($path[strlen($path) - 1] != '/')
-		{
-			$path .= '/';
-		}
-
-		$this->_path = $path;
 		return $this;
-	} // end setModulePath();
-
-	/**
-	 * Returns the current module path.
-	 *
-	 * @return string
-	 */
-	public function getModulePath()
-	{
-		return $this->_path;
-	} // end getModulePath();
-
-	/**
-	 * Sets a hand-built module.
-	 *
-	 * @throws Core_Exception
-	 * @param Module $module The module to add.
-	 * @param boolean $replace Allow replacing an existing module?
-	 */
-	public function setModule(Module $module, $replace = true)
-	{
-		$name = str_replace('\\', '.', get_class($module));
-
-		if(isset($this->_modules[$name]) && !$replace)
-		{
-			throw new Core_Exception('Cannot replace module '.$name);
-		}
-		$this->_modules[$name] = $module;
-	} // end setModule();
-
-	/**
-	 * Attempts to load an application module.
-	 *
-	 * @param string $moduleName The name of the module to load.
-	 * @return Module
-	 */
-	public function loadModule($moduleName)
-	{
-		if(isset($this->_modules[$moduleName]))
-		{
-			return $this->_modules[$moduleName];
-		}
-		$path = $this->_path.str_replace('.', '/', $moduleName).'/';
-		if(file_exists($path.'Module.php'))
-		{
-			if($moduleName == '')
-			{
-				$className = $this->_namespace.'\\Module';
-			}
-			else
-			{
-				$className = $this->_namespace.'\\'.str_replace('.', '\\', $moduleName).'\\Module';
-			}
-			$object = new $className($moduleName, $path);
-
-			if(!$object instanceof Module)
-			{
-				throw new Core_Exception('Invalid interface for module '.$moduleName);
-			}
-		}
-		else
-		{
-			$object = new Module($moduleName, $path);
-		}
-		return $this->_modules[$moduleName] = $object;
-	} // end loadModule();
+	} // end setModuleManager();
 
 	/**
 	 * Registers a new autoloader. In order not to reduce flexibility, it

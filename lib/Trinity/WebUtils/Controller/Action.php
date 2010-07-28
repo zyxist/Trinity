@@ -11,11 +11,12 @@
  */
 
 namespace Trinity\WebUtils\Controller;
-use \Trinity\Web\Controller;
+use \Trinity\Basement\Module;
+use \Trinity\Web\Controller as Web_Controller;
+use \Trinity\Web\Controller\Manager;
+use \Trinity\Web\Brick;
 use \Trinity\Web\View;
 use \Trinity\Web\Controller_Exception;
-use \Trinity\Web\Request_Abstract;
-use \Trinity\Web\Response_Abstract;
 
 /**
  * This controller implements an one-step layout with single, self-contained
@@ -25,7 +26,7 @@ use \Trinity\Web\Response_Abstract;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Action extends Controller
+class Action extends Web_Controller
 {
 	/**
 	 * Default action.
@@ -34,41 +35,30 @@ class Action extends Controller
 	private $_defaultAction = 'index';
 
 	/**
-	 * The directory where actions are located.
-	 * @var string
+	 * The module responsible for loading actions.
+	 * @var \Trinity\Basement\Module
 	 */
-	protected $_actionDirectory;
+	protected $_actionModule;
 
 	/**
-	 * An array of loaded actions.
-	 * @var array
-	 */
-	protected $_loadedActions = array();
-
-	/**
-	 * Sets the directory where the group classes could be found.
+	 * Sets the module responsible for loading group classes.
 	 *
-	 * @throws Controller_Exception
-	 * @param string $directory The directory name.
+	 * @param \Trinity\Basement\Module $module
 	 */
-	public function setActionDirectory($directory)
+	public function setActionModule(Module $module)
 	{
-		if(!is_dir($directory))
-		{
-			throw new Controller_Exception('The controller action directory '.$directory.' is not accessible.');
-		}
-		$this->_actionDirectory = (string)$directory;
-	} // end setActionDirectory();
+		$this->_actionModule = $module;
+	} // end setActionModule();
 
 	/**
-	 * Returns the group directory.
+	 * Returns the group module.
 	 *
-	 * @return string
+	 * @return \Trinity\Basement\Module
 	 */
-	public function getActionDirectory()
+	public function getActionModule()
 	{
-		return $this->_actionDirectory;
-	} // end getActionDirectory();
+		return $this->_actionModule;
+	} // end getActionModule();
 
 
 	/**
@@ -93,52 +83,44 @@ class Action extends Controller
 	/**
 	 * Dispatches the request.
 	 *
-	 * @param Request_Abstract $request The request to dispatch.
-	 * @param Response_Abstract $response The sent response.
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager.
 	 */
-	protected function _dispatch(Request_Abstract $request, Response_Abstract $response)
+	protected function _dispatch(Manager $manager)
 	{
-		if($this->_actionDirectory === null)
+		if($this->_actionModule === null)
 		{
-			throw new Controller_Exception('Cannot dispatch the request: the action directory is not set.');
+			$this->raiseControllerError($manager, Web_Controller::ERROR_CONFIGURATION);
 		}
-		$action = $request->getParam('action', $this->_defaultAction);
+		$action = $manager->request->getParam('action', $this->_defaultAction);
+		$actionProcessed = ucfirst($action).'Action';
+		$actionQualified = $this->_actionModule->getClassName($actionProcessed);
 
-		$actionObj = $this->_loadAction($action);
-		$actionObj->setRequest($request);
-		$actionObj->setResponse($response);
-		$view = $actionObj->dispatch();
-
-		if($view instanceof View)
+		if(!ctype_alnum($action))
 		{
-			$this->_processView($view);
+			$this->raiseControllerError($manager, Web_Controller::ERROR_VALIDATION);
 		}
+		// Try to load the action object
+		if(!$this->_actionModule->loadFile($actionProcessed) || !class_exists($actionQualified, false))
+		{
+			$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+		}
+		$actionObj = new $actionQualified($manager);
+
+		if(!$actionObj instanceof Brick)
+		{
+			$this->raiseControllerError($manager);
+		}
+
+		$manager->events->fire('controller.action.dispatch', array(
+			'brick' => $actionObj,
+			'action' => $action
+		));
+
+		$actionObj->dispatch();
+
+		$manager->events->fire('controller.action.dispatched', array(
+			'brick' => $actionObj,
+			'action' => $action
+		));
 	} // end _dispatch();
-
-	/**
-	 * Loads the specified group object.
-	 * @param string $name The group name.
-	 * @return Action_Single
-	 */
-	protected function _loadAction($name)
-	{
-		$name = ucfirst($name).'Action';
-
-		if(!isset($this->_loadedActions[$name]))
-		{
-			if(!file_exists($this->_actionDirectory.$name.'.php'))
-			{
-				throw new Controller_Exception('Action '.$name.' does not exist.');
-			}
-
-			require($this->_actionDirectory.$name.'.php');
-			$act = new $name($this->_application, $this);
-			if(!$act instanceof Action_Single)
-			{
-				throw new Controller_Exception('Action '.$name.' does not have a proper interface.');
-			}
-			$this->_loadedActions[$name] = $act;
-		}
-		return $this->_loadedActions[$name];
-	} // end _loadAction();
 } // end Action;

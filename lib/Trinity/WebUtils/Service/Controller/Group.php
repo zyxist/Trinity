@@ -11,8 +11,9 @@
  */
 namespace Trinity\WebUtils;
 use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Basement\Service as Service;
-use \Trinity\Web\View_Broker as View_Broker;
+use \Trinity\Basement\Service;
+use \Trinity\Basement\Module;
+use \Trinity\Web\View_Broker;
 
 /**
  * The controller builder.
@@ -21,7 +22,7 @@ use \Trinity\Web\View_Broker as View_Broker;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Controller_ActionGroup extends Service
+class Service_Controller_Group extends Service
 {
 	/**
 	 * List of the required dependencies.
@@ -42,8 +43,9 @@ class Service_Controller_ActionGroup extends Service
 		$area = $this->_serviceLocator->get('web.Area');
 		$broker = $this->_serviceLocator->get('web.Broker');
 
-		$controller = new Controller\ActionGroup(BaseApplication::getApplication());
-		$controller->setGroupDirectory($area->getCodePath('Group'));
+		$controller = new Controller\Group(BaseApplication::getApplication());
+
+		$controller->setGroupModule($area->getAreaModule()->getSubmodule('Group'));
 		$controller->setDefaults($this->defaultGroup, $this->defaultAction);
 		$controller->setModelLocator($this->_serviceLocator->get('model.ModelLocator'));
 

@@ -45,17 +45,17 @@ class Service_Broker extends Service
 
 		// Connect some broker events
 		$application->getEventManager()->addCallback('controller.web.dispatch.end', function($args) use($broker){
-			$viewBroker = $args['controller']->getViewBroker();
-			$viewBroker->setRequest($args['request']);
-			$viewBroker->setResponse($args['response']);
+			$viewBroker = $args['manager']->getViewBroker();
+			$viewBroker->setRequest($args['manager']->request);
+			$viewBroker->setResponse($args['manager']->response);
 			if($viewBroker instanceof View_Broker)
 			{
 				$viewBroker->display();
 			}
-			$args['response']->sendResponse();
+			$args['manager']->response->sendResponse();
 		});
 		$application->getEventManager()->addCallback('controller.web.dispatch.redirect', function($args){
-			$args['response']->sendResponse();
+			$args['manager']->response->sendResponse();
 		});
 
 		return $broker;
