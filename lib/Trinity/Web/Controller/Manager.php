@@ -65,10 +65,22 @@ class Manager
 	 */
 	public $services;
 
+	/**
+	 * The configuration
+	 * @var \Trinity\Utils\Config
+	 */
 	public $config;
 
+	/**
+	 * The router
+	 * @var \Trinity\Web\Router
+	 */
 	public $router;
 
+	/**
+	 * The session manager
+	 * @var \Trinity\Web\Session
+	 */
 	public $session;
 
 	/**
