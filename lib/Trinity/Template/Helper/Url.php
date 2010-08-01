@@ -11,7 +11,7 @@
  */
 namespace Trinity\Template;
 use \Trinity\Web\Area\Strategy_Interface;
-use \Trinity\Web\Router_Interface;
+use \Trinity\Web\Router;
 
 class Helper_Url
 {
@@ -23,7 +23,7 @@ class Helper_Url
 
 	/**
 	 * The router.
-	 * @var \Trinity\Web\Router_Interface
+	 * @var \Trinity\Web\Router
 	 */
 	static private $_router;
 
@@ -53,9 +53,9 @@ class Helper_Url
 	/**
 	 * Sets the router.
 	 *
-	 * @param Router_Interface $router The application router.
+	 * @param Router $router The application router.
 	 */
-	static public function setRouter(Router_Interface $router)
+	static public function setRouter(Router $router)
 	{
 		self::$_router = $router;
 	} // end setStrategy();

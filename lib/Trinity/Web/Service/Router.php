@@ -8,11 +8,10 @@
  *
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
- *
- * $Id$
  */
 namespace Trinity\Web;
 use \Trinity\Basement\Service as Service;
+use \Trinity\Web\Router\Standard as Router_Standard;
 
 /**
  * The routing service.

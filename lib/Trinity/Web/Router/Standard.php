@@ -10,8 +10,10 @@
  * and other contributors. See website for details.
  */
 
-namespace Trinity\Web;
+namespace Trinity\Web\Router;
 use \Trinity\Web\Area\Strategy_Interface;
+use \Trinity\Web\Router as Router_Interface;
+use \Trinity\Web\Router\Exception as Router_Exception;
 
 /**
  * The standard router implementation.
@@ -20,7 +22,7 @@ use \Trinity\Web\Area\Strategy_Interface;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Router_Standard implements Router_Interface
+class Standard implements Router_Interface
 {
 	const COMPULSORY = 1;
 	const OPTIONAL = 0;
@@ -210,7 +212,7 @@ class Router_Standard implements Router_Interface
 	 * is not specified, we assume that the route links to the current
 	 * area.
 	 *
-	 * @throws Router_Exception
+	 * @throws \Trinity\Web\Router\Exception
 	 * @param array $sVars An array of parameters
 	 * @param string $area The area name.
 	 * @param boolean $fullyQualified Use fully qualified paths?
@@ -351,4 +353,4 @@ class Router_Standard implements Router_Interface
 			$this->_params[(string)$name] = $value;
 		}
 	} // end setParams();
-} // end Router_Standard;
+} // end Standard;

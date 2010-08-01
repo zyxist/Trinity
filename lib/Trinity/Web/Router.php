@@ -20,7 +20,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-interface Router_Interface
+interface Router
 {
 	/**
 	 * Constructs a path from the variable list.
@@ -52,4 +52,4 @@ interface Router_Interface
 	 * @param mixed $variables The list of router variables.
 	 */
 	public function setParams(array $variables);
-} // end Router_Interface;
+} // end Router;
