@@ -5,7 +5,7 @@ define('APP_PATH', '../Application/');
 
 // Configure the autoloaders
 $libs = parse_ini_file(dirname(__FILE__).'/../paths.ini', true);
-require($libs['Opl'].'Opl/Base.php');
+require($libs['Opl'].'Opl/Loader.php');
 
 $nsLoader = new Opl_Loader;
 // Libraries that use PHP 5.3 namespaces go here.
