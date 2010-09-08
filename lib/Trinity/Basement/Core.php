@@ -15,6 +15,7 @@
 namespace Trinity\Basement;
 use \Trinity\Basement\Core\Exception as Core_Exception;
 use \Symfony\Component\EventDispatcher\EventDispatcher;
+use \Symfony\Component\EventDispatcher\Event;
 
 /**
  * The controller interface.
@@ -206,23 +207,23 @@ class Locator
 	protected $_pool = array();
 
 	/**
-	 * The event manager.
-	 * @var EventManager
+	 * The event dispatcher.
+	 * @var EventDispatcher
 	 */
-	protected $_eventManager;
+	protected $_eventDispatcher;
 
 	/**
 	 * Creates the locator.
 	 * 
 	 * @param string $name The locator name
-	 * @param EventManager $eventManager The event manager.
+	 * @param EventDispatcher $eventDispatcher The event manager.
 	 */
-	public function __construct($name, EventManager $eventManager)
+	public function __construct($name, EventDispatcher $eventDispatcher)
 	{
 		$this->_name = (string)$name;
-		$this->_eventManager = $eventManager;
+		$this->_eventDispatcher = $eventDispatcher;
 
-		$this->_eventManager->fire('locator.'.$this->_name.'.created', array('locator' => $this));
+		$eventDispatcher->notify(new Event($this, 'locator.'.$this->_name.'.created'));
 	} // end __construct();
 
 	/**
@@ -230,7 +231,7 @@ class Locator
 	 */
 	public function __destruct()
 	{
-		$this->_eventManager->fire('locator.'.$this->_name.'.destroyed', array('locator' => $this));
+		$this->_eventDispatcher->notify(new Event($this, 'locator.'.$this->_name.'.destroyed'));
 	} // end __destruct();
 
 	/**
@@ -335,11 +336,11 @@ class Locator_Object extends Locator
 	 *
 	 * @throws Core_Exception
 	 * @param string $name The locator name
-	 * @param EventManager $eventManager The event manager.
+	 * @param EventDispatcher $eventDispatcher The event manager.
 	 * @param string $baseClass The name of the base class that can be stored in this locator.
 	 * @param callback $creatorFunc The optional object creation function.
 	 */
-	public function __construct($name, EventManager $eventManager, $baseClass, $creatorFunc = null)
+	public function __construct($name, EventDispatcher $eventDispatcher, $baseClass, $creatorFunc = null)
 	{
 		$this->_baseClass = (string)$baseClass;
 
@@ -352,7 +353,7 @@ class Locator_Object extends Locator
 			$this->_creatorFunc = $creatorFunc;
 		}
 
-		parent::__construct($name, $eventManager);
+		parent::__construct($name, $eventDispatcher);
 	} // end __construct();
 
 	/**
@@ -360,6 +361,7 @@ class Locator_Object extends Locator
 	 */
 	public function __destruct()
 	{
+		$this->_eventDispatcher->
 		$this->_eventManager->fire('locator.'.$this->_name.'.destroyed');
 	} // end __destruct();
 
@@ -431,9 +433,9 @@ class Locator_Object extends Locator
 				throw new Core_Exception('The object registered as '.$name.' does not implement '.$this->_baseClass);
 			}
 
-			$this->_eventManager->fire('locator.'.$this->_name.'.new',
+			$this->_eventDispatcher->notify(new Event($this, 'locator.'.$this->_name.'.new',
 				array('name' => $name, 'object' => $this->_pool[(string)$name])
-			);
+			));
 		}
 		else
 		{
@@ -937,9 +939,11 @@ class Locator_Service extends Locator
 			{
 				// Load the service object
 				$this->_pool[$item->getName()] = $item->getObject();
-				$this->_eventManager->fire('locator.'.$item->getName().'.new',
-					array('name' => $item->getName(), 'object' => $this->_pool[$item->getName()])
-				);
+
+				$this->_eventDispatcher->notify(new Event($this, 'locator.'.$this->_name.'.new',
+					array('name' => $name, 'object' => $this->_pool[(string)$name])
+				));
+
 				$postLoading = $item->toPostload();
 				$item->dispose();
 				// Add the post-selected hooks.
