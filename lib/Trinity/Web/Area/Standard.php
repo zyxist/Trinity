@@ -10,7 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Web;
-use \Trinity\Basement\Application as BaseApplication;
+use \Trinity\Basement\Application;
 use \Trinity\Basement\Module;
 use \Trinity\Web\Area\Strategy_Interface;
 
@@ -26,7 +26,7 @@ class Area_Standard
 {
 	/**
 	 * The application link.
-	 * @var BaseApplication
+	 * @var \Trinity\Basement\Application
 	 */
 	protected $_application;
 
@@ -59,11 +59,13 @@ class Area_Standard
 	 * specified strategy. Note that strategy discovery process may throw
 	 * an exception.
 	 *
+	 * The constructor fires the 'area.created' event.
+	 *
 	 * @throws Area_Exception
 	 * @param Application $application The application object
 	 * @param Strategy_Interface $strategy Area discovering strategy
 	 */
-	public function __construct(BaseApplication $application, Strategy_Interface $strategy)
+	public function __construct(Application $application, Strategy_Interface $strategy)
 	{
 		$this->_application = $application;
 
@@ -73,6 +75,8 @@ class Area_Standard
 
 		$this->_name = $name;
 		$this->_options = $data;
+
+		$application->getEventDispatcher()->notify(new Event($this, 'area.created'));
 	} // end __construct();
 
 	/**
