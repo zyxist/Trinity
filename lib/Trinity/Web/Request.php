@@ -18,7 +18,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class Request_Abstract
+abstract class Request
 {
 	/**
 	 * The name of the module to execute.
@@ -28,7 +28,7 @@ abstract class Request_Abstract
 
 	/**
 	 * The request area
-	 * @var \Trinity\Web\Area_Standard
+	 * @var \Trinity\Web\Area
 	 */
 	private $_area = null;
 
@@ -60,7 +60,7 @@ abstract class Request_Abstract
 	/**
 	 * Returns the request area
 	 *
-	 * @return \Trinity\Web\Area_Standard
+	 * @return \Trinity\Web\Area
 	 */
 	public function getArea()
 	{
@@ -70,9 +70,9 @@ abstract class Request_Abstract
 	/**
 	 * Sets the request area.
 	 *
-	 * @param \Trinity\Web\Area_Standard $area
+	 * @param \Trinity\Web\Area $area
 	 */
-	public function setArea(Area_Standard $area)
+	public function setArea(Area $area)
 	{
 		$this->_area = $area;
 	} // end setArea();
@@ -124,7 +124,7 @@ abstract class Request_Abstract
 
 	/**
 	 * Sets the request parameter to the specified value.
-	 * 
+	 *
 	 * @param string $name The parameter name
 	 * @param mixed $value The new parameter value
 	 */
@@ -140,4 +140,4 @@ abstract class Request_Abstract
 	{
 		$this->_params = array();
 	} // end clearParams();
-} // end Request_Abstract;
+} // end Request;
