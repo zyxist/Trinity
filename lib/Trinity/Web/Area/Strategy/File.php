@@ -9,10 +9,11 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web\Area;
+namespace Trinity\Web\Area\Strategy;
 use \Trinity\Basement\Application as BaseApplication;
 use \Trinity\Basement\Module as Module;
-use \Trinity\Web\Area_Exception;
+use \Trinity\Web\Area\Strategy;
+use \Trinity\Web\Area\Exception as Area_Exception;
 
 /**
  * The area discovery strategy that stores area definitions in files.
@@ -21,7 +22,7 @@ use \Trinity\Web\Area_Exception;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Strategy_File implements Strategy_Interface
+class File implements Strategy
 {
 	/**
 	 * Discover the area name from host.
@@ -249,4 +250,4 @@ class Strategy_File implements Strategy_Interface
 			throw new Area_Exception('Error while loading the area definition file.');
 		}
 	} // end _loadAreas();
-} // end Area_File;
+} // end File;
