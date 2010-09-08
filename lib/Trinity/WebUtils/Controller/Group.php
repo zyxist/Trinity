@@ -15,8 +15,8 @@ use \Trinity\Basement\Module;
 use \Trinity\Web\Controller as Web_Controller;
 use \Trinity\Web\View;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
-use \Trinity\Web\Request_Abstract as Request_Abstract;
-use \Trinity\Web\Response_Abstract as Response_Abstract;
+use \Trinity\Web\Request as Request_Abstract;
+use \Trinity\Web\Response as Response_Abstract;
 use \Trinity\Web\Controller\Manager;
 use \Trinity\WebUtils\View\ActionGroup as View_ActionGroup;
 
