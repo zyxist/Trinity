@@ -100,10 +100,10 @@ abstract class Controller implements CoreController
 	/**
 	 * Dispatches the specified request and response.
 	 * 
-	 * @param Request_Abstract $request The HTTP request details
-	 * @param Response_Abstract $response The HTTP response object
+	 * @param Request $request The HTTP request details
+	 * @param Response $response The HTTP response object
 	 */
-	public function dispatch(Request_Abstract $request, Response_Abstract $response)
+	public function dispatch(Request $request, Response $response)
 	{
 		$manager = new Manager($this->_application, $request, $response, $this->_modelLocator);
 		$manager->router->setParam('area', $manager->area->getName());
