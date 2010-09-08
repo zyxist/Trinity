@@ -10,14 +10,14 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Template;
-use \Trinity\Web\Area\Strategy_Interface;
+use \Trinity\Web\Area\Strategy;
 use \Trinity\Web\Router;
 
 class Helper_Url
 {
 	/**
 	 * The area discovery strategy.
-	 * @var \Trinity\Web\Area\Strategy_Interface
+	 * @var \Trinity\Web\Area\Strategy
 	 */
 	static private $_strategy;
 
@@ -43,9 +43,9 @@ class Helper_Url
 	 * Sets the area discovery strategy, so that we are able to communicate
 	 * with it and retrieve area information.
 	 * 
-	 * @param Strategy_Interface $areaStrategy The area strategy.
+	 * @param Strategy $areaStrategy The area strategy.
 	 */
-	static public function setStrategy(Strategy_Interface $areaStrategy)
+	static public function setStrategy(Strategy $areaStrategy)
 	{
 		self::$_strategy = $areaStrategy;
 	} // end setStrategy();
