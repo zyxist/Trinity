@@ -9,7 +9,8 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\Area;
+use \Trinity\Basement\Core_Exception;
 
 /**
  * Exception class for areas.
@@ -18,7 +19,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Area_Exception extends Exception
+class Exception extends Core_Exception
 {
 	/* null */
-} // end Area_Exception;
+} // end Exception;

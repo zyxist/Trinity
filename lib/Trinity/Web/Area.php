@@ -12,7 +12,7 @@
 namespace Trinity\Web;
 use \Trinity\Basement\Application as BaseApplication;
 use \Trinity\Basement\Module;
-use \Trinity\Web\Area\Strategy_Interface;
+use \Trinity\Web\Area\Strategy;
 
 /**
  * Abstract area class provides the minimal interface for communicating
@@ -22,7 +22,7 @@ use \Trinity\Web\Area\Strategy_Interface;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Area_Standard
+class Area
 {
 	/**
 	 * The application link.
@@ -61,9 +61,9 @@ class Area_Standard
 	 *
 	 * @throws Area_Exception
 	 * @param Application $application The application object
-	 * @param Strategy_Interface $strategy Area discovering strategy
+	 * @param Strategy $strategy Area discovering strategy
 	 */
-	public function __construct(BaseApplication $application, Strategy_Interface $strategy)
+	public function __construct(BaseApplication $application, Strategy $strategy)
 	{
 		$this->_application = $application;
 
@@ -107,7 +107,7 @@ class Area_Standard
 	{
 		if(!isset($this->_options[$name]))
 		{
-			throw new Area_Exception('The specified area option '.$name.' does not exist.');
+			throw new Area\Exception('The specified area option '.$name.' does not exist.');
 		}
 		return $this->_options[$name];
 	} // end getOption();
@@ -115,7 +115,7 @@ class Area_Standard
 	/**
 	 * Returns the area option value. If the option is not defined, a
 	 * default value is returned.
-	 * 
+	 *
 	 * @param string $name Option name
 	 * @param mixed $default Default option value
 	 * @return mixed
@@ -232,7 +232,7 @@ class Area_Standard
 	{
 		if(!isset($opts['controller']))
 		{
-			throw new Area_Exception('The area does not define any controller.');
+			throw new Area\Exception('The area does not define any controller.');
 		}
 	} // end _validateOptions();
-} // end Area_Abstract;
+} // end Area;
