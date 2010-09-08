@@ -14,6 +14,7 @@
 
 namespace Trinity\Basement;
 use \Trinity\Basement\Core\Exception as Core_Exception;
+use \Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * The controller interface.
@@ -1044,9 +1045,9 @@ abstract class Application
 {
 	/**
 	 * The event manager used by the application
-	 * @var EventManager
+	 * @var \Symfony\Component\EventDispatcher\EventDispatcher
 	 */
-	private $_eventManager;
+	private $_eventDispatcher;
 
 	/**
 	 * The application service locator
@@ -1104,7 +1105,7 @@ abstract class Application
 	{
 		self::$_application = $this;
 
-		$this->_eventManager = new EventManager;
+		$this->_eventDispatcher = new EventDispatcher;
 		$this->_serviceLocator = new Locator_Service('services', $this->_eventManager);
 		$this->_serviceLocator->addServiceGroup('utils', '\Trinity\Utils\Service_');
 		$this->_serviceLocator->addServiceGroup('model', '\Trinity\Model\Service_');
@@ -1118,13 +1119,14 @@ abstract class Application
 	abstract protected function _launch();
 
 	/**
-	 * Returns the event handler.
-	 * @return EventHandler
+	 * Returns the event dispatcher.
+	 *
+	 * @return \Symfony\Component\EventDispatcher\EventDispatcher
 	 */
-	public function getEventManager()
+	public function getEventDispatcher()
 	{
-		return $this->_eventManager;
-	} // end getEventManager();
+		return $this->_eventDispatcher;
+	} // end getEventDispatcher();
 
 	/**
 	 * Returns the bootstrap object.
