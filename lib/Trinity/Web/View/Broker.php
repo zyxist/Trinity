@@ -24,16 +24,16 @@ interface View_Broker
 	/**
 	 * Sets the request object.
 	 *
-	 * @param Request_Abstract $request The request object.
+	 * @param Request $request The request object.
 	 */
-	public function setRequest(Request_Abstract $request);
+	public function setRequest(Request $request);
 
 	/**
 	 * Sets the response object.
 	 *
-	 * @param Response_Abstract $response The response object.
+	 * @param Response $response The response object.
 	 */
-	public function setResponse(Response_Abstract $response);
+	public function setResponse(Response $response);
 
 	/**
 	 * Displays the view.
