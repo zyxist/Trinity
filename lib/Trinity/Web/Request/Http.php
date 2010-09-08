@@ -9,7 +9,8 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\Request;
+use \Trinity\Web\Request;
 
 /**
  * A typical HTTP request.
@@ -18,7 +19,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Request_Http extends Request_Abstract
+class Http extends Request
 {
 	/**
 	 * The visit information
@@ -66,4 +67,4 @@ class Request_Http extends Request_Abstract
 	{
 		return $this->_visit;
 	} // end getVisit();
-} // end Request_Http;
+} // end Http;
