@@ -11,7 +11,7 @@
  */
 
 namespace Trinity\Web;
-use Trinity\Basement\Application;
+use \Trinity\Basement\Application as Basement_Application;
 
 /**
  * Brokers perform the automated construction of request and response
@@ -44,9 +44,9 @@ abstract class Broker
 	/**
 	 * Constructs the broker object.
 	 *
-	 * @param Application $application The application.
+	 * @param Basement_Application $application The application.
 	 */
-	public function __construct(Application $application)
+	public function __construct(Basement_Application $application)
 	{
 		$this->_application = $application;
 	} // end __construct();

@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\Web\Broker;
+use \Trinity\Web\Broker;
 use \Trinity\Web\Request\Http as Request_Http;
 use \Trinity\Web\Response\Http as Response_Http;
 
