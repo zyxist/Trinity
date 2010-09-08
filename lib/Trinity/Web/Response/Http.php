@@ -9,7 +9,8 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\Response;
+use \Trinity\Web\Response;
 
 /**
  * Standard HTTP response.
@@ -18,7 +19,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Response_Http extends Response_Abstract
+class Http extends Response
 {
 	/* null */
-} // end Response_Http;
+} // end Http;

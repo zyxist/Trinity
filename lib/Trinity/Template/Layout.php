@@ -11,10 +11,11 @@
  */
 
 namespace Trinity\Template;
+use \Symfony\Component\EventDispatcher\Event;
 use Trinity\Basement\Application as BaseApplication;
 use Trinity\Web\View_Broker;
-use Trinity\Web\Request_Abstract;
-use Trinity\Web\Response_Abstract;
+use Trinity\Web\Request;
+use Trinity\Web\Response;
 use Opt_View;
 use Opt_Output_Interface;
 
@@ -185,7 +186,7 @@ class Layout implements View_Broker
 	 *
 	 * @param Request_Abstract $request
 	 */
-	public function setRequest(Request_Abstract $request)
+	public function setRequest(Request $request)
 	{
 		/* null */
 	} // end setRequest();
@@ -196,7 +197,7 @@ class Layout implements View_Broker
 	 *
 	 * @param Response_Abstract $response The response object.
 	 */
-	public function setResponse(Response_Abstract $response)
+	public function setResponse(Response $response)
 	{
 		$this->_output = $output = new Output;
 		$response->setBodyGenerator(function() use($output)
@@ -214,21 +215,21 @@ class Layout implements View_Broker
 	public function display()
 	{
 		$serviceLocator = $this->_application->getServiceLocator();
-		$eventManager = $this->_application->getEventManager();
+		$eventDispatcher = $this->_application->getEventDispatcher();
 
 		// Finish configuring Open Power Template
 		$opt = $serviceLocator->get('template.Opt');
 
-		$eventManager->fire('template.layout.template.configure',
+		$eventDispatcher->notify(new Event($this, 'template.layout.template.configure',
 			array('opt' => $opt)
-		);
+		));
 
 		$opt->setup();
 
 		// Configure the layout view
-		$eventManager->fire('template.layout.configure',
+		$eventDispatcher->notify(new Event($this, 'template.layout.configure',
 			array('layout' => $this->_layout)
-		);
+		));
 
 		// Add placeholders
 		foreach($this->_placeholders as $name => &$placeholder)
@@ -243,9 +244,9 @@ class Layout implements View_Broker
 
 		// Render everything. Actually, this is redirected to events, so
 		// that we can easily change the exact rendering procedure.
-		$eventManager->fire('template.layout.render',
+		$eventDispatcher->notify(new Event($this, 'template.layout.render',
 			array('layout' => $this->_layout)
-		);
+		));
 		$this->_output->render($this->_layout);
 	} // end display();
 } // end Layout;

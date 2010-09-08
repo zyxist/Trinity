@@ -11,6 +11,7 @@
  */
 namespace Trinity\Web;
 use \Trinity\Basement\Service as Service;
+use \Trinity\Web\Broker\Standard;
 
 /**
  * The broker selector.
@@ -39,12 +40,13 @@ class Service_Broker extends Service
 	{
 		$application = \Trinity\Basement\Application::getApplication();
 		// Initialize the broker
-		$broker = new Broker_Standard($application);
+		$broker = new Standard($application);
 		$broker->buildRequest($this->_serviceLocator->get('web.Visit'));
 		$broker->buildResponse();
 
 		// Connect some broker events
-		$application->getEventManager()->addCallback('controller.web.dispatch.end', function($args) use($broker){
+		$eventDispatcher = $application->getEventDispatcher();
+		$eventDispatcher->connect('controller.web.dispatch.end', function($args) use($broker){
 			$viewBroker = $args['manager']->getViewBroker();
 			$viewBroker->setRequest($args['manager']->request);
 			$viewBroker->setResponse($args['manager']->response);
@@ -54,7 +56,7 @@ class Service_Broker extends Service
 			}
 			$args['manager']->response->sendResponse();
 		});
-		$application->getEventManager()->addCallback('controller.web.dispatch.redirect', function($args){
+		$eventDispatcher->connect('controller.web.dispatch.redirect', function($args){
 			$args['manager']->response->sendResponse();
 		});
 

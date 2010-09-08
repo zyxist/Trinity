@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\WebUtils\View;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Application as BaseApplication;
 use \Trinity\Web\View as WebView;
 use \Trinity\Web\View_Html as View_Html;
@@ -25,12 +26,11 @@ class ActionGroup extends View_Html
 	public function __construct(BaseApplication $application)
 	{
 		parent::__construct($application);
-		$eventManager = $application->getEventManager();
 
 		$view = $this;
 		
-		$eventManager->addCallback('controller.actionGroup.dispatched', function($args) use($view){
-			$view->bind($args['group'], $args['action']);
+		$application->getEventDispatcher()->connect('controller.actionGroup.dispatched', function(Event $event) use($view){
+			$view->bind($event['group'], $event['action']);
 		});
 	} // end __construct();
 

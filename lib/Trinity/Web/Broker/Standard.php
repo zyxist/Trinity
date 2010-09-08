@@ -8,11 +8,13 @@
  *
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
- *
- * $Id$
  */
 
-namespace Trinity\Web;
+namespace Trinity\Web\Broker;
+use \Symfony\Component\EventDispatcher\Event;
+use \Trinity\Web\Broker;
+use \Trinity\Web\Request\Http as Request_Http;
+use \Trinity\Web\Response\Http as Response_Http;
 
 /**
  * The standard web application broker that constructs requests and responses
@@ -22,7 +24,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Broker_Standard extends Broker_Abstract
+class Standard extends Broker
 {
 
 	/**
@@ -34,9 +36,9 @@ class Broker_Standard extends Broker_Abstract
 	{
 		$this->setRequest($request = new Request_Http($visit));
 
-		$this->_application->getEventManager()->fire('web.broker.request.create', array(
+		$this->_application->getEventDispatcher()->notify(new Event($this, 'web.broker.request.create', array(
 			'request' => $request
-		));
+		)));
 	} // end buildRequest();
 
 	/**
@@ -46,8 +48,8 @@ class Broker_Standard extends Broker_Abstract
 	{
 		$this->setResponse($response = new Response_Http());
 
-		$this->_application->getEventManager()->fire('web.broker.response.create', array(
+		$this->_application->getEventDispatcher()->notify(new Event($this, 'web.broker.response.create', array(
 			'response' => $response
-		));
+		)));
 	} // end buildResponse();
 } // end Broker_Standard;

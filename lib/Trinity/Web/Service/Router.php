@@ -10,6 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Web;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Service as Service;
 use \Trinity\Web\Router\Standard as Router_Standard;
 
@@ -47,9 +48,9 @@ class Service_Router extends Service
 		require($this->routes);
 
 		// Connect the router to the broker.
-		$application->getEventManager()->addCallback('web.broker.request.create', function(array $args) use($router)
+		$application->getEventDispatcher()->connect('web.broker.request.create', function(Event $event) use($router)
 		{
-			$request = $args['request'];
+			$request = $event['request'];
 			$request->setParams($router->route($request->pathInfo));
 		});
 

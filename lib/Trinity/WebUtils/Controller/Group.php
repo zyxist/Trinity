@@ -11,12 +11,13 @@
  */
 
 namespace Trinity\WebUtils\Controller;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Module;
 use \Trinity\Web\Controller as Web_Controller;
 use \Trinity\Web\View;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
-use \Trinity\Web\Request_Abstract as Request_Abstract;
-use \Trinity\Web\Response_Abstract as Response_Abstract;
+use \Trinity\Web\Request as Request_Abstract;
+use \Trinity\Web\Response as Response_Abstract;
 use \Trinity\Web\Controller\Manager;
 use \Trinity\WebUtils\View\ActionGroup as View_ActionGroup;
 
@@ -138,11 +139,11 @@ class Group extends Web_Controller
 			$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
 		}
 
-		$manager->events->fire('controller.group.dispatch', array(
+		$manager->events->notify(new Event($this, 'controller.group.dispatch', array(
 			'groupObj' => $groupObj,
 			'group' => $group,
 			'action' => $action
-		));
+		)));
 		if($groupObj->hasBrickAction($action))
 		{
 			$brick = $manager->getBrick($groupObj->getBrickAction($action));
@@ -157,10 +158,10 @@ class Group extends Web_Controller
 				$manager->processView($view);
 			}
 		}
-		$manager->events->fire('controller.group.dispatched', array(
+		$manager->events->notify(new Event($this, 'controller.group.dispatched', array(
 			'groupObj' => $groupObj,
 			'group' => $group,
 			'action' => $action
-		));
+		)));
 	} // end _dispatch();
 } // end Group;

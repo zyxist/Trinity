@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\WebUtils\Controller;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Module;
 use \Trinity\Web\Controller as Web_Controller;
 use \Trinity\Web\Controller\Manager;
@@ -111,16 +112,16 @@ class Action extends Web_Controller
 			$this->raiseControllerError($manager);
 		}
 
-		$manager->events->fire('controller.action.dispatch', array(
+		$manager->events->notify(new Event($this, 'controller.action.dispatch', array(
 			'brick' => $actionObj,
 			'action' => $action
-		));
+		)));
 
 		$actionObj->dispatch();
 
-		$manager->events->fire('controller.action.dispatched', array(
+		$manager->events->notify(new Events($this, 'controller.action.dispatched', array(
 			'brick' => $actionObj,
 			'action' => $action
-		));
+		)));
 	} // end _dispatch();
 } // end Action;

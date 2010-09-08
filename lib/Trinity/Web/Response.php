@@ -19,7 +19,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class Response_Abstract
+abstract class Response
 {
 	/**
 	 * The HTTP response code.
@@ -66,11 +66,11 @@ abstract class Response_Abstract
 	/**
 	 * Sets a HTTP header with the specified value.
 	 *
-	 * @throws Response_Exception
+	 * @throws \Trinity\Web\Response\Exception
 	 * @param string $name The header name
 	 * @param string $value The header value
 	 * @param boolean $replace Replace the header, if already exists?
-	 * @return Response_Abstract Fluent interface.
+	 * @return Response Fluent interface.
 	 */
 	public function setHeader($name, $value, $replace = true)
 	{
@@ -78,7 +78,7 @@ abstract class Response_Abstract
 
 		if(isset($this->_headers[$name]) && !$replace)
 		{
-			throw new Response_Exception('Cannot replace the header '.$name.' - already set.');
+			throw new Response\Exception('Cannot replace the header '.$name.' - already set.');
 		}
 
 		$this->_headers[$name] = array(
@@ -91,7 +91,8 @@ abstract class Response_Abstract
 	/**
 	 * Returns the header value. If the header does not exist, an exception
 	 * is thrown.
-	 * 
+	 *
+	 * @throws \Trinity\Web\Response\Exception
 	 * @param string $name The header name
 	 * @return string
 	 */
@@ -99,14 +100,14 @@ abstract class Response_Abstract
 	{
 		if(!isset($this->_headers[$name]))
 		{
-			throw new Response_Exception('The header '.$name.' is not defined.');
+			throw new Response\Exception('The header '.$name.' is not defined.');
 		}
 		return $this->_headers[$name]['value'];
 	} // end getHeader();
 
 	/**
 	 * Checks if the specified header is set.
-	 * 
+	 *
 	 * @param string $name The header name
 	 * @return boolean
 	 */
@@ -117,9 +118,9 @@ abstract class Response_Abstract
 
 	/**
 	 * Removes the header with the specified name.
-	 * 
+	 *
 	 * @param string $name The header name
-	 * @return Response_Abstract Fluent interface.
+	 * @return Response Fluent interface.
 	 */
 	public function removeHeader($name)
 	{
@@ -155,7 +156,8 @@ abstract class Response_Abstract
 
 	/**
 	 * Sets the response code for this response.
-	 * 
+	 *
+	 * @throws \Trinity\Web\Response\Exception
 	 * @param int $code The HTTP response code.
 	 */
 	public function setResponseCode($code)
@@ -180,14 +182,15 @@ abstract class Response_Abstract
 	/**
 	 * Sets the body generator.
 	 *
+	 * @throws \Trinity\Web\Response\Exception
 	 * @param callback $generator Body generator callback
-	 * @return Response_Abstract Fluent interface.
+	 * @return Response Fluent interface.
 	 */
 	public function setBodyGenerator($generator)
 	{
 		if(!is_callable($generator))
 		{
-			throw new Response_Exception('The specified body generator is not a valid callback.');
+			throw new Response\Exception('The specified body generator is not a valid callback.');
 		}
 		$this->_bodyGenerator = $generator;
 
@@ -239,7 +242,7 @@ abstract class Response_Abstract
 	{
 		if($this->_headersSent && $this->throwExceptionsOnHeadersSent)
 		{
-			throw new Response_Exception('Headers have already been sent.');
+			throw new Response\Exception('Headers have already been sent.');
 		}
 
 		// Send the HTTP code
@@ -293,14 +296,14 @@ abstract class Response_Abstract
 	 * Throws an exception, if the headers have been sent and the appropriate
 	 * option is set.
 	 *
-	 * @throws \Trinity\Web\Response_Exception
+	 * @throws \Trinity\Web\Response\Exception
 	 * @param string $headerName The header name for the informatory purposes
 	 */
 	private function _verifyHeadersSent($headerName)
 	{
 		if($this->_headersSent && $this->throwExceptionsOnHeadersSent)
 		{
-			throw new Response_Exception('Cannot set '.$headerName.' - headers have already been sent.');
+			throw new Response\Exception('Cannot set '.$headerName.' - headers have already been sent.');
 		}
 	} // end _verifyHeadersSent();
-} // end Response_Abstract;
+} // end Response;

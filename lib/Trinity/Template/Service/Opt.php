@@ -10,6 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Template;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Service as Service;
 use \Trinity\Basement\Application as BaseApplication;
 use \Opt_Class;
@@ -63,9 +64,9 @@ class Service_Opt extends Service
 		$opt->register(Opt_Class::PHP_FUNCTION, 'baseUrl', '\Trinity\Template\Helper_Url::baseUrl');
 		$opt->register(Opt_Class::PHP_FUNCTION, 'url', '\Trinity\Template\Helper_Url::url');
 
-		$eventManager = BaseApplication::getApplication()->getEventManager();
+		$eventDispatcher = BaseApplication::getApplication()->getEventDispatcher();
 		$serviceLocator = $this->_serviceLocator;
-		$eventManager->addCallback('template.layout.configure', function($args) use($serviceLocator)
+		$eventDispatcher->connect('template.layout.configure', function(Event $event) use($serviceLocator)
 		{
 			$session = $serviceLocator->get('web.Session');
 			\Opt_View::assignGlobal('flash', $session->getNamespace('flash'));

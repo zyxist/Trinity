@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\Web;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Controller as CoreController;
 use \Trinity\Basement\Locator_Object;
 use \Trinity\Basement\Application as BaseApplication;
@@ -100,28 +101,28 @@ abstract class Controller implements CoreController
 	/**
 	 * Dispatches the specified request and response.
 	 * 
-	 * @param Request_Abstract $request The HTTP request details
-	 * @param Response_Abstract $response The HTTP response object
+	 * @param Request $request The HTTP request details
+	 * @param Response $response The HTTP response object
 	 */
-	public function dispatch(Request_Abstract $request, Response_Abstract $response)
+	public function dispatch(Request $request, Response $response)
 	{
 		$manager = new Manager($this->_application, $request, $response, $this->_modelLocator);
 		$manager->router->setParam('area', $manager->area->getName());
 
-		$manager->events->fire('controller.web.dispatch.begin', array(
+		$manager->events->notify(new Event($this, 'controller.web.dispatch.begin', array(
 			'controller' => $this,
 			'manager' => $manager
-		));
+		)));
 
 		$manager->router->setParams($request->getParams());
 		try
 		{
 			$this->_dispatch($manager);
 
-			$manager->events->fire('controller.web.dispatch.end', array(
+			$manager->events->notify(new Event($this,'controller.web.dispatch.end', array(
 				'controller' => $this,
 				'manager' => $manager
-			));
+			)));
 		}
 		catch(Redirect_Exception $redirect)
 		{
@@ -134,11 +135,11 @@ abstract class Controller implements CoreController
 
 			$response->setRedirect($url, $redirect->getCode());
 			// TODO: Add a true redirection here
-			$manager->events->fire('controller.web.dispatch.redirect', array(
+			$manager->events->notify(new Event($this,'controller.web.dispatch.redirect', array(
 				'controller' => $this,
 				'manager' => $manager,
 				'redirect' => $redirect
-			));
+			)));
 		}
 	} // end dispatch();
 

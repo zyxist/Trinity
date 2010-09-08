@@ -11,7 +11,8 @@
  */
 
 namespace Trinity\Web;
-use Trinity\Basement\Application as BaseApplication;
+use \Symfony\Component\EventDispatcher\Event;
+use \Trinity\Basement\Application as Basement_Application;
 
 /**
  * Brokers perform the automated construction of request and response
@@ -21,17 +22,17 @@ use Trinity\Basement\Application as BaseApplication;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class Broker_Abstract
+abstract class Broker
 {
 	/**
 	 * The request object
-	 * @var Request_Abstract
+	 * @var Request
 	 */
 	private $_request;
 
 	/**
 	 * The response object
-	 * @var Response_Abstract
+	 * @var Response
 	 */
 	private $_response;
 
@@ -44,26 +45,26 @@ abstract class Broker_Abstract
 	/**
 	 * Constructs the broker object.
 	 *
-	 * @param BaseApplication $application The application.
+	 * @param Basement_Application $application The application.
 	 */
-	public function __construct(BaseApplication $application)
+	public function __construct(Basement_Application $application)
 	{
 		$this->_application = $application;
 	} // end __construct();
 
 	/**
 	 * Installs an external request within the broker.
-	 * 
-	 * @param Request_Abstract $request The new request.
-	 * @return Broker_Abstract Fluent interface.
+	 *
+	 * @param Request $request The new request.
+	 * @return Broker Fluent interface.
 	 */
-	public function setRequest(Request_Abstract $request)
+	public function setRequest(Request $request)
 	{
 		$this->_request = $request;
 
-		$this->_application->getEventManager()->fire('broker.request.set', array(
+		$this->_application->getEventDispatcher()->notify(new Event($this, 'broker.request.set', array(
 			'request' => $request
-		));
+		)));
 
 		return $this;
 	} // end setRequest();
@@ -71,7 +72,7 @@ abstract class Broker_Abstract
 	/**
 	 * Returns the current request object.
 	 *
-	 * @return \Trinity\Web\Request_Abstract
+	 * @return \Trinity\Web\Request
 	 */
 	public function getRequest()
 	{
@@ -81,16 +82,16 @@ abstract class Broker_Abstract
 	/**
 	 * Installs an external response within the broker.
 	 *
-	 * @param Response_Abstract $response The new response.
-	 * @return Broker_Abstract Fluent interface.
+	 * @param Response $response The new response.
+	 * @return Broker Fluent interface.
 	 */
-	public function setResponse(Response_Abstract $response)
+	public function setResponse(Response $response)
 	{
 		$this->_response = $response;
 
-		$this->_application->getEventManager()->fire('broker.response.set', array(
+		$this->_application->getEventDispatcher()->notify(new Event($this, 'broker.response.set', array(
 			'response' => $response
-		));
+		)));
 
 		return $this;
 	} // end setResponse();
@@ -98,10 +99,10 @@ abstract class Broker_Abstract
 	/**
 	 * Returns the current response object.
 	 *
-	 * @return \Trinity\Web\Response_Abstract
+	 * @return \Trinity\Web\Response
 	 */
 	public function getResponse()
 	{
 		return $this->_response;
 	} // end getResponse();
-} // end Broker_Abstract;
+} // end Broker;

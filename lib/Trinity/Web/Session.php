@@ -11,7 +11,8 @@
  */
 
 namespace Trinity\Web;
-use Trinity\Basement\Application as BaseApplication;
+use \Symfony\Component\EventDispatcher\Event;
+use \Trinity\Basement\Application as BaseApplication;
 
 /**
  * The session management class.
@@ -130,7 +131,7 @@ class Session
 			}
 			$this->_started = true;
 
-			$this->_application->getEventManager()->fire('web.session.start', array('session' => $this));
+			$this->_application->getEventDispatcher()->notify(new Event($this, 'web.session.start'));
 
 			return true;
 		}
@@ -139,7 +140,7 @@ class Session
 
 	public function writeClose()
 	{
-		$this->_application->getEventManager()->fire('web.session.close', array('session' => $this));
+		$this->_application->getEventDispatcher()->notify(new Event($this, 'web.session.close'));
 
 		session_write_close();
 	} // end writeClose();
@@ -148,7 +149,7 @@ class Session
 	{
 		$this->_namespaces[$name] = new Session_Namespace($name);
 
-		$this->_application->getEventManager()->fire('web.session.namespace-created', array('session' => $this, 'namespace' => $this->_namespaces[$name]));
+		$this->_application->getEventDispatcher()->notify(new Event($this, 'web.session.namespace-created', array('namespace' => $this->_namespaces[$name])));
 	} // end _createNamespace();
 
 	protected function _initializeEmptySession()
@@ -161,6 +162,6 @@ class Session
 		$_SESSION[':ip'] = $_SERVER['REMOTE_ADDR'];
 		$_SESSION[':browser'] = (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'not-set');
 
-		$this->_application->getEventManager()->fire('web.session.initialized', array('session' => $this));
+		$this->_application->getEventDispatcher()->notify(new Event($this, 'web.session.initialized'));
 	} // end _initializeEmptySession();
 } // end Session;

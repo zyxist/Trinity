@@ -11,6 +11,7 @@ $nsLoader = new Opl_Loader;
 // Libraries that use PHP 5.3 namespaces go here.
 $nsLoader->addLibrary('Trinity', $libs['Trinity']);
 $nsLoader->addLibrary('Doctrine', $libs['Doctrine']);
+$nsLoader->addLibrary('Symfony', $libs['Symfony']);
 $nsLoader->addLibrary('Application', $libs['Application']);
 $nsLoader->register();
 

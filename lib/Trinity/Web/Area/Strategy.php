@@ -18,7 +18,7 @@ namespace Trinity\Web\Area;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-interface Strategy_Interface
+interface Strategy
 {
 	/**
 	 * Returns the information about the specified area.

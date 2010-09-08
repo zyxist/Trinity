@@ -95,8 +95,8 @@ class Service_Standard extends Service
 				{
 					case 'application':
 						return Application::getApplication();
-					case 'eventManager':
-						return Application::getApplication()->getEventManager();
+					case 'eventDispatcher':
+						return Application::getApplication()->getEventDispatcher();
 					case 'serviceLocator':
 						return $this->_serviceLocator;
 				}

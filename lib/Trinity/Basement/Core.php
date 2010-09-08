@@ -8,8 +8,6 @@
  *
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
- *
- * $Id$
  */
 
 namespace Trinity\Basement;
@@ -361,8 +359,7 @@ class Locator_Object extends Locator
 	 */
 	public function __destruct()
 	{
-		$this->_eventDispatcher->
-		$this->_eventManager->fire('locator.'.$this->_name.'.destroyed');
+		$this->_eventDispatcher->notify(new Event($this, 'locator.'.$this->_name.'.destroyed'));
 	} // end __destruct();
 
 	/**
@@ -938,9 +935,8 @@ class Locator_Service extends Locator
 			foreach($toExecute as $item)
 			{
 				// Load the service object
-				$this->_pool[$item->getName()] = $item->getObject();
-
-				$this->_eventDispatcher->notify(new Event($this, 'locator.'.$this->_name.'.new',
+				$this->_pool[$name = $item->getName()] = $item->getObject();
+				$this->_eventDispatcher->notify(new Event($this, 'locator.'.$name.'.new',
 					array('name' => $name, 'object' => $this->_pool[(string)$name])
 				));
 
@@ -1110,7 +1106,7 @@ abstract class Application
 		self::$_application = $this;
 
 		$this->_eventDispatcher = new EventDispatcher;
-		$this->_serviceLocator = new Locator_Service('services', $this->_eventManager);
+		$this->_serviceLocator = new Locator_Service('services', $this->_eventDispatcher);
 		$this->_serviceLocator->addServiceGroup('utils', '\Trinity\Utils\Service_');
 		$this->_serviceLocator->addServiceGroup('model', '\Trinity\Model\Service_');
 

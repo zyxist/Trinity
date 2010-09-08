@@ -11,11 +11,11 @@
  */
 
 namespace Trinity\Web\Controller;
-use \Trinity\Basement\Application as BaseApplication;
+use \Trinity\Basement\Application as Basement_Application;
 use \Trinity\Basement\Locator_Object;
 use \Trinity\Web\Controller\State;
-use \Trinity\Web\Request_Abstract;
-use \Trinity\Web\Response_Abstract;
+use \Trinity\Web\Request;
+use \Trinity\Web\Response;
 use \Trinity\Web\View_Broker;
 use \Trinity\Web\View;
 
@@ -33,14 +33,14 @@ class Manager
 	/**
 	 * Current request.
 	 *
-	 * @var \Trinity\Web\Request_Abstract
+	 * @var \Trinity\Web\Request
 	 */
 	public $request;
 
 	/**
 	 * Current response.
 	 *
-	 * @var \Trinity\Web\Response_Abstract
+	 * @var \Trinity\Web\Response
 	 */
 	public $response;
 
@@ -54,7 +54,7 @@ class Manager
 	/**
 	 * The event manager.
 	 * 
-	 * @var \Trinity\Basement\EventManager
+	 * @var \Trinity\Basement\EventDispatcher
 	 */
 	public $events;
 
@@ -101,10 +101,10 @@ class Manager
 	 */
 	private $_models = array();
 
-	public function __construct(BaseApplication $application, Request_Abstract $request, Response_Abstract $response, Locator_Object $modelLocator)
+	public function __construct(Basement_Application $application, Request $request, Response $response, Locator_Object $modelLocator)
 	{
 		$this->application = $application;
-		$this->events = $application->getEventManager();
+		$this->events = $application->getEventDispatcher();
 		$this->services = $application->getServiceLocator();
 
 		$this->request = $request;

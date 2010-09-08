@@ -32,14 +32,14 @@ class Service_Session extends Service
 		$application = BaseApplication::getApplication();
 		$session = new Session($application);
 
-		$eventManager = $application->getEventManager();
-		$eventManager->addCallback('controller.web.dispatch.begin', function($args) use($session) {
+		$eventDispatcher = $application->getEventDispatcher();
+		$eventDispatcher->connect('controller.web.dispatch.begin', function($args) use($session) {
 			$session->start();
 
 			return true;
 		});
 
-		$eventManager->addCallback('controller.web.dispatch.end', function($args) use($session) {
+		$eventDispatcher->connect('controller.web.dispatch.end', function($args) use($session) {
 			$session->writeClose();
 
 			return true;

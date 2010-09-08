@@ -32,7 +32,7 @@ class Service_ModelLocator extends Service
 	{
 		$locator = new ObjectLocator(
 			'modelLocator',
-			BaseApplication::getApplication()->getEventManager(),
+			BaseApplication::getApplication()->getEventDispatcher(),
 			'\Trinity\Basement\Model',
 			function($name){
 				$className = str_replace('.', '\\', $name);

@@ -94,7 +94,6 @@ abstract class Json extends Base_View implements View_Broker
 	public function display()
 	{
 		$serviceLocator = $this->_application->getServiceLocator();
-		$eventManager = $this->_application->getEventManager();
 
 		$this->_response->setBody(json_encode($this->_answer));
 	} // end display();
