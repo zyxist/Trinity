@@ -10,8 +10,8 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Web;
-use \Trinity\Basement\Service as Service;
-use \Trinity\Web\Area\Strategy_File;
+use \Trinity\Basement\Service;
+use \Trinity\Web\Area\Strategy\File as Strategy_File;
 
 /**
  * The area selector.
@@ -40,7 +40,7 @@ class Service_Area extends Service
 	/**
 	 * Preconfigures and initializes the configuration object.
 	 *
-	 * @return Area_Abstract
+	 * @return Area
 	 */
 	public function getObject()
 	{
@@ -49,7 +49,7 @@ class Service_Area extends Service
 		$moduleManager = $application->getModuleManager();
 
 		// Initialize the area
-		$area = new Area_Standard($application, $this->_serviceLocator->get('web.AreaStrategy'));
+		$area = new Area($application, $this->_serviceLocator->get('web.AreaStrategy'));
 		$area->setPrimaryModule($module = $moduleManager->getModule($request->getParam('module', $this->defaultModule)));
 		$area->setAreaModule($module->getSubmodule($area->getName()));
 		$request->setArea($area);

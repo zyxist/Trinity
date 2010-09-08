@@ -11,6 +11,7 @@
  */
 namespace Trinity\Web;
 use \Trinity\Basement\Service as Service;
+use \Trinity\Web\Broker\Standard;
 
 /**
  * The broker selector.
@@ -39,7 +40,7 @@ class Service_Broker extends Service
 	{
 		$application = \Trinity\Basement\Application::getApplication();
 		// Initialize the broker
-		$broker = new Broker_Standard($application);
+		$broker = new Standard($application);
 		$broker->buildRequest($this->_serviceLocator->get('web.Visit'));
 		$broker->buildResponse();
 

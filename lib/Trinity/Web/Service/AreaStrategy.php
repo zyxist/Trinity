@@ -11,7 +11,7 @@
  */
 namespace Trinity\Web;
 use \Trinity\Basement\Service as Service;
-use \Trinity\Web\Area\Strategy_File;
+use \Trinity\Web\Area\Strategy\File as Strategy_File;
 
 /**
  * Initializes the area selection strategy.
