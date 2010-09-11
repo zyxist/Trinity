@@ -96,6 +96,12 @@ class Manager
 	protected $_viewBroker;
 
 	/**
+	 * Other extraordinary fast-access stuff.
+	 * @var array
+	 */
+	protected $_data;
+
+	/**
 	 * The currently loaded models.
 	 * @var array
 	 */
@@ -117,6 +123,10 @@ class Manager
 		$this->_modelLocator = $modelLocator;
 	} // end __construct();
 
+	/**
+	 * Clears the references, allowing the garbage collector to eat this
+	 * object.
+	 */
 	public function dispose()
 	{
 		$this->application =
@@ -130,11 +140,60 @@ class Manager
 				null;
 	} // end dispose();
 
+	/**
+	 * Introduces the support for custom manager extensions. Allows an assignment
+	 * of the new objects that are not supported by default.
+	 *
+	 * @throws DomainException
+	 * @param string $name The name of the field
+	 * @param object $value The object to assign
+	 */
+	public function __set($name, $value)
+	{
+		if(!is_object($value))
+		{
+			throw new DomainException('The assigned value must be an object.');
+		}
+		$this->_data[$name] = $value;
+	} // end __set();
+
+	/**
+	 * Returns a custom object assigned to the controller manager. An exception
+	 * is thrown, if the object does not exist.
+	 *
+	 * @throws Controller_Exception
+	 * @param string $name The name of the object to load.
+	 * @return object
+	 */
+	public function __get($name)
+	{
+		if(!isset($this->_data[name]))
+		{
+			throw new Controller_Exception('Cannot load the object with name '.$name);
+		}
+		return $this->_data[name];
+	} // end __get();
+
+	/**
+	 * The model factory. Inspite of creating the models, the factory checks also
+	 * the contracts. Basically, we specify the list of interfaces we expect
+	 * to be implemented and if any of them is not, an exception is thrown.
+	 *
+	 * @param string $model The name of the model.
+	 * @param string|array $contracts The list of contracts the retrieved model must satisfy.
+	 * @return \Trinity\Basement\Model
+	 */
 	public function getModel($model, $contracts = null)
 	{
 		return $this->_modelLocator->get($model, $contracts);
 	} // end getModel();
 
+	/**
+	 * The view factory.
+	 *
+	 * @param string $view The view name
+	 * @return \Trinity\Web\View
+	 */
 	public function getView($view)
 	{
 		$className = str_replace('.', '\\', $view);
