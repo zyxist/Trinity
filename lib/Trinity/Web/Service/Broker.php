@@ -55,7 +55,7 @@ class Service_Broker extends Service
 				$viewBroker->display();
 			}
 			$args['manager']->response->sendResponse();
-		});
+		}, 10);
 		$eventDispatcher->connect('controller.web.dispatch.redirect', function($args){
 			$args['manager']->response->sendResponse();
 		});
