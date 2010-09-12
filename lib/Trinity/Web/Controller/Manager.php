@@ -167,11 +167,11 @@ class Manager
 	 */
 	public function __get($name)
 	{
-		if(!isset($this->_data[name]))
+		if(!isset($this->_data[$name]))
 		{
 			throw new Controller_Exception('Cannot load the object with name '.$name);
 		}
-		return $this->_data[name];
+		return $this->_data[$name];
 	} // end __get();
 
 	/**
