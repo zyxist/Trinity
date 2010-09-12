@@ -25,7 +25,13 @@ class Module extends TrinityModule
 	 */
 	public function onInit(BaseApplication $application)
 	{
-		$dm = $application->getServiceLocator()->get('model.Doctrine_Manager');
+		$services = $application->getServiceLocator();
+
+		$dm = $services->get('model.Doctrine_Manager');
 		$dm->addEntityRepository('MainEntity', $this->getCodePath('Model'));
+
+		$facades = $services->get('web.Facade');
+		$facades->addFacade('default', 'Application.Main.Facade.Standard');
+		$facades->select('default');
 	} // end onInit();
 } // end Module;
