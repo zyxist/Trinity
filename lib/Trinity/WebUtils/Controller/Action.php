@@ -119,7 +119,7 @@ class Action extends Web_Controller
 
 		$actionObj->dispatch();
 
-		$manager->events->notify(new Events($this, 'controller.action.dispatched', array(
+		$manager->events->notify(new Event($this, 'controller.action.dispatched', array(
 			'brick' => $actionObj,
 			'action' => $action
 		)));
