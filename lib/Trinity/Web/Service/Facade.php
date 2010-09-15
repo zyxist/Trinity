@@ -43,6 +43,10 @@ class Service_Facade extends Service
 			}
 		});
 
+		$application->getEventDispatcher()->connect('controller.web.dispatch.begin', function(Event $event) use($manager) {
+			$event['manager']->facade = $manager;
+		});
+
 		return $manager;
 	} // end getObject();
 } // end Service_Facade;
