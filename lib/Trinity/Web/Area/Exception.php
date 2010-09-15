@@ -10,7 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Web\Area;
-use \Trinity\Basement\Core_Exception;
+use \Trinity\Basement\Core\Exception as Core_Exception;
 
 /**
  * Exception class for areas.
