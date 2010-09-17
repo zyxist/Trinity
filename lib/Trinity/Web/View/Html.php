@@ -9,8 +9,9 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\View;
 use \Trinity\Web\View;
+use \Trinity\Web\View\Exception;
 use \Trinity\Template\Layout;
 
 
@@ -21,7 +22,7 @@ use \Trinity\Template\Layout;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class View_Html extends View
+abstract class Html extends View
 {
 	/**
 	 * The layout manager
@@ -30,55 +31,60 @@ abstract class View_Html extends View
 	private $_layout;
 
 	/**
-	 * The template name.
+	 * The template names.
 	 * @var string
 	 */
-	private $_template;
+	private $_templates = array();
 
 	/**
-	 * OPT view object.
-	 * @var \Opt_View
-	 */
-	private $_viewTpl;
-
-	/**
-	 * Sets the template name used by this view.
+	 * This method allows the controllers and bricks to advice
+	 * the template name to a generic view. Each template type
+	 * used by the view has its unique key, which we assign
+	 * the template name to.
 	 *
+	 * Implements fluent interface.
+	 *
+	 * @param string $key The view template key.
 	 * @param string $template The new template name.
+	 * @return \Trinity\Web\View\Html
 	 */
-	public function setTemplate($template)
+	public function setTemplateName($key, $template)
 	{
-		$this->_template = $template;
-
-		if($this->_viewTpl !== null)
-		{
-			$this->_viewTpl->setTemplate($template);
-		}
-	} // end setTemplate();
+		$this->_templates[$key] = $template;
+	} // end setTemplateName();
 
 	/**
-	 * Returns the current template name.
-	 * 
+	 * Returns the template name assigned to the specified
+	 * key.
+	 *
+	 * @param string $key The view template key.
 	 * @return string
 	 */
-	public function getTemplate()
+	public function getTemplateName($key = 'default', $defaultTemplateName = null)
 	{
-		return $this->_template;
-	} // end getTemplate();
+		if(!isset($this->_templates[$key]))
+		{
+			return $defaultTemplateName;
+		}
+		return $this->_templates[$key];
+	} // end getTemplateName();
 
 	/**
-	 * Returns the template object.
-	 * 
+	 * This is a factory for OPT template objects which
+	 * uses the view template key mechanism to give names.
+	 *
+	 * @param string $key The view template key
 	 * @return \Opt_View
 	 */
-	public function getTemplateObject()
+	public function templateFactory($key = 'default')
 	{
-		if($this->_viewTpl === null)
+		if(!isset($this->_templates[$key]))
 		{
-			$this->_viewTpl = new \Opt_View($this->_template);
+			throw new Exception('Cannot create a template object for the view key \''.$key.'\': the key does not exist.');
 		}
-		return $this->_viewTpl;
-	} // end getTemplateObject();
+		
+		return new \Opt_View($this->_templates[$key]);
+	} // end templateFactory();
 
 	/**
 	 * Returns and optionally launches the view broker object that this
@@ -100,12 +106,12 @@ abstract class View_Html extends View
 	 *
 	 * @param View_Broker $broker The view broker to install.
 	 */
-	public function setViewBroker(View_Broker $broker)
+	public function setViewBroker(Broker $broker)
 	{
 		if(!$broker instanceof Layout)
 		{
-			throw new View\Exception('Cannot process a HTML view: layout engine missing.');
+			throw new Exception('Cannot process a HTML view: layout engine missing.');
 		}
 		$this->_layout = $broker;
-	} // end getViewBroker();
-} // end View;
+	} // end setViewBroker();
+} // end Html;

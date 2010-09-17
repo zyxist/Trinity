@@ -158,6 +158,7 @@ class Group extends Web_Controller
 				$manager->processView($view);
 			}
 		}
+
 		$manager->events->notify(new Event($this, 'controller.group.dispatched', array(
 			'groupObj' => $groupObj,
 			'group' => $group,

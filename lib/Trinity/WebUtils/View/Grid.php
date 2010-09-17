@@ -12,8 +12,7 @@
 
 namespace Trinity\WebUtils\View;
 use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Web\View as WebView;
-use \Trinity\Web\View_Html as View_Html;
+use \Trinity\Web\View\Html as View_Html;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
 use \Trinity\Model\Interfaces\Previewable as Interface_Previewable;
 use \Trinity\Model\Interfaces\Addable as Interface_Addable;

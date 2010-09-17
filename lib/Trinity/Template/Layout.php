@@ -13,7 +13,7 @@
 namespace Trinity\Template;
 use \Symfony\Component\EventDispatcher\Event;
 use Trinity\Basement\Application as BaseApplication;
-use Trinity\Web\View_Broker;
+use Trinity\Web\View\Broker;
 use Trinity\Web\Request;
 use Trinity\Web\Response;
 use Opt_View;
@@ -26,7 +26,7 @@ use Opt_Output_Interface;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Layout implements View_Broker
+class Layout implements Broker
 {
 	/**
 	 * The placeholder list with the views.

@@ -16,7 +16,7 @@ use \Trinity\Basement\Locator_Object;
 use \Trinity\Web\Controller\State;
 use \Trinity\Web\Request;
 use \Trinity\Web\Response;
-use \Trinity\Web\View_Broker;
+use \Trinity\Web\View\Broker as View_Broker;
 use \Trinity\Web\View;
 
 /**
@@ -233,7 +233,7 @@ class Manager
 	/**
 	 * Returns the current view broker.
 	 *
-	 * @return \Trinity\Web\View_Broker
+	 * @return \Trinity\Web\View\Broker
 	 */
 	public function getViewBroker()
 	{

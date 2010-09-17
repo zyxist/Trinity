@@ -12,9 +12,8 @@
 
 namespace Trinity\WebUtils\View;
 use \Symfony\Component\EventDispatcher\Event;
-use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Web\View as WebView;
-use \Trinity\Web\View_Html as View_Html;
+use \Trinity\Basement\Application as Basement_Application;
+use \Trinity\Web\View\Html as View_Html;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
 
 class ActionGroup extends View_Html
@@ -23,7 +22,7 @@ class ActionGroup extends View_Html
 
 	private $_group = 'index';
 
-	public function __construct(BaseApplication $application)
+	public function __construct(Basement_Application $application)
 	{
 		parent::__construct($application);
 
@@ -39,7 +38,7 @@ class ActionGroup extends View_Html
 		$this->_group = strtolower($group);
 		$this->_action = $action;
 
-		$this->setTemplate('area.templates:'.$this->_group.'/'.$action.'.tpl');
+		$this->setTemplateName('default', 'area.templates:'.$this->_group.'/'.$action.'.tpl');
 	} // end setAction();
 
 	public function dispatch()
@@ -54,11 +53,10 @@ class ActionGroup extends View_Html
 			throw new Web_Controller_Exception('Action '.$this->_action.' does not exist.');
 		}
 		$actionName = $this->_action.'Action';
-		$this->$actionName();
-
-		$view = $this->getTemplateObject();
-
-		$layout = $this->_application->getServiceLocator()->get('template.Layout');
-		$layout->appendView($view);
+		if(($returnedView = $this->$actionName()) !== null)
+		{
+			$layout = $this->_application->getServiceLocator()->get('template.Layout');
+			$layout->appendView($returnedView);
+		}
 	} // end dispatch();
 } // end ActionGroup;

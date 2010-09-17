@@ -12,9 +12,7 @@
 
 namespace Trinity\Web\View\Broker;
 use Trinity\Basement\Application as BaseApplication;
-use Trinity\Web\View_Broker;
-use Trinity\Web\Request_Abstract;
-use Trinity\Web\Response_Abstract;
+use Trinity\Web\View\Broker;
 
 /**
  * The JSON view broker.
@@ -26,4 +24,4 @@ use Trinity\Web\Response_Abstract;
 class Json
 {
 
-} // end Layout;
+} // end Json;

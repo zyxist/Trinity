@@ -12,8 +12,8 @@
 namespace Trinity\Web\View;
 use \Trinity\Web\View as Base_View;
 use \Trinity\Web\View_Broker;
-use \Trinity\Web\Request_Abstract;
-use \Trinity\Web\Response_Abstract;
+use \Trinity\Web\Request;
+use \Trinity\Web\Response;
 
 
 /**
@@ -23,7 +23,7 @@ use \Trinity\Web\Response_Abstract;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class Json extends Base_View implements View_Broker
+abstract class Json extends Base_View implements Broker
 {
 	/**
 	 * The JSON answer.
@@ -52,7 +52,7 @@ abstract class Json extends Base_View implements View_Broker
 	 *
 	 * @param View_Broker $broker The view broker to install.
 	 */
-	public function setViewBroker(View_Broker $broker)
+	public function setViewBroker(Broker $broker)
 	{
 		throw new View_Exception('Cannot process a JSON view: invalid view broker loaded.');
 	} // end getViewBroker();
@@ -70,9 +70,9 @@ abstract class Json extends Base_View implements View_Broker
 	/**
 	 * Not needed in this particular case.
 	 *
-	 * @param Request_Abstract $request
+	 * @param Request $request
 	 */
-	public function setRequest(Request_Abstract $request)
+	public function setRequest(Request $request)
 	{
 		/* null */
 	} // end setRequest();
@@ -80,9 +80,9 @@ abstract class Json extends Base_View implements View_Broker
 	/**
 	 * Configures the response object for the JSON transfer.
 	 *
-	 * @param Response_Abstract $response The response object.
+	 * @param Response $response The response object.
 	 */
-	public function setResponse(Response_Abstract $response)
+	public function setResponse(Response $response)
 	{
 		$this->_response = $response;
 		$response->setHeader('Content-type', 'application/json;charset=utf-8');

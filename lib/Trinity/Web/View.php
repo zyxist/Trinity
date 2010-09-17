@@ -12,8 +12,9 @@
 
 namespace Trinity\Web;
 
-use \Trinity\Basement\View as BaseView;
-use \Trinity\Basement\Application as BaseApplication;
+use \Trinity\Basement\View as Basement_View;
+use \Trinity\Basement\Application as Basement_Application;
+use \Trinity\Web\View\Broker as View_Broker;
 
 /**
  * The base interface for web views.
@@ -22,7 +23,7 @@ use \Trinity\Basement\Application as BaseApplication;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class View extends BaseView
+abstract class View extends Basement_View
 {
 	/**
 	 * The application link.
@@ -33,9 +34,9 @@ abstract class View extends BaseView
 	/**
 	 * Constructs the view.
 	 * 
-	 * @param BaseApplication $application The application link.
+	 * @param \Trinity\Basement\Application $application The application link.
 	 */
-	public function __construct(BaseApplication $application)
+	public function __construct(Basement_Application $application)
 	{
 		$this->_application = $application;
 	} // end __construct();

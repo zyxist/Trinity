@@ -12,6 +12,7 @@
 namespace Trinity\Web;
 use \Trinity\Basement\Service as Service;
 use \Trinity\Web\Broker\Standard;
+use \Trinity\Web\View\Broker as View_Broker;
 
 /**
  * The broker selector.

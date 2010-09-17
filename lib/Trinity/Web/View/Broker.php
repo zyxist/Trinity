@@ -9,7 +9,9 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\View;
+use \Trinity\Web\Request;
+use \Trinity\Web\Response;
 
 /**
  * View brokers contain the concrete code for displaying something, because
@@ -19,7 +21,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-interface View_Broker
+interface Broker
 {
 	/**
 	 * Sets the request object.
@@ -39,4 +41,4 @@ interface View_Broker
 	 * Displays the view.
 	 */
 	public function display();
-} // end View_Broker;
+} // end Broker;
