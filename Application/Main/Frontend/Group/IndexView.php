@@ -13,14 +13,16 @@ class IndexView extends ActionGroup
 	{
 		$model = $this->getModel('date', '\\Application\\Main\\Model\\CurrentDate');
 		$counter = $this->getModel('session');
-		$template = $this->getTemplateObject();
+		$template = $this->templateFactory();
 		$template->date = $model->getDate();
 		$template->counter = $counter->counter;
 		$template->counter2 = $counter->counter2;
+
+		return $template;
 	} // end indexAction();
 
 	public function brickAction()
 	{
-		$template = $this->getTemplateObject();
+		return $this->templateFactory();
 	} // end brickAction();
 } // end IndexView;
