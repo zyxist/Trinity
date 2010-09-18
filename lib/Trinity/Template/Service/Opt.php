@@ -49,6 +49,8 @@ class Opt extends Basement_Service
 			'file' => $this->appTemplates,
 			'app.templates' => $this->appTemplates,
 			'app.layouts' => $this->appLayouts,
+			'module.templates' => $area->getPrimaryModule()->getFilePath('templates'),
+			'module.layouts' => $area->getPrimaryModule()->getFilePath('layouts'),
 			'area.templates' => $area->getFilePath('templates'),
 			'area.layouts' => $area->getFilePath('layouts')
 		);
