@@ -33,5 +33,8 @@ class Module extends TrinityModule
 		$facades = $services->get('web.Facade');
 		$facades->addFacade('default', 'Application.Main.Facade.Standard');
 		$facades->select('default');
+
+		$router = $services->get('web.Router');
+		$router->keepRoutedVariables(array('module', 'group', 'action', 'id'));
 	} // end onInit();
 } // end Module;

@@ -114,7 +114,6 @@ abstract class Controller implements CoreController
 			'manager' => $manager
 		)));
 
-		$manager->router->setParams($request->getParams());
 		try
 		{
 			$this->_dispatch($manager);
