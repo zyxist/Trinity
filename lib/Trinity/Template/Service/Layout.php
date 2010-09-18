@@ -9,8 +9,9 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Template;
-use \Trinity\Basement\Service as Service;
+namespace Trinity\Template\Service;
+use \Trinity\Basement\Service as Basement_Service;
+use \Trinity\Template\Layout as Template_Layout;
 
 /**
  * Launches the layout manager for views.
@@ -19,7 +20,7 @@ use \Trinity\Basement\Service as Service;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Layout extends Service
+class Layout extends Basement_Service
 {
 
 	/**
@@ -38,7 +39,7 @@ class Service_Layout extends Service
 	{
 		$application = \Trinity\Basement\Application::getApplication();
 		$broker = $this->_serviceLocator->get('web.Broker');
-		$layout = new Layout($application);
+		$layout = new Template_Layout($application);
 		$layout->setLayout($this->layout);
 
 		// TODO: Replace with something more clever.
@@ -47,4 +48,4 @@ class Service_Layout extends Service
 
 		return $layout;
 	} // end getObject();
-} // end Service_Layout;
+} // end Layout;

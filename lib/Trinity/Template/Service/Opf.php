@@ -9,8 +9,8 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Template;
-use \Trinity\Basement\Service as Service;
+namespace Trinity\Template\Service;
+use \Trinity\Basement\Service as Basement_Service;
 use \Opf_Class;
 
 /**
@@ -20,7 +20,7 @@ use \Opf_Class;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Opf extends Service
+class Opf extends Basement_Service
 {
 	/**
 	 * List of services to preload.
@@ -41,4 +41,4 @@ class Service_Opf extends Service
 		// Create the OPF instance.
 		return new Opf_Class($this->_serviceLocator->get('template.Opt'));
 	} // end getObject();
-} // end Service_Opf;
+} // end Opf;

@@ -9,9 +9,9 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Template;
+namespace Trinity\Template\Service;
 use \Symfony\Component\EventDispatcher\Event;
-use \Trinity\Basement\Service as Service;
+use \Trinity\Basement\Service as Basement_Service;
 use \Trinity\Basement\Application as BaseApplication;
 use \Opt_Class;
 
@@ -22,7 +22,7 @@ use \Opt_Class;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Opt extends Service
+class Opt extends Basement_Service
 {
 	/**
 	 * List of services to preload.
@@ -75,4 +75,4 @@ class Service_Opt extends Service
 
 		return $opt;
 	} // end getObject();
-} // end Service_Opt;
+} // end Opt;
