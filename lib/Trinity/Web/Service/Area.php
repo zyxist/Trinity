@@ -9,8 +9,9 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
-use \Trinity\Basement\Service;
+namespace Trinity\Web\Service;
+use \Trinity\Basement\Service as Basement_Service;
+use \Trinity\Web\Area as Web_Area;
 use \Trinity\Web\Area\Strategy\File as Strategy_File;
 
 /**
@@ -20,7 +21,7 @@ use \Trinity\Web\Area\Strategy\File as Strategy_File;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Area extends Service
+class Area extends Basement_Service
 {
 	/**
 	 * The controller name requested by the area.
@@ -49,7 +50,7 @@ class Service_Area extends Service
 		$moduleManager = $application->getModuleManager();
 
 		// Initialize the area
-		$area = new Area($application, $this->_serviceLocator->get('web.AreaStrategy'));
+		$area = new Web_Area($application, $this->_serviceLocator->get('web.AreaStrategy'));
 		$area->setPrimaryModule($module = $moduleManager->getModule($request->getParam('module', $this->defaultModule)));
 		$area->setAreaModule($module->getSubmodule($area->getName()));
 		$request->setArea($area);
@@ -72,4 +73,4 @@ class Service_Area extends Service
 		}
 		return array();
 	} // end toPostload();
-} // end Service_Config;
+} // end Area;

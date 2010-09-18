@@ -9,9 +9,9 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\Service;
 use \Symfony\Component\EventDispatcher\Event;
-use \Trinity\Basement\Service;
+use \Trinity\Basement\Service as Basement_Service;
 use \Trinity\Web\Facade\Manager as Facade_Manager;
 
 /**
@@ -21,7 +21,7 @@ use \Trinity\Web\Facade\Manager as Facade_Manager;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Facade extends Service
+class Facade extends Basement_Service
 {
 	/**
 	 * Preconfigures and initializes the facade manager object.
@@ -49,4 +49,4 @@ class Service_Facade extends Service
 
 		return $manager;
 	} // end getObject();
-} // end Service_Facade;
+} // end Facade;

@@ -9,8 +9,8 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Template;
-use \Trinity\Basement\Service as Service;
+namespace Trinity\Web\Service;
+use \Trinity\Basement\Service as Basement_Service;
 use \Trinity\Web\View\Json;
 
 /**
@@ -20,7 +20,7 @@ use \Trinity\Web\View\Json;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Json extends Service
+class Json extends Basement_Service
 {
 
 	/**
@@ -45,4 +45,4 @@ class Service_Json extends Service
 
 		return $json;
 	} // end getObject();
-} // end Service_Json;
+} // end Json;

@@ -9,9 +9,9 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\Service;
 use \Symfony\Component\EventDispatcher\Event;
-use \Trinity\Basement\Service as Service;
+use \Trinity\Basement\Service as Basement_Service;
 use \Trinity\Web\Router\Standard as Router_Standard;
 
 /**
@@ -21,7 +21,7 @@ use \Trinity\Web\Router\Standard as Router_Standard;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Router extends Service
+class Router extends Basement_Service
 {
 	/**
 	 * List of services to preload.
@@ -59,4 +59,4 @@ class Service_Router extends Service
 
 		return $router;
 	} // end getObject();
-} // end Service_Config;
+} // end Router;
