@@ -75,7 +75,7 @@ class Application extends Base_Application implements Service_Configurator
 		$locator = $this->getServiceLocator();
 		$locator->addServiceGroup('template', '\Trinity\Template\Service_');
 		$locator->addServiceGroup('web', '\Trinity\Web\Service\\');
-		$locator->addServiceGroup('webUtils', '\Trinity\WebUtils\Service_');
+		$locator->addServiceGroup('webUtils', '\Trinity\WebUtils\Service\\');
 
 		$locator->addConfigurator('application', $this);
 		$locator->setDefaultConfigurator('application');

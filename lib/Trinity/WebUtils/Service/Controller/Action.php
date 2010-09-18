@@ -9,10 +9,11 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\WebUtils;
+namespace Trinity\WebUtils\Service;
 use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Basement\Service as Service;
-use \Trinity\Web\View_Broker as View_Broker;
+use \Trinity\Basement\Service as Basement_Service;
+use \Trinity\Web\View\Broker as View_Broker;
+use \Trinity\WebUtils\Controller\Action as WebUtils_Controller_Action;
 
 /**
  * The controller builder.
@@ -21,7 +22,7 @@ use \Trinity\Web\View_Broker as View_Broker;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Service_Controller_Action extends Service
+class Controller_Action extends Basement_Service
 {
 	/**
 	 * List of the required dependencies.
@@ -42,7 +43,7 @@ class Service_Controller_Action extends Service
 		$area = $this->_serviceLocator->get('web.Area');
 		$broker = $this->_serviceLocator->get('web.Broker');
 
-		$controller = new Controller\Action(BaseApplication::getApplication());
+		$controller = new WebUtils_Controller_Action(BaseApplication::getApplication());
 
 		$controller->setActionModule($area->getAreaModule()->getSubmodule('Action'));
 		$controller->setDefaults($this->defaultAction);
@@ -51,4 +52,4 @@ class Service_Controller_Action extends Service
 		$controller->dispatch($broker->getRequest(), $broker->getResponse());
 		return $controller;
 	} // end getObject();
-} // end Service_Controller_Action;
+} // end Controller_Action;
