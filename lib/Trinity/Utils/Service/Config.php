@@ -10,7 +10,6 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Utils;
-use \Trinity\Utils\Config\Loader_Ini as Loader_Ini;
 use \Trinity\Basement\Service as Service;
 
 /**
@@ -31,7 +30,8 @@ class Service_Config extends Service
 	{
 		$config = new Config;
 		$config->setEnvironment($this->environment);
-		$config->loadConfig(new Loader_Ini($this->configPath));
+		$loader = '\Trinity\Utils\Config\Loader_'.$this->configLoader;
+		$config->loadConfig(new $loader($this->configPath));
 
 		$this->_serviceLocator->addConfigurator('config', $config);
 		$this->_serviceLocator->setDefaultConfigurator('config');
