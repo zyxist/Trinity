@@ -62,7 +62,11 @@ class Application extends Base_Application implements Service_Configurator
 	{
 		if($serviceName == 'utils.Config')
 		{
-			return array('environment' => $this->_environment, 'configPath' => $this->_configPath);
+			return array(
+				'environment' => $this->_environment,
+				'configPath' => $this->_configPath,
+				'configLoader' => $this->getConfigLoader()
+			);
 		}
 		return array();
 	} // end getServiceOptions();

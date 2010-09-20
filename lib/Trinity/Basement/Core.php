@@ -1062,15 +1062,21 @@ abstract class Application
 	private $_moduleManager;
 
 	/**
-	 * The module manager.
-	 * @var \Trinity\Basement\Module\Manager
-	 */
-
-	/**
 	 * The list of autoloaders.
 	 * @var array
 	 */
 	private $_loaders;
+
+	/**
+	 * Currently selected config loader. Default: 'Ini'.
+	 * @var string
+	 */
+	private $_configLoader = 'Ini';
+	/**
+	 * A list of supported config loaders.
+	 * @var array
+	 */
+	private $_configLoaders = array('Ini', 'Yaml');
 
 	/**
 	 * The current application object.
@@ -1196,4 +1202,38 @@ abstract class Application
 		}
 		return $this->_loaders[$name];
 	} // end getLoader();
+
+	/**
+	 * Sets configuration loader classname. Currently supported loaders are
+	 * 'Yaml' and 'Ini'.
+	 *
+	 * @param string $name Loader name
+	 */
+	public function setConfigLoader($name)
+	{
+		if(in_array($name, $this->_configLoaders))
+		{
+			$this->_configLoader = (string)$name;
+		}
+	} // end setConfigLoader();
+
+	/**
+	 * Returns configuration loader classname.
+	 *
+	 * @return string
+	 */
+	public function getConfigLoader()
+	{
+		return $this->_configLoader;
+	} // end getConfigLoader();
+
+	/**
+	 * Returns classnames of supported loaders.
+	 *
+	 * @return array
+	 */
+	public function getSupportedConfigLoaders()
+	{
+		return $this->_configLoaders;
+	} // end getSupportedConfigLoaders();
 } // end Application;

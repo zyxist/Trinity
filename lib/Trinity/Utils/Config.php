@@ -13,6 +13,7 @@
 namespace Trinity\Utils;
 use \Trinity\Basement\Service_Configurator as Service_Configurator;
 use \Trinity\Utils\Config\Loader as Loader;
+use \SplQueue;
 
 /**
  * The configuration manager.
@@ -97,7 +98,22 @@ class Config implements Service_Configurator
 		}
 		else
 		{
-			// TODO: Implement that
+			$queue = new SplQueue();
+			$queue->enqueue(array($this, $options));
+			while(!$queue->isEmpty())
+			{
+				list($aggregator, $options) = $queue->dequeue();
+				foreach($options as $key => $option)
+				{
+					if(is_array($option))
+					{
+						$aggregator->_options[$key] = new Config;
+						$queue->enqueue(array($aggregator->_options[$key], $option));
+						continue;
+					}
+					$aggregator->_options[$key] = $option;
+				}
+			}
 		}
 	} // end loadConfig();
 
