@@ -380,14 +380,14 @@ class Standard implements Router_Interface
 
 		if($address == '/')
 		{
-			return $baseUrl.'?'.http_build_query($vars, '');
+			return rtrim($baseUrl.'?'.http_build_query($vars, ''), '?');
 		}
 
 		if(sizeof($vars) > 0)
 		{
-			return $baseUrl.$address.'?'.http_build_query($vars, '');
+			return rtrim($baseUrl.$address.'?'.http_build_query($vars, ''), '/?');
 		}
-		return $baseUrl.$address;
+		return rtrim($baseUrl.$address, '/');
 	} // end assemble();
 
 	/**
