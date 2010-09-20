@@ -1,0 +1,83 @@
+production:
+  # Brief setup howto: in baseUrl, please provide the correct domain, where
+  # the application is installed. If you do not use mod_rewrite, and there must
+  # also appear a part of address between the host (baseUrl) and script arguments,
+  # please provide it in queryPath.
+  #
+  # Example: http://www.example.com/index.php/module/group/action
+  # baseUrl = "http://www.example.com"
+  # queryPath = "index.php"
+  #
+  # Example: http://www.example.com/module/group/action
+  # baseUrl = "http://www.example.com"
+  # queryPath = ""
+  #
+  # Note that areas may configure their own domains which are used as base URL-s.
+  #
+  baseUrl: "http://trinity.trunk.projects.php53.lh/"
+  queryPath: "index.php"
+  # Helpers configuration
+  helpers:
+    # Helper_Styles
+    styles:
+      cacheDirectory: "cache/"
+      minify: true
+      gzip: false
+    # Helper_Javascripts
+    javascripts:
+      cacheDirectory: "cache/"
+      minify: false
+      gzip: false
+  pagination:
+    itemsPerPage: 20
+    decorator: "slider"
+    decoratorOpts:
+      around: 3
+      chunk: 3
+  services:
+    template:
+      # Configuration for Open Power Template
+      Opt:
+        compileDir: "../Application/cache/"
+        appTemplates: "../Application/templates/"
+        appLayouts: "../Application/layouts/"
+        stripWhitespaces: false
+        # 0 - CM_DEFAULT (templates recompiled when changed)
+        # 1 - CM_REBUILD (templates recompiled every time)
+        # 2 - CM_PERFORMANCE (templates never recompiled)
+        compileMode: 1
+      # Configuration for layout
+      Layout:
+        layout: "area.layouts:layout"
+    web:
+      # Configuration for areas
+      AreaStrategy:
+        areaList: "../Application/config/area.ini"
+        discoveryType: 0
+      Area:
+        defaultModule: "Main"
+      # Configuration for router
+      Router:
+        routes: "../Application/config/routes.php"
+    webUtils:
+      # Action group controller configuration
+      Controller_Group:
+        defaultGroup: "index"
+        defaultAction: "index"
+      # Action controller configuration
+      Controller_Action:
+        defaultAction: "index"
+    model:
+      # Database configuration
+      Doctrine_ORM:
+        connection:
+          driver: "pdo_mysql"
+          host: "localhost"
+          user: "root"
+          password: "root"
+          dbname: "trinity"
+        defaultEntityPath: "../Application/Entities/"
+        defaultEntityNamespace: "\\Application\\Entities"
+        proxyNamespace: "Application\\Proxies"
+        proxyDir: "../Application/Proxies/"
+        cache: "apc"
