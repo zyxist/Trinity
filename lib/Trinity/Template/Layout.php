@@ -16,6 +16,7 @@ use Trinity\Basement\Application as BaseApplication;
 use Trinity\Web\View\Broker;
 use Trinity\Web\Request;
 use Trinity\Web\Response;
+use Trinity\Template\Exception;
 use Opt_View;
 use Opt_Output_Interface;
 
@@ -132,11 +133,12 @@ class Layout implements Broker
 	 */
 	public function getViews($placeholder = 'content')
 	{
-		if(!isset($this->_placeholders[$placeholder]))
+		$data = array();
+		for($i = 0, $endI = count($this->_placeholders[$placeholder]); $i<$endI; $i++)
 		{
-			return array();
+			$data[] = &$this->_placeholders[$placeholder][$i]['view'];
 		}
-		return $this->_placeholders[$placeholder];
+		return $data;
 	} // end getViews();
 
 	/**
@@ -152,7 +154,7 @@ class Layout implements Broker
 		{
 			$this->_placeholders[$placeholder] = array();
 		}
-		$this->_placeholders[$placeholder][] = $view;
+		$this->_placeholders[$placeholder][] = array('view' => $view);
 
 		// Save the used placeholder.
 		$view->placeholder = $placeholder;
@@ -173,13 +175,32 @@ class Layout implements Broker
 		{
 			$this->_placeholders[$placeholder] = array();
 		}
-		\array_unshift($this->_placeholders[$placeholder], $view);
+		\array_unshift($this->_placeholders[$placeholder], array('view' => $view));
 
 		// Save the used placeholder.
 		$view->placeholder = $placeholder;
 
 		return $this;
 	} // end prependView();
+
+ 	/**
+	 * Assigns a new view to the placeholder.
+     *
+	 * @param \Opt_View $view View object.
+	 * @param string $placeholder Placeholder name.
+	 * @return Trinity\Template\Layout
+	 */
+	public function assignView(Opt_View $view, $placeholder)
+	{
+		if(isset($this->_placeholders[$placeholder]))
+		{
+			throw new Exception('Placeholder "'.$placeholder.'" is already used!');
+			return $this;
+		}
+		$this->_placeholders[$placeholder] = $view;
+
+		return $this;
+	} // end assignView();
 
 	/**
 	 * Not needed in this particular case.
@@ -226,20 +247,26 @@ class Layout implements Broker
 
 		$opt->setup();
 
-		// Configure the layout view
-		$eventDispatcher->notify(new Event($this, 'template.layout.configure',
-			array('layout' => $this->_layout)
-		));
+		if($this->_layout === null)
+		{
+			$this->_layout = array_shift($this->_placeholders);
+			if(is_array($this->_layout))
+			{
+				$this->_layout = $this->_layout[0]['view'];
+			}
+		}
+		else
+		{
+			// Configure the layout view
+			$eventDispatcher->notify(new Event($this, 'template.layout.configure',
+				array('layout' => $this->_layout)
+			));
+		}// Configure the layout view
 
 		// Add placeholders
 		foreach($this->_placeholders as $name => &$placeholder)
 		{
-			$data = array();
-			foreach($placeholder as $view)
-			{
-				$data[] = array('view' => $view);
-			}
-			$this->_layout->assign($name, $data);
+			$this->_layout->assign($name, $placeholder);
 		}
 
 		// Render everything. Actually, this is redirected to events, so
