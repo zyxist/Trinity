@@ -221,6 +221,16 @@ class Manager
 	} // end getBrick();
 
 	/**
+	 * Returns facade manager.
+	 * 
+	 * @return \Trinity\Web\Facade\Manager
+	 */
+	public function getFacadeManager()
+	{
+		return $this->application->getServiceLocator()->get('web.Facade');
+	} // end getFacadeManager();
+
+	/**
 	 * Sets the view broker used by this controller.
 	 *
 	 * @param View_Broker $broker The new view broker.
