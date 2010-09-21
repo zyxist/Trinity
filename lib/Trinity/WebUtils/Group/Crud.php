@@ -94,7 +94,7 @@ abstract class Crud extends Controller_Action_Group
 
 		if($this->templates['index'] !== null)
 		{
-			$view->setTemplate($this->templates['index']);
+			$view->setTemplateName('default', $this->templates['index']);
 		}
 
 		$view->addModel('grid', $model);
@@ -137,7 +137,7 @@ abstract class Crud extends Controller_Action_Group
 			$view = $manager->getView('Trinity.WebUtils.View.Form');
 			if($this->templates['add'] !== null)
 			{
-				$view->setTemplate($this->templates['add']);
+				$view->setTemplateName('default', $this->templates['add']);
 			}
 			$view->set('title', $model->getMessage('crud.add'));
 			$view->addModel('form', $form);
@@ -173,7 +173,7 @@ abstract class Crud extends Controller_Action_Group
 				$view = $manager->getView('Trinity.WebUtils.View.Form');
 				if($this->templates['add'] !== null)
 				{
-					$view->setTemplate($this->templates['edit']);
+					$view->setTemplateName('default', $this->templates['edit']);
 				}
 				$view->set('title', $model->getMessage('crud.edit'));
 
