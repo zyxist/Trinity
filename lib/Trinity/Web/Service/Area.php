@@ -51,7 +51,7 @@ class Area extends Basement_Service
 
 		// Initialize the area
 		$area = new Web_Area($application, $this->_serviceLocator->get('web.AreaStrategy'));
-		$area->setPrimaryModule($module = $moduleManager->getModule($request->getParam('module', $this->defaultModule)));
+		$area->setPrimaryModule($module = $moduleManager->getModule(ucfirst($request->getParam('module', $this->defaultModule))));
 		$area->setAreaModule($module->getSubmodule($area->getName()));
 		$request->setArea($area);
 
