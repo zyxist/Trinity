@@ -62,14 +62,4 @@ abstract class View extends Basement_View
 	 * Dispatches the view.
 	 */
 	abstract public function dispatch();
-
-	/**
-	 * Returns layout manager.
-	 * 
-	 * @return \Trinity\Template\Layout
-	 */
-	public function getLayout()
-	{
-		return $this->_application->getServiceLocator()->get('template.Layout');
-	} // end getLayout();
 } // end View;
