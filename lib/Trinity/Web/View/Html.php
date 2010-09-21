@@ -114,14 +114,4 @@ abstract class Html extends View
 		}
 		$this->_layout = $broker;
 	} // end setViewBroker();
-
-	/**
-	 * Returns layout manager.
-	 *
-	 * @return \Trinity\Template\Layout
-	 */
-	public function getLayout()
-	{
-		return $this->_application->getServiceLocator()->get('template.Layout');
-	} // end getLayout();
 } // end Html;
