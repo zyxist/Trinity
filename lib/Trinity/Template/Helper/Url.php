@@ -9,35 +9,35 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Template;
+namespace Trinity\Template\Helper;
 use \Trinity\Web\Area\Strategy;
 use \Trinity\Web\Router;
 
-class Helper_Url
+class Url
 {
 	/**
 	 * The area discovery strategy.
 	 * @var \Trinity\Web\Area\Strategy
 	 */
-	static private $_strategy;
+	private $_strategy;
 
 	/**
 	 * The router.
 	 * @var \Trinity\Web\Router
 	 */
-	static private $_router;
+	private $_router;
 
 	/**
 	 * Default base path, if all other methods fail
 	 * @var string
 	 */
-	static private $_base;
+	private $_base;
 
 	/**
 	 * The discoveried base URL-s.
 	 * @var array
 	 */
-	static private $_discoveried = array();
+	private $_discoveried = array();
 
 	/**
 	 * Sets the area discovery strategy, so that we are able to communicate
@@ -45,9 +45,9 @@ class Helper_Url
 	 * 
 	 * @param Strategy $areaStrategy The area strategy.
 	 */
-	static public function setStrategy(Strategy $areaStrategy)
+	public function setStrategy(Strategy $areaStrategy)
 	{
-		self::$_strategy = $areaStrategy;
+		$this->_strategy = $areaStrategy;
 	} // end setStrategy();
 
 	/**
@@ -55,9 +55,9 @@ class Helper_Url
 	 *
 	 * @param Router $router The application router.
 	 */
-	static public function setRouter(Router $router)
+	public function setRouter(Router $router)
 	{
-		self::$_router = $router;
+		$this->_router = $router;
 	} // end setStrategy();
 
 	/**
@@ -65,9 +65,9 @@ class Helper_Url
 	 *
 	 * @param string $baseUrl Base URL
 	 */
-	static public function setBaseUrl($baseUrl)
+	public function setBaseUrl($baseUrl)
 	{
-		self::$_base = (string)$baseUrl;
+		$this->_base = (string)$baseUrl;
 	} // end setBaseUrl();
 
 	/**
@@ -77,36 +77,36 @@ class Helper_Url
 	 * @param string $area Area name.
 	 * @return string
 	 */
-	static public function baseUrl($area = null)
+	public function baseUrl($area = null)
 	{
 		// Default area
 		if($area === null)
 		{
-			list($name, $data) = self::$_strategy->discoverArea();
+			list($name, $data) = $this->_strategy->discoverArea();
 			if(!isset($data['baseUrl']))
 			{
-				return self::$_base;
+				return $this->_base;
 			}
 			return $data['baseUrl'];
 		}
 		// The area has been previously checked.
-		elseif(isset(self::$_discoveried[$name]))
+		elseif(isset($this->_discoveried[$name]))
 		{
-			return self::$_discoveried[$name];
+			return $this->_discoveried[$name];
 		}
 		// New area
 		else
 		{
-			$area = self::$_strategy->getAreaOptions($name);
+			$area = $this->_strategy->getAreaOptions($name);
 			if(!isset($data['baseUrl']))
 			{
-				self::$_discoveried[$name] = self::$_base;
+				$this->_discoveried[$name] = $this->_base;
 			}
 			else
 			{
-				self::$_discoveried[$name] = $data['baseUrl'];
+				$this->_discoveried[$name] = $data['baseUrl'];
 			}
-			return self::$_discoveried[$name];
+			return $this->_discoveried[$name];
 		}
 	} // end baseUrl();
 
@@ -117,14 +117,14 @@ class Helper_Url
 	 * @param string $area Area name.
 	 * @return string
 	 */
-	static public function url($args, $area = null)
+	public function assemble($args, $area = null)
 	{
-		$baseUrl = self::baseUrl($area);
-		$addr = self::$_router->assemble($args);
+		$baseUrl = $this->baseUrl($area);
+		$addr = $this->_router->assemble($args);
 		if($baseUrl[strlen($baseUrl) -1] == '/' && $addr[0] == '/')
 		{
 			return $baseUrl.ltrim($addr, '/');
 		}
 		return $baseUrl.$addr;
-	} // end url();
-} // end Helper_Url;
+	} // end assemble();
+} // end Url;

@@ -9,12 +9,12 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Template;
+namespace Trinity\Template\Helper;
 use Trinity\Template\Helper\Styles\CSSCompressor;
 
-class Helper_Styles
+class Styles
 {
-	static private
+	private
 		$_minify = true,
 		$_base = null,
 		$_options = array(
@@ -29,9 +29,9 @@ class Helper_Styles
 	 *
 	 * @param string $baseUrl Base URL
 	 */
-	static public function setBaseUrl($baseUrl)
+	public function setBaseUrl($baseUrl)
 	{
-		self::$_base = (string)$baseUrl;
+		$this->_base = (string)$baseUrl;
 	} // end setBaseUrl();
 
 	/**
@@ -39,9 +39,9 @@ class Helper_Styles
 	 *
 	 * @return string
 	 */
-	static public function getBaseUrl()
+	public function getBaseUrl()
 	{
-		return self::$_base;
+		return $this->_base;
 	} // end getBaseUrl();
 
 	/**
@@ -49,16 +49,16 @@ class Helper_Styles
 	 *
 	 * @param string $baseUrl Base URL
 	 */
-	static public function setMinify($state)
+	public function setMinify($state)
 	{
-		self::$_minify = (bool)$state;
+		$this->_minify = (bool)$state;
 		if(!(bool)$state)
 		{
-			for($i = 0, $endI = count(self::$_styles); $i<$endI; $i++)
+			for($i = 0, $endI = count($this->_styles); $i<$endI; $i++)
 			{
-				if(in_array(self::$_styles[$i], self::$_localStyles))
+				if(in_array($this->_styles[$i], $this->_localStyles))
 				{
-					self::$_styles[$i] = self::getBaseUrl().self::$_styles[$i];
+					$this->_styles[$i] = $this->getBaseUrl().$this->_styles[$i];
 				}
 			}
 		}
@@ -69,9 +69,9 @@ class Helper_Styles
 	 *
 	 * @return string
 	 */
-	static public function getMinify()
+	public function getMinify()
 	{
-		return self::$_minify;
+		return $this->_minify;
 	} // end getMinify();
 
 	/**
@@ -79,13 +79,13 @@ class Helper_Styles
 	 *
 	 * @param string $dir Directory.
 	 */
-	static public function setCacheDirectory($dir)
+	public function setCacheDirectory($dir)
 	{
 		if($dir[strlen($dir)-1] != '/')
 		{
 			$dir .= '/';
 		}
-		self::$_options['cache_directory'] = (string)$dir;
+		$this->_options['cache_directory'] = (string)$dir;
 	} // end setCacheDirectory();
 
 	/**
@@ -93,9 +93,9 @@ class Helper_Styles
 	 *
 	 * @return string
 	 */
-	static public function getCacheDirectory()
+	public function getCacheDirectory()
 	{
-		return self::$_options['cache_directory'];
+		return $this->_options['cache_directory'];
 	} // end getCacheDirectory();
 
 	/**
@@ -104,9 +104,9 @@ class Helper_Styles
 	 * @param string $name Option name
 	 * @param mixed $value Value
 	 */
-	static public function set($name, $value)
+	public function set($name, $value)
 	{
-		self::$_options[$name] = $value;
+		$this->_options[$name] = $value;
 	} // end set();
 
 	/**
@@ -115,9 +115,9 @@ class Helper_Styles
 	 * @param string $name Option name.
 	 * @return mixed
 	 */
-	static public function get($name)
+	public function get($name)
 	{
-		return isset(self::$_options[$name])?self::$_options[$name]:null;
+		return isset($this->_options[$name])?$this->_options[$name]:null;
 	} // end get();
 
 	/**
@@ -126,13 +126,13 @@ class Helper_Styles
 	 * @param String $style Path to style with its name.
 	 * @param Boolean $local Optional Is it on local server?
 	 */
-	static public function append($style, $local = true)
+	public function append($style, $local = true)
 	{
 		if((bool)$local)
 		{
-			self::$_localStyles[] = $style;
+			$this->_localStyles[] = $style;
 		}
-		self::$_styles[] = $style;
+		$this->_styles[] = $style;
 	} // end append();
 
 	/**
@@ -141,13 +141,13 @@ class Helper_Styles
 	 * @param String $style Path to style with its name.
 	 * @param Boolean $local Is it on local server?
 	 */
-	static public function prepend($style, $local = true)
+	public function prepend($style, $local = true)
 	{
 		if((bool)$local)
 		{
-			self::$_localStyles[] = $style;
+			$this->_localStyles[] = $style;
 		}
-		\array_unshift(self::$_styles, $style);
+		\array_unshift($this->_styles, $style);
 	} // end prepend();
 
 	/**
@@ -156,27 +156,27 @@ class Helper_Styles
 	 * 
 	 * @return array
 	 */
-	static public function getStyles()
+	public function getStyles()
 	{
-		if(self::getMinify())
+		if($this->getMinify())
 		{
-			if(self::$_compressor === null)
+			if($this->_compressor === null)
 			{
-				self::$_compressor = new CSSCompressor(self::$_options);
+				$this->_compressor = new CSSCompressor($this->_options);
 			}
-			self::$_compressor->addFiles(self::$_styles);
-			return array(self::getBaseUrl().self::$_compressor->minifyCode());
+			$this->_compressor->addFiles($this->_styles);
+			return array($this->getBaseUrl().$this->_compressor->minifyCode());
 		}
 		else
 		{
-			for($i = 0, $endI = count(self::$_styles); $i<$endI; $i++)
+			for($i = 0, $endI = count($this->_styles); $i<$endI; $i++)
 			{
-				if(in_array(self::$_styles[$i], self::$_localStyles))
+				if(in_array($this->_styles[$i], $this->_localStyles))
 				{
-					self::$_styles[$i] = self::getBaseUrl().self::$_styles[$i];
+					$this->_styles[$i] = $this->getBaseUrl().$this->_styles[$i];
 				}
 			}
 		}
-		return self::$_styles;
+		return $this->_styles;
 	} // end getStyles();
-} // end Helper_Styles;
+} // end Styles;

@@ -62,4 +62,15 @@ abstract class View extends Basement_View
 	 * Dispatches the view.
 	 */
 	abstract public function dispatch();
+
+	/**
+	 * Returns helper object.
+	 * 
+	 * @param string $name Helper name.
+	 * @return \Trinity\Template\Helper
+	 */
+	public function getHelper($name)
+	{
+		return $this->_application->getServiceLocator()->get('helper.'.ucfirst((string)$name));
+	} // end getHelper();
 } // end View;

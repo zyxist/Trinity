@@ -30,7 +30,8 @@ class Opt extends Basement_Service
 	 */
 	public function toPreload()
 	{
-		return array('web.Area');
+		return array();
+		//return array('web.Area');
 	} // end toPreload();
 
 	/**
@@ -55,6 +56,13 @@ class Opt extends Basement_Service
 			'area.layouts' => $area->getFilePath('layouts')
 		);
 
+		// Load URL helper
+		$serviceLocator = $this->_serviceLocator;
+		$urlHelper = $serviceLocator->get('helper.Url');
+		// Register URL helper instruction.
+		$opt->register(Opt_Class::OPT_NAMESPACE, 'trinity');
+		$opt->register(Opt_Class::OPT_INSTRUCTION, 'Url', '\Trinity\Template\Helper\Instruction\Url');
+		
 		$options = $this->getOptions();
 		if(!isset($options['stripWhitespaces']))
 		{
@@ -62,12 +70,7 @@ class Opt extends Basement_Service
 		}
 		$opt->loadConfig($options);
 
-		// Register helpers.
-		$opt->register(Opt_Class::PHP_FUNCTION, 'baseUrl', '\Trinity\Template\Helper_Url::baseUrl');
-		$opt->register(Opt_Class::PHP_FUNCTION, 'url', '\Trinity\Template\Helper_Url::url');
-
-		$eventDispatcher = BaseApplication::getApplication()->getEventDispatcher();
-		$serviceLocator = $this->_serviceLocator;
+		$eventDispatcher = $serviceLocator->getEventDispatcher();
 		$eventDispatcher->connect('template.layout.configure', function(Event $event) use($serviceLocator)
 		{
 			$session = $serviceLocator->get('web.Session');

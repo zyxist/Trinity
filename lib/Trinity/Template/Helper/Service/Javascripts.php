@@ -9,18 +9,18 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web\Service;
+namespace Trinity\Template\Helper\Service;
 use \Trinity\Basement\Service as Basement_Service;
-use \Trinity\Web\Area\Strategy\File as Strategy_File;
+use \Trinity\Template\Helper\Javascripts as Helper_Javascripts;
 
 /**
- * Initializes the area selection strategy.
+ * Launches the stylesheet helper.
  *
- * @author Tomasz Jędrzejewski
+ * @author Amadeusz "megawebmaster" Starzykiewicz
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class AreaStrategy extends Basement_Service
+class Javascripts extends Basement_Service
 {
 	/**
 	 * List of services to preload.
@@ -28,24 +28,23 @@ class AreaStrategy extends Basement_Service
 	 */
 	public function toPreload()
 	{
-		return array('utils.Config', 'web.Visit');
+		return array('utils.Config');
 	} // end toPreload();
 
 	/**
-	 * Preconfigures and initializes the configuration object.
-	 *
-	 * @return Area_Abstract
+	 * Builds the layout object.
 	 */
 	public function getObject()
 	{
-		// Initialize the area discovery strategy
-		$strategy = new Strategy_File($this->areaList);
-		$strategy->setDiscoveryType($this->discoveryType, $this->_serviceLocator->get('web.Visit'));
-		if($this->defaultArea !== null)
-		{
-			$strategy->setDefaultArea($this->defaultArea);
-		}
+		$config = $this->_serviceLocator->get('utils.Config');
+		$javascripts = new Helper_Javascripts();
 
-		return $strategy;
+		// Configure helper
+		$javascripts->setBaseUrl($config->baseUrl);
+		$javascripts->setCacheDirectory($config->helpers->javascripts->cacheDirectory);
+		$javascripts->setMinify($config->helpers->javascripts->minify);
+		$javascripts->set('gzip_contents', $config->helpers->javascripts->gzip);
+
+		return $javascripts;
 	} // end getObject();
-} // end AreaStrategy;
+} // end Javascripts;

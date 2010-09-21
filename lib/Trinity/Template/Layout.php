@@ -261,7 +261,7 @@ class Layout implements Broker
 			$eventDispatcher->notify(new Event($this, 'template.layout.configure',
 				array('layout' => $this->_layout)
 			));
-		}// Configure the layout view
+		}
 
 		// Add placeholders
 		foreach($this->_placeholders as $name => &$placeholder)

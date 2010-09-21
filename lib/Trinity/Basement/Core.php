@@ -659,6 +659,12 @@ class Locator_Service extends Locator
 	private $_serviceConfigurators = array();
 
 	/**
+	 * Event dispatcher.
+	 * @var \Symfony\Component\EventDispatcher\EventDispatcher
+	 */
+	protected $_eventDispacher;
+
+	/**
 	 * Adds a new service group used for discovering the services. The group
 	 * alias should be a valid PHP class prefix together with the namespace
 	 * and the optional trailing underscore, if necessary.
@@ -965,6 +971,16 @@ class Locator_Service extends Locator
 		// Return the object created by this service.
 		return $this->_pool[$name];
 	} // end get();
+
+	/**
+	 * Returns event dispatcher object.
+	 * 
+	 * @return \Symfony\Component\EventDispatcher\EventDispatcher
+	 */
+	public function getEventDispatcher()
+	{
+		return $this->_eventDispatcher;
+	} // end getEventDispatcher();
 
 	/**
 	 * Resolve dependencies and preload them in the requested order.
