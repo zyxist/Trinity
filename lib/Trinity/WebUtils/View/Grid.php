@@ -42,7 +42,7 @@ class Grid extends View_Html
 	public function __construct(BaseApplication $application)
 	{
 		parent::__construct($application);
-		$this->setTemplate('app.templates:grid.tpl');
+		$this->setTemplateName('default', 'app.templates:grid.tpl');
 	} // end __construct();
 
 	/**
@@ -50,7 +50,7 @@ class Grid extends View_Html
 	 */
 	public function dispatch()
 	{
-		$view = $this->getTemplateObject();
+		$view = $this->templateFactory();
 
 		$model = $this->getModel('grid', '\\Trinity\\Model\\Interfaces\\Grid');
 

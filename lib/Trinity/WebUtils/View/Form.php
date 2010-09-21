@@ -32,7 +32,7 @@ class Form extends View_Html
 	public function __construct(BaseApplication $application)
 	{
 		parent::__construct($application);
-		$this->setTemplate('app.templates:form.tpl');
+		$this->setTemplateName('default', 'app.templates:form.tpl');
 	} // end __construct();
 
 	/**
@@ -40,7 +40,7 @@ class Form extends View_Html
 	 */
 	public function dispatch()
 	{
-		$view = $this->getTemplateObject();
+		$view = $this->templateFactory('default');
 
 		$model = $this->getModel('form', '\\Opf_Form');
 		$model->setView($view);
