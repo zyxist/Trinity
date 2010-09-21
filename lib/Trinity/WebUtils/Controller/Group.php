@@ -128,7 +128,7 @@ class Group extends Web_Controller
 		// Try to load the group object
 		if(!$this->_groupModule->loadFile($groupProcessed) || !class_exists($groupQualified, false))
 		{
-			$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
 		}
 		$groupObj = new $groupQualified($manager, $this, $action);
 
