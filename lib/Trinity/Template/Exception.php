@@ -10,15 +10,16 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Template;
+use Trinity\Basement\Exception as Base_Exception;
 
 /**
- * An exception for web-related issues.
+ * An exception for template-related issues.
  *
- * @author Tomasz Jędrzejewski
+ * @author Amadeusz "megawebmaster" Starzykiewicz
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Exception extends \Exception
+class Exception extends Base_Exception
 {
 	/* null */
 } // end Exception;
