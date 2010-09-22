@@ -24,10 +24,10 @@ class Visit extends Basement_Service
 	/**
 	 * Preconfigures and initializes the visit object.
 	 *
-	 * @return \Opc_Visit
+	 * @return \Opc\Visit
 	 */
 	public function getObject()
 	{
-		return new \Opc_Visit;
+		return new \Opc\Visit;
 	} // end getObject();
 } // end Visit;

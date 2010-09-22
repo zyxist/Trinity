@@ -20,7 +20,7 @@ use \Trinity\Model\Interfaces\Editable as Interface_Editable;
 use \Trinity\Model\Interfaces\Removable as Interface_Removable;
 use \Trinity\Model\Interfaces\Movable as Interface_Movable;
 use \Trinity\Model\Interfaces\Paginable as Interface_Paginable;
-use \Opc_Paginator;
+use \Opc\Paginator;
 
 /**
  * This view represents a grid table of rows imported from a
@@ -57,7 +57,7 @@ class Grid extends View_Html
 		// Add pagination
 		if($model instanceof Interface_Paginable)
 		{
-			$paginator = Opc_Paginator::create($model->count());
+			$paginator = Paginator::create($model->count());
 			$paginator->page = $this->get('page');
 
 			$model->setLimit($paginator->limit, $paginator->offset);

@@ -11,7 +11,7 @@
  */
 namespace Trinity\Utils;
 use \Trinity\Basement\Service as Service;
-use \Opc_Class;
+use \Opc\Core as Opc_Core;
 
 /**
  * The Open Power Forms instance builder.
@@ -34,14 +34,14 @@ class Service_Opc extends Service
 	/**
 	 * Preconfigures and initializes the OPF object.
 	 *
-	 * @return \Opc_Class
+	 * @return \Opc\Core
 	 */
 	public function getObject()
 	{
 		$config = $this->_serviceLocator->get('utils.Config');
 
 		// Create the OPF instance.
-		$opc = new Opc_Class();
+		$opc = new Opc_Core();
 		$opc->paginatorDecorator = $config->pagination->decorator;
 		$opc->paginatorDecoratorOptions = $config->pagination->decoratorOpts->toArray();
 		$opc->itemsPerPage = $config->pagination->itemsPerPage;

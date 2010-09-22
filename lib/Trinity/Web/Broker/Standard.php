@@ -30,9 +30,9 @@ class Standard extends Broker
 	/**
 	 * Builds the request using the visit information.
 	 * 
-	 * @param \Opc_Visit $visit The visit information object.
+	 * @param \Opc\Visit $visit The visit information object.
 	 */
-	public function buildRequest(\Opc_Visit $visit)
+	public function buildRequest(\Opc\Visit $visit)
 	{
 		$this->setRequest($request = new Request_Http($visit));
 

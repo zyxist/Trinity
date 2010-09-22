@@ -23,7 +23,7 @@ class Http extends Request
 {
 	/**
 	 * The visit information
-	 * @var \Opc_Visit
+	 * @var \Opc\Visit
 	 */
 	private $_visit;
 
@@ -31,9 +31,9 @@ class Http extends Request
 	 * Constructs a HTTP request, importing the information from the visit
 	 * data collector provided by Open Power Classes.
 	 * 
-	 * @param \Opc_Visit $visit The visit information.
+	 * @param \Opc\Visit $visit The visit information.
 	 */
-	public function __construct(\Opc_Visit $visit)
+	public function __construct(\Opc\Visit $visit)
 	{
 		$this->_visit = $visit;
 	} // end __construct();
@@ -51,9 +51,9 @@ class Http extends Request
 	/**
 	 * Sets the used visit object.
 	 * 
-	 * @param \Opc_Visit $visit New visit object.
+	 * @param \Opc\Visit $visit New visit object.
 	 */
-	public function setVisit(\Opc_Visit $visit)
+	public function setVisit(\Opc\Visit $visit)
 	{
 		$this->_visit = $visit;
 	} // end setVisit();
@@ -61,7 +61,7 @@ class Http extends Request
 	/**
 	 * Returns the currently used visit object.
 	 * 
-	 * @return \Opc_Visit
+	 * @return \Opc\Visit
 	 */
 	public function getVisit()
 	{

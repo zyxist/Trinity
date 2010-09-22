@@ -100,10 +100,10 @@ class File implements Strategy
 	 * Sets the requested discovery type.
 	 *
 	 * @param int $type Discovery type
-	 * @param Opc_Visit $visit Visit object used to grab the discovery type data.
+	 * @param Opc\Visit $visit Visit object used to grab the discovery type data.
 	 * @return Strategy_File Fluent interface.
 	 */
-	public function setDiscoveryType($type, \Opc_Visit $visit)
+	public function setDiscoveryType($type, \Opc\Visit $visit)
 	{
 		$this->_discoveryType = (int)$type;
 
