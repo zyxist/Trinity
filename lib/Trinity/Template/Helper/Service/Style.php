@@ -11,8 +11,8 @@
  */
 namespace Trinity\Template\Helper\Service;
 use \Trinity\Basement\Service as Basement_Service;
-use \Trinity\Template\Helper\Styles as Helper_Styles;
-use \Symfony\Component\EventDispatcher\Event;
+use \Trinity\Template\Helper\Style as Helper_Style;
+use \Opt_View;
 
 /**
  * Launches the stylesheet helper.
@@ -21,7 +21,7 @@ use \Symfony\Component\EventDispatcher\Event;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Styles extends Basement_Service
+class Style extends Basement_Service
 {
 	/**
 	 * List of services to preload.
@@ -38,23 +38,19 @@ class Styles extends Basement_Service
 	public function getObject()
 	{
 		$config = $this->_serviceLocator->get('utils.Config');
-		$styles = new Helper_Styles();
+		$style = new Helper_Style();
+		$style->setBaseUrl($config->baseUrl);
 
-		// Configure helper
-		$styles->setBaseUrl($config->baseUrl);
-		$styles->setCacheDirectory($config->helpers->styles->cacheDirectory);
-		$styles->setMinify($config->helpers->styles->minify);
-		$styles->set('gzip_contents', $config->helpers->styles->gzip);
-		$eventDispatcher = $this->_serviceLocator->getEventDispatcher();
-		$eventDispatcher->connect('template.layout.render', function(Event $event) use($styles)
-		{
-			$layout = $event->getSubject();
-			$layout->getLayout()->assign('helpers', array_merge(
-				isset($layout->getLayout()->helpers)?$layout->getLayout()->helpers:array(),
-				array('styles' => $styles->getStyles())
-			));
-		});
+		Opt_View::assignGlobal(
+			'helper',
+			array_merge(
+				Opt_View::definedGlobal('helper')?Opt_View::getGlobal('helper'):array(),
+				array('style' => $style)
+			)
+		);
+		Opt_View::setFormatGlobal('helper', 'Global/Array', false);
+		Opt_View::setFormatGlobal('style', 'Helper', false);
 
-		return $styles;
+		return $style;
 	} // end getObject();
-} // end Styles;
+} // end Style;
