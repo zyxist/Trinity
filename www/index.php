@@ -12,6 +12,7 @@ $nsLoader = new Opl_Loader;
 $nsLoader->addLibrary('Trinity', $libs['Trinity']);
 $nsLoader->addLibrary('Doctrine', $libs['Doctrine']);
 $nsLoader->addLibrary('Symfony', $libs['Symfony']);
+$nsLoader->addLibrary('Opc', $libs['Opc']);
 $nsLoader->addLibrary('Application', $libs['Application']);
 $nsLoader->register();
 
@@ -20,8 +21,6 @@ $oplLoader = new Opl_Loader('_');
 // due to backward compatibility issues.
 $oplLoader->addLibrary('Opl', $libs['Opl']);
 $oplLoader->addLibrary('Opt', $libs['Opt']);
-// Note that OPC is going to be ported soon to namespaces.
-$oplLoader->addLibrary('Opc', $libs['Opc']);
 // Note that OPF is being currently ported to namespaces.
 $oplLoader->addLibrary('Opf', $libs['Opf']);
 $oplLoader->register();
@@ -38,6 +37,8 @@ $application = new \Trinity\Web\Application(
 // Bind autoloaders, so that they could be accessed
 $application->addLoader('default', $nsLoader);
 $application->addLoader('legacy', $oplLoader);
+// Set config loader classname.
+$application->setConfigLoader('Ini');
 
 // Run everything
 $application->initialize();
