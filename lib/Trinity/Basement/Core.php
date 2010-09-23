@@ -251,7 +251,7 @@ class Locator
 	 */
 	public function set($name, $object)
 	{
-		$this->_verifyObject($object);
+		$this->_verify($name, $object);
 		$this->_pool[(string)$name] = $object;
 	} // end set();
 
@@ -288,7 +288,7 @@ class Locator
 	 * 
 	 * @param object $object The object to verify.
 	 */
-	protected function _verify($object)
+	protected function _verify($name, $object)
 	{
 		/* don't verify */
 	} // end _verify();
@@ -405,11 +405,14 @@ class Locator_Object extends Locator
 	 * @throws Core_Exception
 	 * @param object $object
 	 */
-	protected function _verify($object)
+	protected function _verify($name, $object)
 	{
-		if(!\is_a($object, $this->_baseClass))
+		if($this->_baseClass !== '')
 		{
-			throw new Core_Exception('The object registered as '.$name.' does not implement '.$this->_baseClass);
+			if(!\is_a($object, $this->_baseClass))
+			{
+				throw new Core_Exception('The object registered as '.$name.' does not implement '.$this->_baseClass);
+			}
 		}
 	} // end _verify();
 
@@ -425,10 +428,7 @@ class Locator_Object extends Locator
 		{
 			$this->_pool[(string)$name] = \call_user_func($this->_creatorFunc, $name);
 
-			if(!\is_a($this->_pool[(string)$name], $this->_baseClass))
-			{
-				throw new Core_Exception('The object registered as '.$name.' does not implement '.$this->_baseClass);
-			}
+			$this->_verify($name, $this->_pool[(string)$name]);
 
 			$this->_eventDispatcher->notify(new Event($this, 'locator.'.$this->_name.'.new',
 				array('name' => $name, 'object' => $this->_pool[(string)$name])
@@ -657,12 +657,6 @@ class Locator_Service extends Locator
 	 * @var array
 	 */
 	private $_serviceConfigurators = array();
-
-	/**
-	 * Event dispatcher.
-	 * @var \Symfony\Component\EventDispatcher\EventDispatcher
-	 */
-	protected $_eventDispacher;
 
 	/**
 	 * Adds a new service group used for discovering the services. The group
@@ -900,9 +894,10 @@ class Locator_Service extends Locator
 	 * interface.
 	 *
 	 * @throws Core_Exception
+	 * @param string $name
 	 * @param object $object
 	 */
-	protected function _verify($object)
+	protected function _verify($name, $object)
 	{
 		if(!$object instanceof Service)
 		{
@@ -973,16 +968,6 @@ class Locator_Service extends Locator
 	} // end get();
 
 	/**
-	 * Returns event dispatcher object.
-	 * 
-	 * @return \Symfony\Component\EventDispatcher\EventDispatcher
-	 */
-	public function getEventDispatcher()
-	{
-		return $this->_eventDispatcher;
-	} // end getEventDispatcher();
-
-	/**
 	 * Resolve dependencies and preload them in the requested order.
 	 *
 	 * @param Hook $initial Initial hook
@@ -1043,7 +1028,7 @@ class Locator_Service extends Locator
 
 		// Create the service and inject the configuration.
 		$service = new $className($this, $name);
-		$this->_verify($service);
+		$this->_verify($name, $service);
 		$service->setOptions($this->getServiceConfigurator($name)->getServiceOptions($name));
 
 		return $service;
