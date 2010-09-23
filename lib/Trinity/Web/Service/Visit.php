@@ -11,6 +11,7 @@
  */
 namespace Trinity\Web\Service;
 use \Trinity\Basement\Service as Basement_Service;
+use Opc\Visit as Opc_Visit;
 
 /**
  * The visit builder.
@@ -28,6 +29,6 @@ class Visit extends Basement_Service
 	 */
 	public function getObject()
 	{
-		return new \Opc\Visit;
+		return new Opc_Visit();
 	} // end getObject();
 } // end Visit;
