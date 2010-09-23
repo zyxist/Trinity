@@ -26,6 +26,8 @@ interface Controller
 {
 	public function setModelLocator(Locator_Object $locator);
 	public function getModelLocator();
+	public function setHelperLocator(Locator_Object $locator);
+	public function getHelperLocator();
 } // end Controller;
 
 /**
@@ -281,6 +283,16 @@ class Locator
 		}
 		return $this->_pool[(string)$name];
 	} // end get();
+
+	/**
+	 * Returns event dispatcher object.
+	 *
+	 * @return \Symfony\Component\EventDispatcher\EventDispatcher
+	 */
+	public function getEventDispatcher()
+	{
+		return $this->_eventDispatcher;
+	} // end getEventDispatcher();
 
 	/**
 	 * This method should check if the specified object can be inserted in this

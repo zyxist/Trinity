@@ -90,6 +90,12 @@ class Manager
 	protected $_modelLocator;
 
 	/**
+	 * The helper locator
+	 * @var \Trinity\Basement\Locator_Object;
+	 */
+	protected $_helperLocator;
+
+	/**
 	 * The view broker.
 	 * @var View_Broker
 	 */
@@ -107,7 +113,7 @@ class Manager
 	 */
 	private $_models = array();
 
-	public function __construct(Basement_Application $application, Request $request, Response $response, Locator_Object $modelLocator)
+	public function __construct(Basement_Application $application, Request $request, Response $response, Locator_Object $modelLocator, Locator_Object $helperLocator)
 	{
 		$this->application = $application;
 		$this->events = $application->getEventDispatcher();
@@ -121,6 +127,7 @@ class Manager
 		$this->session = $this->services->get('web.Session');
 		$this->area = $this->services->get('web.Area');
 		$this->_modelLocator = $modelLocator;
+		$this->_helperLocator = $helperLocator;
 	} // end __construct();
 
 	/**

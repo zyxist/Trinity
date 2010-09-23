@@ -30,6 +30,7 @@ abstract class View extends Basement_View
 	 * @var \Trinity\Basement\Application
 	 */
 	protected $_application;
+	protected $_helperLocator;
 
 	/**
 	 * Constructs the view.
@@ -39,6 +40,7 @@ abstract class View extends Basement_View
 	public function __construct(Basement_Application $application)
 	{
 		$this->_application = $application;
+		$this->_helperLocator = $application->getServiceLocator()->get('template.HelperLocator');
 	} // end __construct();
 
 	/**
@@ -71,6 +73,6 @@ abstract class View extends Basement_View
 	 */
 	public function getHelper($name)
 	{
-		return $this->_application->getServiceLocator()->get('helper.'.ucfirst((string)$name));
+		return $this->_helperLocator->get($name);
 	} // end getHelper();
 } // end View;

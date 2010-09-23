@@ -39,6 +39,11 @@ abstract class Controller implements CoreController
 	 */
 	protected $_modelLocator;
 	/**
+	 * The helper locator.
+	 * @var \Trinity\Basement\Locator_Object
+	 */
+	protected $_helperLocator;
+	/**
 	 * The application link.
 	 * @var \Trinity\Basement\Application
 	 */
@@ -81,6 +86,26 @@ abstract class Controller implements CoreController
 	} // end getModelLocator();
 
 	/**
+	 * Assigns a new helper locator to the controller.
+	 *
+	 * @param \Trinity\Basement\Locator_Object $locator The helper locator
+	 */
+	public function setHelperLocator(Locator_Object $locator)
+	{
+		$this->_helperLocator = $locator;
+	} // end setHelperLocator();
+
+	/**
+	 * Returns the current helper locator.
+	 *
+	 * @return \Trinity\Basement\Locator_Object
+	 */
+	public function getHelperLocator()
+	{
+		return $this->_helperLocator;
+	} // end getHelperlLocator();
+
+	/**
 	 * Sets the name of the brick used if a controller error occurs.
 	 *
 	 * @param string $brickName The name of the brick
@@ -106,7 +131,7 @@ abstract class Controller implements CoreController
 	 */
 	public function dispatch(Request $request, Response $response)
 	{
-		$manager = new Manager($this->_application, $request, $response, $this->_modelLocator);
+		$manager = new Manager($this->_application, $request, $response, $this->_modelLocator, $this->_helperLocator);
 		$manager->router->setParam('area', $manager->area->getName());
 
 		$manager->events->notify(new Event($this, 'controller.web.dispatch.begin', array(

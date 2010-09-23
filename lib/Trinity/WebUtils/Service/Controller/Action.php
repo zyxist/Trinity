@@ -30,7 +30,7 @@ class Controller_Action extends Basement_Service
 	 */
 	public function toPreload()
 	{
-		return array('web.Router', 'web.Area', 'web.Session', 'model.ModelLocator', 'template.Opf');
+		return array('web.Router', 'web.Area', 'web.Session', 'model.ModelLocator', 'template.HelperLocator', 'template.Opf');
 	} // end toPreload();
 
 	/**
@@ -48,6 +48,7 @@ class Controller_Action extends Basement_Service
 		$controller->setActionModule($area->getAreaModule()->getSubmodule('Action'));
 		$controller->setDefaults($this->defaultAction);
 		$controller->setModelLocator($this->_serviceLocator->get('model.ModelLocator'));
+		$controller->setHelperLocator($this->_serviceLocator->get('template.HelperLocator'));
 
 		$controller->dispatch($broker->getRequest(), $broker->getResponse());
 		return $controller;
