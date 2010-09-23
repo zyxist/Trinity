@@ -21,6 +21,9 @@ class Test extends View_Html
 	{
 		$this->setTemplate('area.templates:test.tpl');
 
+		// Get helper.
+		$styles = $this->getHelper('style');
+
 		$model = $this->getModel('model');
 		$view = $this->getTemplateObject();
 		$view->foo = $model->getFoo();
