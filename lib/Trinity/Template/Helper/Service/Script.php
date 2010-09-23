@@ -11,16 +11,17 @@
  */
 namespace Trinity\Template\Helper\Service;
 use \Trinity\Basement\Service as Basement_Service;
-use \Trinity\Template\Helper\Javascripts as Helper_Javascripts;
+use \Trinity\Template\Helper\Script as Helper_Script;
+use \Opt_View;
 
 /**
- * Launches the stylesheet helper.
+ * Launches the javascript helper.
  *
  * @author Amadeusz "megawebmaster" Starzykiewicz
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Javascripts extends Basement_Service
+class Script extends Basement_Service
 {
 	/**
 	 * List of services to preload.
@@ -37,14 +38,19 @@ class Javascripts extends Basement_Service
 	public function getObject()
 	{
 		$config = $this->_serviceLocator->get('utils.Config');
-		$javascripts = new Helper_Javascripts();
+		$script = new Helper_Script();
+		$script->setBaseUrl($config->baseUrl);
 
-		// Configure helper
-		$javascripts->setBaseUrl($config->baseUrl);
-		$javascripts->setCacheDirectory($config->helpers->javascripts->cacheDirectory);
-		$javascripts->setMinify($config->helpers->javascripts->minify);
-		$javascripts->set('gzip_contents', $config->helpers->javascripts->gzip);
+		Opt_View::assignGlobal(
+			'helper',
+			array_merge(
+				Opt_View::definedGlobal('helper')?Opt_View::getGlobal('helper'):array(),
+				array('script' => $script)
+			)
+		);
+		Opt_View::setFormatGlobal('helper', 'Global/Array', false);
+		Opt_View::setFormatGlobal('script', 'Helper', false);
 
-		return $javascripts;
+		return $script;
 	} // end getObject();
-} // end Javascripts;
+} // end Script;
