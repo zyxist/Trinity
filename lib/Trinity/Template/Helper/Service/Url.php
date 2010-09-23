@@ -12,7 +12,7 @@
 namespace Trinity\Template\Helper\Service;
 use \Trinity\Basement\Service as Basement_Service;
 use \Trinity\Template\Helper\Url as Helper_Url;
-use \Symfony\Component\EventDispatcher\Event;
+use \Opt_View;
 
 /**
  * Launches the stylesheet helper.
@@ -44,15 +44,15 @@ class Url extends Basement_Service
 		$url->setBaseUrl($config->baseUrl);
 		$url->setStrategy($this->_serviceLocator->get('web.AreaStrategy'));
 		$url->setRouter($this->_serviceLocator->get('web.Router'));
-		$eventDispatcher = $this->_serviceLocator->getEventDispatcher();
-		$eventDispatcher->connect('template.layout.render', function(Event $event) use($url)
-		{
-			$layout = $event->getSubject();
-			$layout->getLayout()->assign('helpers', array_merge(
-				isset($layout->getLayout()->helpers)?$layout->getLayout()->helpers:array(),
+
+		Opt_View::assignGlobal(
+			'helper',
+			array_merge(
+				Opt_View::definedGlobal('helper')?Opt_View::getGlobal('helper'):array(),
 				array('baseUrl' => $url->baseUrl())
-			));
-		});
+			)
+		);
+		Opt_View::setFormatGlobal('helper', 'Global/Array', false);
 
 		return $url;
 	} // end getObject();

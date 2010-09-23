@@ -58,10 +58,11 @@ class Opt extends Basement_Service
 
 		// Load URL helper
 		$serviceLocator = $this->_serviceLocator;
-		$urlHelper = $serviceLocator->get('helper.Url');
+		$urlHelper = $serviceLocator->get('template.HelperLocator')->get('url');
 		// Register URL helper instruction.
 		$opt->register(Opt_Class::OPT_NAMESPACE, 'trinity');
 		$opt->register(Opt_Class::OPT_INSTRUCTION, 'Url', '\Trinity\Template\Helper\Instruction\Url');
+		$opt->register(Opt_Class::OPT_FORMAT, 'Helper', '\Trinity\Template\Helper\Format\Helper');
 		
 		$options = $this->getOptions();
 		if(!isset($options['stripWhitespaces']))

@@ -10,14 +10,15 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Template\Helper\Instruction;
-use \Opt_Instruction_Abstract as Opt_Instruction;
-use \Opt_Xml_Node as Node;
+use \Opt_Instruction_Abstract;
+use \Opt_Xml_Node;
 use \Opt_Xml_Buffer;
 use \Opt_Xml_Attribute;
 use \Opt_Instruction_Exception;
 use \Opt_Instruction_Attribute;
+use \Opt_Compiler_Class;
 
-class Url extends Opt_Instruction
+class Url extends Opt_Instruction_Abstract
 {
 	protected $_name = 'Url';
 	protected $_defaultArea;
@@ -25,11 +26,12 @@ class Url extends Opt_Instruction
     public function configure()
     {
         $this->_addInstructions(array('trinity:url'));
+        $this->_addAttributes(array('trinity:url'));
 		$area = \Trinity\Basement\Application::getApplication()->getServiceLocator()->get('web.Area');
 		$this->_defaultArea = $area->getName();
     } // end configure();
 
-	public function processNode(Node $node)
+	public function processNode(Opt_Xml_Node $node)
 	{
 		// TODO: Improve checking parents.
 		// Prevent from adding an attribute to OPT tags
@@ -72,8 +74,30 @@ class Url extends Opt_Instruction
 			$this->_buildCode($node, $vars, $params['attribute']);
 		}
 	} // end processNode();
+	
+	/**
+	 * Processes the trinity:url attributes.
+	 * @internal
+	 * @param Opt_Xml_Node $node The node with the attribute
+	 * @param Opt_Xml_Attribute $attr The recognized attribute.
+	 */
+	public function processAttribute(Opt_Xml_Node $node, Opt_Xml_Attribute $attr)
+	{
+		if(!$this->_compiler->isNamespace($node->getNamespace()))
+		{
+			//
+		}
+		$expression = $this->_compiler->compileExpression('['.$attr->getValue().']', false, Opt_Compiler_Class::ESCAPE_OFF);
+		//var_dump($expression); exit;
+		$code = 'echo \Trinity\Basement\Application::getApplication()->getServiceLocator()->get(\'helper.Url\')->assemble('.$expression[0].');';
+		// Create an attribute for the parent.
+		$attribute = new Opt_Xml_Attribute('href', null);
+		$attribute->addAfter(Opt_Xml_Buffer::ATTRIBUTE_VALUE, $code);
 
-	private function _buildCode(Node $node, array $vars, $attributeName)
+		$node->addAttribute($attribute);
+	} // end processAttribute();
+
+	private function _buildCode(Opt_Xml_Node $node, array $vars, $attributeName)
 	{
 		// Build the code
 		$code = 'echo \Trinity\Basement\Application::getApplication()->getServiceLocator()->get(\'helper.Url\')->assemble(array(';
