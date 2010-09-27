@@ -10,6 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Web\Service;
+use \Trinity\Basement\Module;
 use \Trinity\Basement\Service as Basement_Service;
 use \Trinity\Web\Area as Web_Area;
 use \Trinity\Web\Area\Strategy\File as Strategy_File;
@@ -52,7 +53,24 @@ class Area extends Basement_Service
 		// Initialize the area
 		$area = new Web_Area($application, $this->_serviceLocator->get('web.AreaStrategy'));
 		$area->setPrimaryModule($module = $moduleManager->getModule(ucfirst($request->getParam('module', $this->defaultModule))));
-		$area->setAreaModule($module->getSubmodule($area->getName()));
+
+		// Create the area module
+		if($area->hasOption('moduleClass'))
+		{
+			$className = $area->getOption('moduleClass');
+		}
+		else
+		{
+			$className = $this->areaModuleLocation.'\\'.$area->getName();
+		}
+		$object = new $className($moduleManager, $module->getName().'.'.$area->getName(), $this->areaModuleLocation, $module->getCodePath($area->getName()));
+		if(!$object instanceof Module)
+		{
+			throw new \Trinity\Basement\Core\Exception('The class \''.$className.'\' is not a valid module class.');
+		}
+		$moduleManager->setModule($object);
+
+		$area->setAreaModule($object);
 		$request->setArea($area);
 
 		// Get the controller name
