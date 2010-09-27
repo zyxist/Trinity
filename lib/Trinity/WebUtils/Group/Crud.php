@@ -11,7 +11,7 @@
  */
 namespace Trinity\WebUtils\Group;
 use \Trinity\Model\Interfaces\Grid as Interface_Grid;
-use \Trinity\Web\Controller_Exception;
+use \Trinity\Web\Controller_Exception as Controller_Exception;
 use \Trinity\Web\Redirect_Exception;
 use \Trinity\Web\Redirect_Flash;
 use \Trinity\Web\Controller\Manager;
@@ -171,7 +171,7 @@ abstract class Crud extends Controller_Action_Group
 			else
 			{
 				$view = $manager->getView('Trinity.WebUtils.View.Form');
-				if($this->templates['add'] !== null)
+				if($this->templates['edit'] !== null)
 				{
 					$view->setTemplateName('default', $this->templates['edit']);
 				}
