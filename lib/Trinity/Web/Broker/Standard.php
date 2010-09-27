@@ -52,4 +52,28 @@ class Standard extends Broker
 			'response' => $response
 		)));
 	} // end buildResponse();
+
+	/**
+	 * Extracts the specified request parameters back to the router, so that
+	 * they do not have to be specified every time we want to generate an URL.
+	 *
+	 * Implements fluent interface.
+	 *
+	 * @param Router $router The router.
+	 * @param array $vars The list of parameter names to extract.
+	 * @return \Trinity\Web\Broker\Standard
+	 */
+	public function extractVars(\Trinity\Web\Router $router, array $vars)
+	{
+		$request = $this->getRequest();
+		foreach($vars as $name)
+		{
+			if($request->hasParam($name))
+			{
+				
+				$router->setParam($name, $request->getParam($name));
+			}
+		}
+		return $this;
+	} // end extractVars();
 } // end Broker_Standard;
