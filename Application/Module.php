@@ -8,7 +8,6 @@
 namespace Application;
 use \Trinity\Basement\Application as BaseApplication;
 use \Trinity\Basement\Module as TrinityModule;
-use \Trinity\Basement\EventSubscriber as EventSubscriber;
 
 class Module extends TrinityModule
 {
@@ -19,6 +18,6 @@ class Module extends TrinityModule
 	 */
 	public function onInit(BaseApplication $application)
 	{
-
+		/* null */
 	} // end onInit();
 } // end Module;

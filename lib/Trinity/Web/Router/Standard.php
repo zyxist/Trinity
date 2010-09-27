@@ -46,12 +46,6 @@ class Standard implements Router_Interface
 	private $_params = array();
 
 	/**
-	 * List of kept routed variables.
-	 * @var array
-	 */
-	private $_keptRoutedVars = null;
-
-	/**
 	 * The area strategy used for building inter-area routes.
 	 * @var \Trinity\Web\Area\Strategy_Interface
 	 */
@@ -81,40 +75,6 @@ class Standard implements Router_Interface
 		$this->_queryPath = $queryPath;
 		$this->_baseUrl = $baseUrl;
 	} // end __construct();
-
-	/**
-	 * Sets the list of kept routed variables. These variable values are used
-	 * during the URL assembling process, if they have not been defined by
-	 * the programmer.
-	 *
-	 * Implements fluent interface.
-	 *
-	 * @param array $list The list of kept routed variable names.
-	 * @return \Trinity\Web\Router\Standard
-	 */
-	public function keepRoutedVariables(array $list)
-	{
-		if($this->_keptRoutedVars === null)
-		{
-			$this->_keptRoutedVars = array();
-		}
-		foreach($list as $name)
-		{
-			$this->_keptRoutedVars[$name] = null;
-		}
-
-		return $this;
-	} // end keepRoutedVariables();
-
-	/**
-	 * Returns the list of kept routed variables.
-	 *
-	 * @return array
-	 */
-	public function getKeptRoutedVariables()
-	{
-		return $this->_keptRoutedVars;
-	} // end getKeptRoutedVariables();
 
 	/**
 	 * Adds a routing pattern to the router.
@@ -244,18 +204,6 @@ class Standard implements Router_Interface
 				$params[$name] = $value;
 			}
 		}
-
-		// Store kept routed variables.
-		if($this->_keptRoutedVars !== null)
-		{
-			foreach($this->_keptRoutedVars as $name => &$value)
-			{
-				if(isset($params[$name]))
-				{
-					$value = $params[$name];
-				}
-			}
-		}
 		return $params;
 	} // end createParams();
 
@@ -276,15 +224,7 @@ class Standard implements Router_Interface
 		{
 			throw new Router_Exception('The variable list passed to router is not an array.');
 		}
-		if($this->_keptRoutedVars !== null)
-		{
-			$sVars = array_merge($this->_keptRoutedVars, $this->_params, $sVars);
-		}
-		else
-		{
-			$sVars = array_merge($this->_params, $sVars);
-		}
-		
+		$sVars = array_merge($this->_params, $sVars);	
 
 		$address = '/';
 		if($fullyQualified)
