@@ -37,9 +37,6 @@ class Module extends TrinityModule
 		$facades->addFacade('default', 'Application.Main.Facade.Standard');
 		$facades->select('default');
 
-		$router = $services->get('web.Router');
-		$router->keepRoutedVariables(array('module', 'group', 'action', 'id'));
-
 		// Configure helpers.
 		$config = $services->get('utils.Config');
 		Helper_Url::setBaseUrl($config->baseUrl);
