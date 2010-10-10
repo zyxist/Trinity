@@ -27,6 +27,17 @@ use \Trinity\Navigation\Page\Exception as Page_Exception;
  */
 class Page implements \Iterator
 {
+	const TYPE_REAL = 0;
+	const TYPE_URL = 1;
+	const TYPE_STRUCTURAL = 2;
+
+	const RENDER_ALWAYS = 0;
+	const RENDER_ON_ACTIVE = 1;
+	const RENDER_ON_INACTIVE = 2;
+	const RENDER_SELECTION_SPECIFIC = 3;
+	const RENDER_NONE = 4;
+	const RENDER_CHILDREN = 5;
+
 	/**
 	 * The previous page at the same level.
 	 * @var \Trinity\Navigation\Page
@@ -67,6 +78,194 @@ class Page implements \Iterator
 	 * @var integer
 	 */
 	protected $_size = 0;
+	/**
+	 * The page data.
+	 * @var array
+	 */
+	protected $_data = array();
+	/**
+	 * The navigation tree hook.
+	 * @var Hook
+	 */
+	protected $_hook = null;
+	/**
+	 * The page type class.
+	 * @var integer
+	 */
+	protected $_pageType = self::TYPE_REAL;
+	/**
+	 * The rendering behaviour for various helper classes.
+	 * @var array
+	 */
+	protected $_renderClasses = array();
+	/**
+	 * Have the page data been read from the hook?
+	 * @var boolean
+	 */
+	protected $_hookReadData = false;
+	/**
+	 * Have the children been read from the hook?
+	 * @var boolean
+	 */
+	protected $_hookReadChildren = false;
+
+	/**
+	 * Creates the page object.
+	 * 
+	 * @param array $data The optional, initial page data.
+	 */
+	public function __construct($data = array())
+	{
+		$this->_data = $data;
+	} // end __construct();
+
+	/**
+	 * Sets the page information hook.
+	 * 
+	 * @param Hook $hook The page hook.
+	 */
+	public function setHook(Hook $hook)
+	{
+		$this->_hook = $hook;
+	} // end setHook();
+
+	/**
+	 * Returns the page information hook.
+	 * @return Hook
+	 */
+	public function getHook()
+	{
+		return $this->_hook;
+	} // end getHook();
+
+	/**
+	 * Sets the page type. If the page type is invalid, an exception
+	 * is thrown.
+	 *
+	 * @throws \Trinity\Navigation\Page\Exception
+	 * @param integer $type The new page type.
+	 */
+	public function setPageType($type)
+	{
+		if($type < 0 || $type > 2)
+		{
+			throw new Page_Exception('Invalid page type: '.$type);
+		}
+		$this->_pageType = $type;
+	} // end setPageType();
+
+	/**
+	 * Returns the page type.
+	 * @return integer
+	 */
+	public function getPageType()
+	{
+		return $this->_pageType;
+	} // end getPageType();
+
+	/**
+	 * Sets the rendering properties for the given class. Note that the
+	 * rendering classes have nothing to do with OOP classes, but rather
+	 * identify various helper types.
+	 *
+	 * @throws \Trinity\Navigation\Page\Exception
+	 * @param string $className the rendering class name.
+	 * @param integer $renderProps The new rendering properties.
+	 * @return integer
+	 */
+	public function setRenderClass($className, $renderProps)
+	{
+		if($renderProps < 0 || $renderProps > 5)
+		{
+			throw new Page_Exception('Invalid rendering property for class \''.$className.'\': '.$renderProps);
+		}
+		$this->_renderClasses[$className] = $renderProps;
+	} // end setRenderClass();
+
+	/**
+	 * Returns the rendering properties for the given class.
+	 *
+	 * @return integer
+	 */
+	public function getRenderClass($className, $default = null)
+	{
+		if(!isset($this->_renderClasses[$className]))
+		{
+			return $default;
+		}
+		return $this->_renderClasses[$className];
+	} // end getRenderClass();
+
+	/**
+	 * Returns the page property. Note that it can optionally lazy-load the
+	 * missing properties from the hook, if any is set.
+	 *
+	 * @param string $name The page property name.
+	 * @return mixed
+	 */
+	public function __get($name)
+	{
+		if(!isset($this->_data[$name]))
+		{
+			// Lazy-load the data from the hook.
+			if(isset($this->_hook) && !$this->_hookReadData)
+			{
+				$this->_hook->createPageInfo($this);
+				$this->_hookReadData = true;
+				// If still does not exist, the name is invalid.
+				if(!isset($this->_data[$name]))
+				{
+					return null;
+				}
+			}
+			else
+			{
+				return null;
+			}
+		}
+		return $this->_data[$name];
+	} // end __get();
+
+	/**
+	 * Sets the new value of the page property.
+	 * 
+	 * @param string $name The property name.
+	 * @param mixed $value The property value.
+	 */
+	public function __set($name, $value)
+	{
+		$this->_data[$name] = $value;
+	} // end __set();
+
+	/**
+	 * Checks if the specified page property exists. The method can optionally
+	 * lazy-load the extra properties from the hook, if any is defined.
+	 *
+	 * @param string $name The property name.
+	 * @return boolean
+	 */
+	public function __isset($name)
+	{
+		if(!isset($this->_data[$name]))
+		{
+			// Lazy-load the data from the hook.
+			if(isset($this->_hook) && !$this->_hookReadData)
+			{
+				$this->_hook->createPageInfo($this);
+				$this->_hookReadData = true;
+				// If still does not exist, the name is invalid.
+				if(!isset($this->_data[$name]))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return true;
+	} // end __isset();
 
 	/**
 	 * Appends a new child to the end of the children list.
