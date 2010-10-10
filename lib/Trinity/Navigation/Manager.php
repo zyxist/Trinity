@@ -29,10 +29,28 @@ class Manager
 	protected $_tree;
 
 	/**
+	 * The active page.
+	 * @var \Trinity\Navigation\Page
+	 */
+	protected $_activePage;
+
+	/**
 	 * The reader object.
 	 * @var \Trinity\Navigation\Reader
 	 */
 	protected $_reader;
+
+	/**
+	 * The matcher object.
+	 * @var \Trinity\Navigation\Matcher
+	 */
+	protected $_matcher;
+
+	/**
+	 * The list of navigation tree hooks.
+	 * @var array
+	 */
+	protected $_hooks;
 
 	/**
 	 * Sets the reader responsible for loading the tree structure. Implements
@@ -57,55 +75,58 @@ class Manager
 		return $this->_reader;
 	} // end getReader();
 
-	public function setCache(Cache $cache)
+	public function setMatcher(Matcher $matcher)
 	{
-
-	} // end setCache();
-
-	public function getCache()
-	{
-
-	} // end getCache();
-
-	public function setMatcher(Matcher $cache)
-	{
-
+		$this->_matcher = $matcher;
+		return $this;
 	} // end setMatcher();
 
 	public function getMatcher()
 	{
-
+		return $this->_matcher;
 	} // end getMatcher();
 
-	public function addHook($name, $hook)
+	public function addHook($name, Hook $hook)
 	{
-
+		if(isset($this->_hooks[(string)$name]))
+		{
+			throw new Exception('The specified navigation hook name: \''.$name.'\' is already in use.');
+		}
+		$this->_hooks[(string)$name] = $hook;
+		return $this;
 	} // end addHook();
 
 	public function hasHook($name)
 	{
-
+		return $this->_hooks[(string)$name];
 	} // end hasHook();
 
 	public function getHook($name)
 	{
-
+		if(!isset($this->_hooks[(string)$name]))
+		{
+			throw new Exception('The specified navigation hook \''.$name.'\' does not exist.');
+		}
+		return $this->_hooks[(string)$name];
 	} // end getHook();
 
+	/**
+	 * Returns the root of the navigation tree.
+	 * @return \Trinity\Navigation\Page
+	 */
 	public function getNavigationTree()
 	{
-
+		return $this->_tree;
 	} // end getNavigationTree();
 
+	/**
+	 * Returns the active page.
+	 * @return \Trinity\Navigation\Page
+	 */
 	public function getActivePage()
 	{
-
+		return $this->_active;
 	} // end getActivePage();
-
-	public function getPageMappings()
-	{
-
-	} // end getPageMappings();
 
 	/**
 	 * Performs the navigation discovery. Loads the tree structure, matches the
@@ -116,6 +137,56 @@ class Manager
 	 */
 	public function discover()
 	{
+		// Build the navigation tree
+		$tree = $this->_reader->buildNavigationTree();
+		if(!$tree instanceof Page)
+		{
+			throw new Exception('The navigation reader returned an invalid tree: object of class \Trinity\Navigation\Page was expected.');
+		}
+		$this->_tree = $tree;
 
+		// Match the hooks to the pages.
+		$queue = new SplQueue;
+		$queue->enqueue($tree);
+		do
+		{
+			$item = $queue->dequeue();
+			$hookName = $item->getHookName();
+			if($hookName !== null)
+			{
+				$item->setHook($this->getHook($hookName));
+			}
+			foreach($item as $subitem)
+			{
+				$queue->enqueue($subitem);
+			}
+		}
+		while($queue->count() > 0);
+
+		// Discover the active page.
+		$page = $this->_matcher->matchPage($tree);
+		if(is_object($page) && !$page instanceof Page)
+		{
+			throw new Exception('The navigation matcher returned an invalid active page: object of class \Trinity\Navigation\Page was expected.');
+		}
+
+		// Mark all the pages on the way to the root
+		$item = $page->getParent();
+		$page->setFlags($page->getFlags() | Page::ACTIVE);
+		while($item !== null)
+		{
+			$page->setFlags($page->getFlags() | Page::ON_ACTIVE_PATH);
+			$parent = $item->getParent();
+
+			if($parent === null && $item !== $tree)
+			{
+				throw new Exception('The selected active page is not a part of the navigation tree.');
+			}
+			$item = $parent;
+		}
+
+		$this->_activePage = $page;
+
+		return $this;
 	} // end discover();
 } // end Manager;

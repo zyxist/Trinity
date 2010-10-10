@@ -21,13 +21,6 @@ namespace Trinity\Navigation;
 interface Reader
 {
 	/**
-	 * Sets the cache that should be used by this reader.
-	 *
-	 * @param Cache $cache The cache manager object.
-	 */
-	public function setCache(Cache $cache);
-
-	/**
 	 * This method should build and return the root of the navigation tree.
 	 *
 	 * @return \Trinity\Navigation\Page
