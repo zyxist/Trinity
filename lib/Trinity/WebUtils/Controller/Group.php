@@ -55,6 +55,16 @@ class Group extends Web_Controller
 	protected $_groupModule = null;
 
 	/**
+	 * Returns the controller name.
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'group';
+	} // end getName();
+
+	/**
 	 * Sets the module responsible for loading group classes.
 	 *
 	 * @param \Trinity\Basement\Module $module

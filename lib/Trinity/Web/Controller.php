@@ -66,6 +66,13 @@ abstract class Controller implements CoreController
 	} // end __construct();
 
 	/**
+	 * Returns the controller name.
+	 * 
+	 * @return string
+	 */
+	abstract public function getName();
+
+	/**
 	 * Assigns a new model locator to the controller.
 	 *
 	 * @param \Trinity\Basement\Locator_Object $locator The model locator
