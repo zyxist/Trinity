@@ -268,6 +268,84 @@ class Page implements \Iterator
 	} // end __isset();
 
 	/**
+	 * Returns the parent node object.
+	 * 
+	 * @return Page
+	 */
+	public function getParent()
+	{
+		return $this->_parent;
+	} // end getParent();
+
+	/**
+	 * Returns the next brother object.
+	 *
+	 * @return Page
+	 */
+	public function getNext()
+	{
+		return $this->_next;
+	} // end getNext();
+
+	/**
+	 * Returns the previous brother object.
+	 *
+	 * @return Page
+	 */
+	public function getPrev()
+	{
+		return $this->_prev;
+	} // end getPrev();
+
+	/**
+	 * Returns the first child of the current node. If a hook has been defined,
+	 * the method may lazy-load the children.
+	 *
+	 * @return Page
+	 */
+	public function getFirstChild()
+	{
+		if(is_object($this->_hook) && !$this->_hookReadChildren)
+		{
+			$this->_hook->createPageChildren($this);
+			$this->_hookReadChildren = true;
+		}
+		return $this->_firstChild;
+	} // end getFirstChild();
+
+	/**
+	 * Returns the last child of the current node. If a hook has been defined,
+	 * the method may lazy-load the children.
+	 *
+	 * @return Page
+	 */
+	public function getLastChild()
+	{
+		if(is_object($this->_hook) && !$this->_hookReadChildren)
+		{
+			$this->_hook->createPageChildren($this);
+			$this->_hookReadChildren = true;
+		}
+		return $this->_lastChild;
+	} // end getLastChild();
+
+	/**
+	 * Returns true, if there are children defined. If a hook has been defined,
+	 * the method may lazy-load the children.
+	 *
+	 * @return boolean
+	 */
+	public function hasChildren()
+	{
+		if(is_object($this->_hook) && !$this->_hookReadChildren)
+		{
+			$this->_hook->createPageChildren($this);
+			$this->_hookReadChildren = true;
+		}
+		return $this->_firstChild !== null;
+	} // end getLastChild();
+
+	/**
 	 * Appends a new child to the end of the children list.
 	 *
 	 * @param Page $child The child to be appended.
