@@ -42,6 +42,16 @@ class Action extends Web_Controller
 	protected $_actionModule;
 
 	/**
+	 * Returns the controller name.
+	 *
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'action';
+	} // end getName();
+
+	/**
 	 * Sets the module responsible for loading group classes.
 	 *
 	 * @param \Trinity\Basement\Module $module
@@ -114,6 +124,7 @@ class Action extends Web_Controller
 
 		$manager->events->notify(new Event($this, 'controller.action.dispatch', array(
 			'brick' => $actionObj,
+			'module' => $this->_actionModule,
 			'action' => $action
 		)));
 
@@ -121,6 +132,7 @@ class Action extends Web_Controller
 
 		$manager->events->notify(new Event($this, 'controller.action.dispatched', array(
 			'brick' => $actionObj,
+			'module' => $this->_actionModule,
 			'action' => $action
 		)));
 	} // end _dispatch();
