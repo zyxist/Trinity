@@ -41,12 +41,6 @@ class Manager
 	protected $_reader;
 
 	/**
-	 * The matcher object.
-	 * @var \Trinity\Navigation\Matcher
-	 */
-	protected $_matcher;
-
-	/**
 	 * The list of navigation tree hooks.
 	 * @var array
 	 */
@@ -74,17 +68,6 @@ class Manager
 	{
 		return $this->_reader;
 	} // end getReader();
-
-	public function setMatcher(Matcher $matcher)
-	{
-		$this->_matcher = $matcher;
-		return $this;
-	} // end setMatcher();
-
-	public function getMatcher()
-	{
-		return $this->_matcher;
-	} // end getMatcher();
 
 	public function addHook($name, Hook $hook)
 	{
@@ -129,9 +112,7 @@ class Manager
 	} // end getActivePage();
 
 	/**
-	 * Performs the navigation discovery. Loads the tree structure, matches the
-	 * active page, and initializes the navigation manager. Implements fluent
-	 * interface.
+	 * Performs the navigation tree discovery.
 	 *
 	 * @return \Trinity\Navigation\Manager
 	 */
@@ -151,7 +132,7 @@ class Manager
 		do
 		{
 			$item = $queue->dequeue();
-			$hookName = $item->getHookName();
+			$hookName = $item->hook;
 			if($hookName !== null)
 			{
 				$item->setHook($this->getHook($hookName));
@@ -162,20 +143,71 @@ class Manager
 			}
 		}
 		while($queue->count() > 0);
+		return $this;
+	} // end discover();
 
-		// Discover the active page.
-		$page = $this->_matcher->matchPage($tree);
-		if(is_object($page) && !$page instanceof Page)
+	/**
+	 * Finds the active page, using the request and controller data.
+	 *
+	 * @param string $controller The name of the controller that handles the request.
+	 * @param array $data The controller and request data.
+	 * @return Page
+	 */
+	public function findActivePage($controller, array $data)
+	{
+		if($this->_activePage !== null)
 		{
-			throw new Exception('The navigation matcher returned an invalid active page: object of class \Trinity\Navigation\Page was expected.');
+			return $this->_activePage;
 		}
 
+		$queue = new SplQueue;
+		$queue->enqueue($this->_tree);
+		while($queue->count() > 0)
+		{
+			$item = $queue->dequeue();
+			if($item->getPageType() == Page::TYPE_REAL)
+			{
+				if($item->controller == 'action')
+				{
+					$ok = true;
+					foreach($data as $name => $value)
+					{
+						if($item->$name != $value)
+						{
+							$ok = false;
+							break;
+						}
+					}
+					if($ok)
+					{
+						$this->_navigationManager->setActivePage($item);
+						return $item;
+
+					}
+				}
+			}
+			foreach($item as $subitem)
+			{
+				$queue->enqueue($subitem);
+			}
+		}
+		return null;
+	} // end findActivePage();
+
+	/**
+	 * Selects the active page.
+	 * 
+	 * @param Page $page The active page.
+	 * @return Manager 
+	 */
+	public function setActivePage(Page $page)
+	{
 		// Mark all the pages on the way to the root
 		$item = $page->getParent();
-		$page->setFlags($page->getFlags() | Page::ACTIVE);
+		$page->active = true;
 		while($item !== null)
 		{
-			$page->setFlags($page->getFlags() | Page::ON_ACTIVE_PATH);
+			$page->onActivePath = true;
 			$parent = $item->getParent();
 
 			if($parent === null && $item !== $tree)
