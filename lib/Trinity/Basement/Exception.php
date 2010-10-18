@@ -8,14 +8,11 @@
  *
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
- *
- * $Id$
  */
-
 namespace Trinity\Basement;
 
 /**
- * The base exception class for Trinity.
+ * The core exception for Trinity.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
@@ -23,5 +20,5 @@ namespace Trinity\Basement;
  */
 class Exception extends \Exception
 {
-	/* null */
+
 } // end Exception;

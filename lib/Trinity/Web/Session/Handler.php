@@ -9,7 +9,7 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\Session;
 
 /**
  * Interface for writing custom session handlers.
@@ -18,7 +18,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-interface Session_Handler
+interface Handler
 {
 	/**
 	 * A method called for opening a session and retrieving

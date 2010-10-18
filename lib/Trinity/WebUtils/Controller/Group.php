@@ -13,6 +13,7 @@
 namespace Trinity\WebUtils\Controller;
 use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Module;
+use \Trinity\Web\Area;
 use \Trinity\Web\Controller as Web_Controller;
 use \Trinity\Web\View;
 use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
@@ -48,11 +49,7 @@ class Group extends Web_Controller
 	 */
 	private $_defaultAction = 'index';
 
-	/**
-	 * The group class module.
-	 * @var \Trinity\Basement\Module
-	 */
-	protected $_groupModule = null;
+
 
 	/**
 	 * Returns the controller name.
@@ -63,26 +60,6 @@ class Group extends Web_Controller
 	{
 		return 'group';
 	} // end getName();
-
-	/**
-	 * Sets the module responsible for loading group classes.
-	 *
-	 * @param \Trinity\Basement\Module $module
-	 */
-	public function setGroupModule(Module $module)
-	{
-		$this->_groupModule = $module;
-	} // end setGroupModule();
-
-	/**
-	 * Returns the group module.
-	 *
-	 * @return \Trinity\Basement\Module
-	 */
-	public function getGroupModule()
-	{
-		return $this->_groupModule;
-	} // end getGroupModule();
 
 	/**
 	 * Sets the default group and action name.
@@ -122,13 +99,14 @@ class Group extends Web_Controller
 	protected function _dispatch(Manager $manager)
 	{
 		// Validation, etc.
-		if($this->_groupModule === null)
+		if($this->_module === null || $this->_area === null)
 		{
 			$this->raiseControllerError($manager, Web_Controller::ERROR_CONFIGURATION);
 		}
 		$group = $manager->request->getParam('group', $this->_defaultGroup);
 		$groupProcessed = ucfirst($group).'Group';
-		$groupQualified = $this->_groupModule->getClassName($groupProcessed);
+		$groupQualified = $this->_module->getNamespacePrefix().'\\'.ucfirst($this->_area->getAreaName()).'\\Group\\'.$groupProcessed;
+		$groupFile = $this->_module->getDirectory().ucfirst($this->_area->getAreaName()).DIRECTORY_SEPARATOR.'Group'.DIRECTORY_SEPARATOR.$groupProcessed.'.php';
 		$action = $manager->request->getParam('action', $this->_defaultAction);
 
 		if(!ctype_alnum($action))
@@ -136,10 +114,16 @@ class Group extends Web_Controller
 			$this->raiseControllerError($manager, Web_Controller::ERROR_VALIDATION);
 		}
 		// Try to load the group object
-		if(!$this->_groupModule->loadFile($groupProcessed) || !class_exists($groupQualified, false))
+		if(!file_exists($groupFile))
 		{
 				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
 		}
+		require($groupFile);
+		if(!class_exists($groupQualified, false))
+		{
+				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+		}
+
 		$groupObj = new $groupQualified($manager, $this, $action);
 
 		// Try to dispatch the action.

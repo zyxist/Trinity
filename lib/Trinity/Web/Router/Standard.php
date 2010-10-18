@@ -66,12 +66,11 @@ class Standard implements Router_Interface
 	/**
 	 * Creates the router.
 	 *
-	 * @param \Trinity\Web\Area\Strategy_Interface $areaStrategy Area strategy
 	 * @param string $queryPath The query path
+	 * @param string $baseUrl The base URL
 	 */
-	public function __construct($areaStrategy, $queryPath, $baseUrl)
+	public function __construct($queryPath, $baseUrl)
 	{
-		$this->_areaStrategy = $areaStrategy;
 		$this->_queryPath = $queryPath;
 		$this->_baseUrl = $baseUrl;
 	} // end __construct();

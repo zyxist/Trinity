@@ -12,7 +12,10 @@
 
 namespace Trinity\Web;
 use \Symfony\Component\EventDispatcher\Event;
-use \Trinity\Basement\Application as BaseApplication;
+use \Symfony\Component\EventDispatcher\EventDispatcher;
+use \Trinity\Web\Session\Exception as Session_Exception;
+use \Trinity\Web\Session\Handler;
+use \Trinity\Web\Session\Group;
 
 /**
  * The session management class.
@@ -32,10 +35,10 @@ class Session
 	private $_handler;
 
 	/**
-	 * The list of loaded session namespaces.
+	 * The list of loaded session groups.
 	 * @var array
 	 */
-	private $_namespaces = array();
+	private $_groups = array();
 
 	/**
 	 * Has the session been started?
@@ -45,56 +48,86 @@ class Session
 
 	/**
 	 * The application link.
-	 * @var BaseApplication
+	 * @var \Symfony\Component\EventDispatcher\EventDispatcher;
 	 */
-	private $_application;
+	private $_eventDispatcher;
 
 	/**
 	 * Creates the session object.
 	 *
-	 * @param BaseApplication $application The application link.
+	 * @param EventDispatcher $eventDispatcher The event dispatcher.
 	 * @param Session_Handler $handler The session handler used for the session
 	 *        management.
 	 */
-	public function __construct(BaseApplication $application, Session_Handler $handler = null)
+	public function __construct(EventDispatcher $eventDispatcher, Handler $handler = null)
 	{
 		if($handler !== null)
 		{
 			$this->setSessionHandler($handler);
 		}
-		$this->_application = $application;
+		$this->_eventDispatcher = $eventDispatcher;
 	} // end __construct();
 
-	public function getNamespace($namespace)
+	/**
+	 * Returns the session group with the given name. If the group does not
+	 * exist, it is automatically created.
+	 *
+	 * @param string $group Group name
+	 * @return \Trinity\Web\Session\Group
+	 */
+	public function getGroup($group)
 	{
-		if(!isset($this->_namespaces[$namespace]))
+		if(!isset($this->_groups[$group]))
 		{
-			$this->_createNamespace($namespace);
+			$this->_createGroup($group);
 		}
-		return $this->_namespaces[$namespace];
-	} // end getNamespace();
+		return $this->_groups[$group];
+	} // end getGroup();
 
-	public function hasNamespace($namespace)
+	/**
+	 * Returns true, if a group with the given name exists.
+	 * @param string $group Group name.
+	 * @return boolean
+	 */
+	public function hasGroup($group)
 	{
-		return isset($this->_namespaces[$namespace]);
-	} // end hasNamespace();
+		return isset($this->_groups[$group]);
+	} // end hasGroup();
 
-	public function removeNamespace($namespace)
+	/**
+	 * Removes the group from the session.
+	 *
+	 * @throws \Trinity\Web\Session\Exception
+	 * @param string $group Group name.
+	 */
+	public function removeGroup($group)
 	{
-		if(!isset($this->_namespaces[$namespace]))
+		if(!isset($this->_groups[$group]))
 		{
-			throw new Session_Exception('The namespace '.$namespace.' does not exist.');
+			throw new Session_Exception('The session group '.$group.' does not exist.');
 		}
-		$this->_namespaces[$namespace]->remove();
-		unset($this->_namespaces[$namespace]);
-	} // end removeNamespace();
+		$this->_groups[$group]->remove();
+		unset($this->_groups[$group]);
+	} // end removeGroup();
 
+	/**
+	 * Returns the session handler used by this session.
+	 *
+	 * @param string $handler The session handler.
+	 * @return \Trinity\Web\Session\Handler
+	 */
 	public function getSessionHandler($handler)
 	{
 		return $this->_handler;
 	} // end getSessionHandler();
 
-	public function setSessionHandler($handler)
+	/**
+	 * Registers the session handler for this session.
+	 *
+	 * @param Handler $handler Session handler
+	 * @return boolean
+	 */
+	public function setSessionHandler(Handler $handler)
 	{
 		$this->_handler = $handler;
 
@@ -108,6 +141,12 @@ class Session
 		);
 	} // end setSessionHandler();
 
+	/**
+	 * Starts the session and validates it against some basic attacks. Returns
+	 * <tt>true</tt>, if the session has been initialized properly.
+	 * 
+	 * @return boolean
+	 */
 	public function start()
 	{
 		if(!$this->_started)
@@ -131,27 +170,38 @@ class Session
 			}
 			$this->_started = true;
 
-			$this->_application->getEventDispatcher()->notify(new Event($this, 'web.session.start'));
+			$this->_eventDispatcher->notify(new Event($this, 'web.session.start'));
 
 			return true;
 		}
 		return false;
 	} // end start();
 
+	/**
+	 * Finishes the session  and fires <tt>web.session.close</tt> event.
+	 */
 	public function writeClose()
 	{
-		$this->_application->getEventDispatcher()->notify(new Event($this, 'web.session.close'));
+		$this->_eventDispatcher->notify(new Event($this, 'web.session.close'));
 
 		session_write_close();
 	} // end writeClose();
 
-	protected function _createNamespace($name)
+	/**
+	 * Creates a new group and fires <tt>web.session.group-created</tt> event.
+	 * @param string $name The name of the new group.
+	 */
+	protected function _createGroup($name)
 	{
-		$this->_namespaces[$name] = new Session_Namespace($name);
+		$this->_groups[$name] = new Group($name);
 
-		$this->_application->getEventDispatcher()->notify(new Event($this, 'web.session.namespace-created', array('namespace' => $this->_namespaces[$name])));
-	} // end _createNamespace();
+		$this->_eventDispatcher->notify(new Event($this, 'web.session.group-created', array('group' => $this->_groups[$name])));
+	} // end _createGroup();
 
+	/**
+	 * Initializes a new, empty session, and fires <tt>web.session.initialized</tt>
+	 * event.
+	 */
 	protected function _initializeEmptySession()
 	{
 		session_regenerate_id();
@@ -162,6 +212,6 @@ class Session
 		$_SESSION[':ip'] = $_SERVER['REMOTE_ADDR'];
 		$_SESSION[':browser'] = (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'not-set');
 
-		$this->_application->getEventDispatcher()->notify(new Event($this, 'web.session.initialized'));
+		$this->_eventDispatcher->notify(new Event($this, 'web.session.initialized'));
 	} // end _initializeEmptySession();
 } // end Session;

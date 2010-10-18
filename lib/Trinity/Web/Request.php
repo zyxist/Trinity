@@ -18,7 +18,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class Request
+class Request
 {
 	/**
 	 * The name of the module to execute.

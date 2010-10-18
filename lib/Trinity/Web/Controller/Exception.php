@@ -9,7 +9,8 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web;
+namespace Trinity\Web\Controller;
+use \Trinity\Web\Exception as Web_Exception;
 
 /**
  * Exception class for controller-related issues.
@@ -18,7 +19,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Controller_Exception extends Exception
+class Exception extends Web_Exception
 {
 	/* null */
-} // end Controller_Exception;
+} // end Exception;

@@ -12,9 +12,11 @@
 
 namespace Trinity\Web;
 use \Symfony\Component\EventDispatcher\Event;
-use \Trinity\Basement\Controller as CoreController;
-use \Trinity\Basement\Locator_Object;
-use \Trinity\Basement\Application as BaseApplication;
+use \Trinity\Basement\Controller as Basement_Controller;
+use \Trinity\Basement\ObjectLocator;
+use \Trinity\Basement\ServiceLocator;
+use \Trinity\Basement\Module;
+use \Trinity\Web\Controller\Exception as Controller_Exception;
 use \Trinity\Web\Controller\Manager;
 use \Trinity\Web\Controller\State;
 
@@ -25,7 +27,7 @@ use \Trinity\Web\Controller\State;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class Controller implements CoreController
+abstract class Controller implements Basement_Controller
 {
 	const ERROR_GENERIC = 0;
 	const ERROR_NOT_FOUND = 1;
@@ -35,14 +37,14 @@ abstract class Controller implements CoreController
 
 	/**
 	 * The model locator.
-	 * @var \Trinity\Basement\Locator_Object
+	 * @var \Trinity\Basement\ObjectLocator
 	 */
 	protected $_modelLocator;
 	/**
-	 * The application link.
-	 * @var \Trinity\Basement\Application
+	 * The service locator.
+	 * @var \Trinity\Basement\ServiceLocator
 	 */
-	protected $_application;
+	protected $_serviceLocator;
 
 	/**
 	 * The name of the brick used, if a 404 error occurs.
@@ -51,13 +53,25 @@ abstract class Controller implements CoreController
 	protected $_errorBrick = null;
 
 	/**
+	 * The area module.
+	 * @var \Trinity\Basement\Module
+	 */
+	protected $_area = null;
+
+	/**
+	 * The general module.
+	 * @var \Trinity\Basement\Module
+	 */
+	protected $_module = null;
+
+	/**
 	 * Initializes the controller.
 	 * 
-	 * @param BaseApplication $application The application object.
+	 * @param ServiceLocator $serviceLocator The service locator object.
 	 */
-	public function __construct(BaseApplication $application)
+	public function __construct(ServiceLocator $serviceLocator)
 	{
-		$this->_application = $application;
+		$this->_serviceLocator = $serviceLocator;
 	} // end __construct();
 
 	/**
@@ -70,9 +84,9 @@ abstract class Controller implements CoreController
 	/**
 	 * Assigns a new model locator to the controller.
 	 *
-	 * @param \Trinity\Basement\Locator_Object $locator The model locator
+	 * @param \Trinity\Basement\ObjectLocator $locator The model locator
 	 */
-	public function setModelLocator(Locator_Object $locator)
+	public function setModelLocator(ObjectLocator $locator)
 	{
 		$this->_modelLocator = $locator;
 	} // end setModelLocator();
@@ -105,6 +119,26 @@ abstract class Controller implements CoreController
 		return $this->_errorBrick;
 	} // end getErrorBrick();
 
+	public function setArea(Area $area)
+	{
+		return $this->_area = $area;
+	} // end setArea();
+
+	public function setModule(Module $module)
+	{
+		$this->_module = $module;
+	} // end setModule();
+
+	public function getArea()
+	{
+		return $this->_area;
+	} // end getArea();
+
+	public function getModule()
+	{
+		return $this->_module;
+	} // end getModule();
+
 	/**
 	 * Dispatches the specified request and response.
 	 * 
@@ -113,8 +147,7 @@ abstract class Controller implements CoreController
 	 */
 	public function dispatch(Request $request, Response $response)
 	{
-		$manager = new Manager($this->_application, $request, $response, $this->_modelLocator);
-		$manager->router->setParam('area', $manager->area->getName());
+		$manager = new Manager($this->_serviceLocator, $request, $response, $this->_modelLocator);
 
 		$manager->events->notify(new Event($this, 'controller.web.dispatch.begin', array(
 			'controller' => $this,
@@ -176,7 +209,7 @@ abstract class Controller implements CoreController
 	 * Raises an internal controller error. If an error brick is defined, it executes
 	 * it, otherwise it throws a controller exception.
 	 *
-	 * @throws \Trinity\Web\Controller_Exception
+	 * @throws \Trinity\Web\Controller\Exception
 	 * @param Manager $manager The controller manager.
 	 * @param int $errorType The error type
 	 */

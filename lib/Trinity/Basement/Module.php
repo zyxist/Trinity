@@ -10,180 +10,128 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Basement;
-use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Basement\Module\Manager;
 
 /**
- * Represents a single module and provides utilities for managing them. The
- * concrete modules may extend this class to provide some extra utilities.
+ * A single application module. The class must be extended by modules.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Module
+abstract class Module
 {
-	/**
-	 * The module name.
-	 * @var string
-	 */
-	private $_name;
+	protected $_name;
+	protected $_namespacePrefix;
+	protected $_directory;
+	protected $_reflection;
 
 	/**
-	 * The module namespace.
-	 * @var string
+	 * The service locator
+	 * @var \Trinity\Basement\ServiceLocator
 	 */
-	private $_namespace;
+	protected $_serviceLocator;
 
-	/**
-	 * The module path.
-	 * @var string
-	 */
-	private $_path;
-
-	/**
-	 * The module manager.
-	 * @var \Trinity\Basement\Module\Manager
-	 */
-	private $_manager;
-
-	/**
-	 * Creates the module.
-	 *
-	 * @param \Trinity\Basement\Module\Manager $manager The module manager.
-	 * @param string $name The module name
-	 * @param string $namespace The module fully qualified namespace
-	 * @param string $path The path to the module files.
-	 */
-	public function __construct(Manager $manager, $name, $namespace, $path)
+	public function setServiceLocator(ServiceLocator $serviceLocator)
 	{
-		$this->_manager = $manager;
-		$this->_name = $name;
-		$this->_namespace = $namespace;
+		$this->_serviceLocator = $serviceLocator;
+	} // end setServiceLocator();
 
-		if($path[strlen($path) - 1] != '/')
-		{
-			$path .= '/';
-		}
-
-		$this->_path = $path;
-		$this->onInit(BaseApplication::getApplication());
-	} // end __construct();
+	public function getServiceLocator()
+	{
+		return $this->_serviceLocator;
+	} // end getServiceLocator();
 
 	/**
-	 * Returns the name of the module.
+	 * This method should return a service container used with this application.
+	 *
+	 * @return ServiceContainer
+	 */
+	public function registerServiceContainer()
+	{
+		return null;
+	} // end registerServiceContainer();
+
+	/**
+	 * Here goes the launching code.
+	 */
+	public function launch()
+	{
+		/* null */
+	} // end launch();
+
+	/**
+	 * Here goes the shutdown code.
+	 */
+	public function shutdown()
+	{
+		/* null */
+	} // end shutdown();
+
+	/**
+	 * Returns the module name.
 	 *
 	 * @return string
 	 */
 	public function getName()
 	{
+		if(null === $this->_name)
+		{
+			$this->initReflection();
+		}
 		return $this->_name;
 	} // end getName();
 
 	/**
-	 * Returns the module path.
+	 * Returns the module namespace prefix.
 	 *
 	 * @return string
 	 */
-	public function getPath()
+	public function getNamespacePrefix()
 	{
-		return $this->_path;
+		if(null === $this->_namespacePrefix)
+		{
+			$this->initReflection();
+		}
+		return $this->_namespacePrefix;
 	} // end getName();
 
 	/**
-	 * Returns the namespace of this module.
+	 * Returns the  module directory with the appended
+	 * trailing slash.
 	 *
 	 * @return string
 	 */
-	public function getNamespace()
+	public function getDirectory()
 	{
-		return $this->_namespace;
-	} // end getNamespace();
-
-	/**
-	 * Returns the path to the code directory within a module.
-	 * 
-	 * @param string $item The directory name.
-	 * @return string
-	 */
-	public function getCodePath($item)
-	{
-		return $this->_path.ucfirst($item).'/';
-	} // end getCodePath();
-
-	/**
-	 * Returns the path to the data directory within a module.
-	 * 
-	 * @param string $item The directory name.
-	 * @return string
-	 */
-	public function getFilePath($item)
-	{
-		return $this->_path.$item.'/';
-	} // end getFilePath();
-
-	/**
-	 * Returns an object of the submodule.
-	 *
-	 * @param string $item The module item.
-	 * @return \Trinity\Basement\Module
-	 */
-	public function getSubmodule($item)
-	{
-		if($this->_name != '')
+		if(null === $this->_directory)
 		{
-			return $this->_manager->getModule($this->_name.'.'.$item);
+			$this->initReflection();
 		}
-		else
-		{
-			return $this->_manager->getModule($item);
-		}
-	} // end getSubmodule();
+		return $this->_directory;
+	} // end getDirectory();
 
 	/**
-	 * Loads the specified PHP file within a module. Before loading,
-	 * the method checks if the file actually exists. Returns true,
-	 * if the file was successfully loaded, and false otherwise.
+	 * Returns the reflection object for this module.
 	 *
-	 * @param string $fileName The file name (without an extension)
-	 * @return boolean
+	 * @return \ReflectionObject
 	 */
-	public function loadFile($fileName)
+	public function getReflectionObject()
 	{
-		if(!file_exists($this->_path.$fileName.'.php'))
+		if(null === $this->_reflectionObject)
 		{
-			return false;
+			$this->initReflection();
 		}
-		require($this->_path.$fileName.'.php');
-		return true;
-	} // end loadFile();
+		return $this->_reflectionObject;
+	} // end getReflectionObject();
 
 	/**
-	 * Returns the fully qualified class name for the given module.
-	 *
-	 * @param string $className The relative class name
-	 * @return string
+	 * Creates the reflection information about the module.
 	 */
-	public function getClassName($className)
+	public function initReflection()
 	{
-		return $this->_namespace.'\\'.$className;
-	} // end getClassName();
+		$this->_reflectionObject = new \ReflectionObject($this);
 
-	/**
-	 * The method is called during the module initialization.
-	 * 
-	 * @param BaseApplication $application The application link.
-	 */
-	public function onInit(BaseApplication $application)
-	{
-		/* empty */
-	} // end onInit();
-
-	/**
-	 * Allows to free the memory.
-	 */
-	public function dispose()
-	{
-		$this->_manager = null;
-	} // end dispose();
+		$this->_name = str_replace('\\', '', $this->_namespacePrefix = $this->_reflectionObject->getNamespaceName());
+		$this->_directory = dirname($this->_reflectionObject->getFileName()).DIRECTORY_SEPARATOR;
+	} // end initReflection();
 } // end Module;

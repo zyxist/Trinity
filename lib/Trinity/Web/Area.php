@@ -11,9 +11,7 @@
  */
 namespace Trinity\Web;
 use \Symfony\Component\EventDispatcher\Event;
-use \Trinity\Basement\Application as Basement_Application;
 use \Trinity\Basement\Module;
-use \Trinity\Web\Area\Strategy;
 
 /**
  * Abstract area class provides the minimal interface for communicating
@@ -23,221 +21,132 @@ use \Trinity\Web\Area\Strategy;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Area
+abstract class Area extends Module
 {
 	/**
-	 * The application link.
-	 * @var \Trinity\Basement\Application
-	 */
-	protected $_application;
-
-	/**
-	 * The area name.
-	 * @var string
-	 */
-	protected $_name = 'Default';
-
-	/**
-	 * The area options.
+	 * The area metadata.
 	 * @var array
 	 */
-	protected $_options = array();
+	protected $_metadata = array();
 
 	/**
-	 * The area module
-	 * @var Module
+	 * The list of verified metadata.
+	 * @var array
 	 */
-	private $_areaModule;
+	protected $_verifiedMetadata = array();
 
 	/**
-	 * The selected module.
-	 * @var Module
-	 */
-	private $_primaryModule;
-
-	/**
-	 * Constructs the area object, discovering the selected area using the
-	 * specified strategy. Note that strategy discovery process may throw
-	 * an exception.
-	 *
-	 * The constructor fires the 'area.created' event.
-	 *
-	 * @throws Area_Exception
-	 * @param Application $application The application object
-	 * @param Strategy $strategy Area discovering strategy
-	 */
-	public function __construct(Basement_Application $application, Strategy $strategy)
-	{
-		$this->_application = $application;
-
-		list($name, $data) = $strategy->discoverArea();
-
-		$this->_validateOptions($data);
-
-		$this->_name = $name;
-		$this->_options = $data;
-
-		$application->getEventDispatcher()->notify(new Event($this, 'area.created'));
-	} // end __construct();
-
-	/**
-	 * Returns the area name.
+	 * This method should return the unique area name. The name will be also
+	 * used to define sub-namespaces within the interested modules.
 	 *
 	 * @return string
 	 */
-	public function getName()
-	{
-		return $this->_name;
-	} // end getName();
+	abstract public function getAreaName();
 
 	/**
-	 * Returns the area options.
-	 *
+	 * The default launch method registers the area as active.
+	 */
+	public function launch()
+	{
+		$serviceLocator = $this->getServiceLocator();
+		$areaManager = $serviceLocator->get('AreaManager');
+
+		// The application should be always registered as the main area module.
+		// This will simplify the code later.
+		$areaManager->registerModuleForArea($serviceLocator->get('Application'), 'main', $this->getAreaName());
+
+		// Now we select the active area.
+		$areaManager->setActiveArea($this);
+	} // end launch();
+
+	/**
+	 * This method is executed before dispatching the controller. The programmer
+	 * may use it for any purpose.
+	 */
+	public function initArea()
+	{
+
+	} // end initArea();
+
+	/**
+	 * Sets the metadata for the area.
+	 * @param array $data The metadata.
+	 */
+	public function setMetadata(array $data)
+	{
+		$this->_metadata = $data;
+	} // end setMetadata();
+
+	/**
+	 * Returns the metadata set.
 	 * @return array
 	 */
-	public function getOptions()
+	public function getMetadata()
 	{
-		return $this->_options;
-	} // end getOptions();
+		return $this->_metadata;
+	} // end getMetadata();
 
 	/**
-	 * Returns the area option value. If the option is not defined, an
-	 * exception is thrown.
+	 * Returns the metadata option. If the option does not exist, the method attempts
+	 * to load it from the global configuration.
 	 *
-	 * @throws Area_Exception.
-	 * @param string $name Option name
+	 * @throws \Trinity\Basement\Exception
+	 * @param name $name The option name.
 	 * @return mixed
 	 */
-	public function getOption($name)
+	public function __get($name)
 	{
-		if(!isset($this->_options[$name]))
+		if(!isset($this->_metadata[$name]))
 		{
-			throw new Area\Exception('The specified area option '.$name.' does not exist.');
+			$this->_metadata[$name] = $this->getServiceLocator()->getConfiguration()->get('application.area.default.'.$name);
 		}
-		return $this->_options[$name];
-	} // end getOption();
+		return $this->_metadata[$name];
+	} // end __get();
 
-	/**
-	 * Returns the area option value. If the option is not defined, a
-	 * default value is returned.
-	 *
-	 * @param string $name Option name
-	 * @param mixed $default Default option value
-	 * @return mixed
-	 */
-	public function getOptionDef($name, $default = null)
+	public function __isset($name)
 	{
-		if(!isset($this->_options[$name]))
+		if(!isset($this->_metadata[$name]))
 		{
-			return $default;
+			if(!isset($this->_verifiedMetadata[$name]))
+			{
+				$this->_verifiedMetadata[$name] = true;
+				$config = $this->getServiceLocator()->getConfiguration();
+				if($config->isDefined('application.area.default.'.$name))
+				{
+					$this->_metadata[$name] = $config->get('application.area.default.'.$name);
+					return true;
+				}
+			}
+			return false;
 		}
-		return $this->_options[$name];
-	} // end getOptionDef();
+		return true;
+	} // end __isset();
 
-	/**
-	 * Checks if the area has the specified option.
-	 *
-	 * @param string $name The option name
-	 * @return boolean
-	 */
-	public function hasOption($name)
+	public function get($name)
 	{
-		return isset($this->_options[$name]);
-	} // end hasOption();
-
-	/**
-	 * Selects the primary module.
-	 *
-	 * @param \Trinity\Basement\Module $module The new primary module.
-	 */
-	public function setPrimaryModule(Module $module)
-	{
-		$this->_primaryModule = $module;
-	} // end setModule();
-
-	/**
-	 * Selects the area module.
-	 *
-	 * @param \Trinity\Basement\Module $module The new area module.
-	 */
-	public function setAreaModule(Module $module)
-	{
-		$this->_areaModule = $module;
-	} // end setAreaModule();
-
-	/**
-	 * Returns the path for the code within the given area.
-	 *
-	 * @param string $item Directory name
-	 * @return string
-	 */
-	public function getCodePath($item)
-	{
-		if($this->_areaModule !== null)
+		if(!isset($this->_metadata[$name]))
 		{
-			return $this->_areaModule->getCodePath($item);
+			$this->_metadata[$name] = $this->getServiceLocator()->getConfiguration()->get('application.area.default.'.$name);
 		}
-		return $this->_primaryModule->getCodePath($item);
-	} // end getCodePath();
+		return $this->_metadata[$name];
+	} // end get();
 
-	/**
-	 * Returns the path for the data item within the given area.
-	 *
-	 * @param string $item Directory name
-	 * @return string
-	 */
-	public function getFilePath($item)
+	public function isDefined($name)
 	{
-		if($this->_areaModule !== null)
+		if(!isset($this->_metadata[$name]))
 		{
-			return $this->_areaModule->getFilePath($item);
+			if(!isset($this->_verifiedMetadata[$name]))
+			{
+				$this->_verifiedMetadata[$name] = true;
+				$config = $this->getServiceLocator()->getConfiguration();
+				if($config->isDefined('application.area.default.'.$name))
+				{
+					$this->_metadata[$name] = $config->get('application.area.default.'.$name);
+					return true;
+				}
+			}
+			return false;
 		}
-		return $this->_primaryModule->getFilePath($item);
-	} // end getFilePath();
-
-	/**
-	 * Returns the primary module.
-	 *
-	 * @return \Trinity\Basement\Module
-	 */
-	public function getPrimaryModule()
-	{
-		return $this->_primaryModule;
-	} // end getPrimaryModule();
-
-
-	/**
-	 * Returns the area module.
-	 *
-	 * @return \Trinity\Basement\Module
-	 */
-	public function getAreaModule()
-	{
-		return $this->_areaModule;
-	} // end getModule();
-
-	/**
-	 * Returns the name of the service controller to be used by
-	 * this area.
-	 *
-	 * @return string
-	 */
-	public function getController()
-	{
-		return $this->_options['controller'];
-	} // end getController();
-
-	/**
-	 * Performs the option validation.
-	 *
-	 * @throws Area_Exception
-	 * @param array $opts The options to validate
-	 */
-	private function _validateOptions(array $opts)
-	{
-		if(!isset($opts['controller']))
-		{
-			throw new Area\Exception('The area does not define any controller.');
-		}
-	} // end _validateOptions();
+		return true;
+	} // end isDefined();
 } // end Area;

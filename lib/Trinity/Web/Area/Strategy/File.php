@@ -164,7 +164,7 @@ class File implements Strategy
 		}
 		if($this->_discoveriedArea !== null)
 		{
-			return array($name, $this->_areas[$this->_discoveriedArea]);
+			return array($this->_discoveriedArea, $this->_areas[$this->_discoveriedArea]);
 		}
 		if($this->_discoveryType == self::DISCOVERY_HOST)
 		{

@@ -1,8 +1,5 @@
 <?php
-// Define the environment variables
-define('APP_ENVIRONMENT', 'production');
-define('APP_PATH', '../Application/');
-
+$start = microtime(true);
 // Configure the autoloaders
 $libs = parse_ini_file(dirname(__FILE__).'/../paths.ini', true);
 require($libs['Opl'].'Opl/Loader.php');
@@ -13,6 +10,8 @@ $nsLoader->addLibrary('Trinity', $libs['Trinity']);
 $nsLoader->addLibrary('Doctrine', $libs['Doctrine']);
 $nsLoader->addLibrary('Symfony', $libs['Symfony']);
 $nsLoader->addLibrary('Application', $libs['Application']);
+$nsLoader->addLibrary('Addon', $libs['Addon']);
+$nsLoader->addLibrary('Opc', $libs['Opc']);
 $nsLoader->register();
 
 $oplLoader = new Opl_Loader('_');
@@ -20,24 +19,12 @@ $oplLoader = new Opl_Loader('_');
 // due to backward compatibility issues.
 $oplLoader->addLibrary('Opl', $libs['Opl']);
 $oplLoader->addLibrary('Opt', $libs['Opt']);
-// Note that OPC is going to be ported soon to namespaces.
-$oplLoader->addLibrary('Opc', $libs['Opc']);
 // Note that OPF is being currently ported to namespaces.
 $oplLoader->addLibrary('Opf', $libs['Opf']);
 $oplLoader->register();
 
-require($libs['Trinity'].'Trinity/Basement/Core.php');
-
-// Create application object
-$application = new \Trinity\Web\Application(
-	'Application',
-	APP_ENVIRONMENT,
-	APP_PATH.'config/config.ini',
-	'../'
-);
-// Bind autoloaders, so that they could be accessed
-$application->addLoader('default', $nsLoader);
-$application->addLoader('legacy', $oplLoader);
-
-// Run everything
-$application->initialize();
+// Create the application object
+$application = new \Application\Module('production', false);
+$application->setAreaModule(new \Application\Frontend\Module);
+$application->launch();
+echo 'Time: '.(microtime(true) - $start).'<br/>';
