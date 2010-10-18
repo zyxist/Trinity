@@ -4,16 +4,16 @@
  *
  * @author Tomasz Jędrzejewski
  */
-namespace Application\Main\Frontend\Group;
+namespace Application\Frontend\Group;
 use \Trinity\Web\Controller\Manager;
-use \Trinity\WebUtils\View\Grid;
-use \Trinity\WebUtils\Controller\Action_Group as ControllerActionGroup;
+use \Trinity\Opt\View\Grid;
+use \Trinity\Opt\Controller\Group\ActionGroup;
 
-class IndexGroup extends ControllerActionGroup
+class IndexGroup extends ActionGroup
 {
 	public function indexAction(Manager $manager)
 	{
-		$fooNs = $manager->session->getNamespace('foo');
+		$fooNs = $manager->session->getGroup('foo');
 		if(!isset($fooNs->counter))
 		{
 			$fooNs->counter = 5;
@@ -35,7 +35,7 @@ class IndexGroup extends ControllerActionGroup
 
 		$view = $this->getActionView();
 
-		$view->addModel('date', $manager->getModel('Application.Main.Model.CurrentDate'));
+		$view->addModel('date', $manager->getModel('Application.Model.CurrentDate'));
 		$view->addModel('session', $fooNs);
 
 		return $view;
@@ -46,14 +46,14 @@ class IndexGroup extends ControllerActionGroup
 		$view = $manager->getView('Trinity.WebUtils.View.Grid');
 		$view->set('args', $manager->request->getParams());
 		$view->set('title', 'Some dummy title');
-		$view->addModel('grid', $manager->getModel('Application.Main.Model.Grid'));
+		$view->addModel('grid', $manager->getModel('Application.Model.Grid'));
 
 		return $view;
 	} // end listAction();
 
 	public function brickAction(Manager $manager)
 	{
-		$brick = $manager->getBrick('Application.Main.Brick.Test');
+		$brick = $manager->getBrick('Application.Brick.Test');
 		$brick->dispatch();
 
 		return $this->getActionView();

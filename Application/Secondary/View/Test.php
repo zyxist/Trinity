@@ -9,8 +9,8 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Application\Main\Secondary\View;
-use \Trinity\Web\View_Html as View_Html;
+namespace Application\Secondary\View;
+use \Trinity\Opt\View\Html as View_Html;
 
 class Test extends View_Html
 {
@@ -19,10 +19,9 @@ class Test extends View_Html
 	 */
 	public function dispatch()
 	{
-		$this->setTemplate('area.templates:test.tpl');
-		$view = $this->getTemplateObject();
+		$view = new \Opt_View('current.templates:test.tpl');
 
-		$layout = $this->_application->getServiceLocator()->get('template.Layout');
+		$layout = $this->_serviceLocator->get('Layout');
 		$layout->appendView($view);
 	} // end dispatch();
 } // end Test;

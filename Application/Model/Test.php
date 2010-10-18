@@ -4,11 +4,9 @@
  *
  * @author Tomasz Jędrzejewski
  */
-namespace Application\Main\Model;
-use \Trinity\Basement\Model as Model;
-use \Trinity\Model\Interfaces\Grid as Interface_Grid;
+namespace Application\Model;
 
-class Test implements Model
+class Test
 {
 	public function getFoo()
 	{

@@ -4,14 +4,14 @@
  *
  * @author Tomasz Jędrzejewski
  */
-namespace Application\Main\Frontend\Group;
-use Trinity\WebUtils\View\ActionGroup;
+namespace Application\Frontend\Group;
+use \Trinity\Opt\View\ActionGroup;
 
 class IndexView extends ActionGroup
 {
 	public function indexAction()
 	{
-		$model = $this->getModel('date', '\\Application\\Main\\Model\\CurrentDate');
+		$model = $this->getModel('date', '\\Application\\Model\\CurrentDate');
 		$counter = $this->getModel('session');
 		$template = $this->templateFactory();
 		$template->date = $model->getDate();

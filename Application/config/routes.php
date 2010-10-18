@@ -1,6 +1,6 @@
 <?php
 $router->connect(
-	'/:group/:action',
-	array('group' => \Trinity\Web\Router\Standard::COMPULSORY, 'action' => \Trinity\Web\Router\Standard::COMPULSORY),
+	'/:module/:group/:action',
+	array('group' => \Trinity\Web\Router\Standard::COMPULSORY, 'group' => \Trinity\Web\Router\Standard::COMPULSORY, 'action' => \Trinity\Web\Router\Standard::COMPULSORY),
 	array()
 );

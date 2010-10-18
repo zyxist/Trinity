@@ -4,10 +4,9 @@
  *
  * @author Tomasz Jędrzejewski
  */
-namespace Application\Main\Model;
-use \Trinity\Basement\Model as Model;
+namespace Application\Model;
 
-class CurrentDate implements Model
+class CurrentDate
 {
 	public function getDate()
 	{

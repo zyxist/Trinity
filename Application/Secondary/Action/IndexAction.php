@@ -4,7 +4,7 @@
  *
  * @author Tomasz Jędrzejewski
  */
-namespace Application\Main\Secondary\Action;
+namespace Application\Secondary\Action;
 use \Trinity\Web\Controller\Manager;
 use \Trinity\Web\Brick;
 
@@ -13,7 +13,7 @@ class IndexAction extends Brick
 
 	protected function _dispatch(Manager $manager)
 	{
-		return new \Application\Main\Secondary\View\Test($manager->application);
+		return $manager->getView('Application.Secondary.View.Test');
 	} // end _dispatch();
 
 } // end IndexAction;
