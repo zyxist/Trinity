@@ -10,9 +10,10 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Opt;
+use \Opt_Class;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Service\Container;
 use \Trinity\Basement\ServiceLocator;
-use \Opt_Class;
 
 /**
  * Defines, how to start the default web stack services and configure them.
@@ -27,7 +28,7 @@ class Services extends Container
 	public function getConfiguration()
 	{
 		return array(
-			'trinity.opt.layout' => 'app.layouts:layout',
+			'trinity.opt.layout' => 'application.layouts:layout',
 			'trinity.opt.stripWhitespaces' => false,
 			'trinity.opt.parser' => 'Opt_Parser_Xml',
 			'trinity.opt.escape' => true,
@@ -47,17 +48,7 @@ class Services extends Container
 		// Create the OPT instance.
 		$opt = new Opt_Class;
 		$opt->compileDir = $application->getDirectory().'cache'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
-		$opt->sourceDir = array(
-			'file' => $appTemplates = $application->getDirectory().'templates'.DIRECTORY_SEPARATOR,
-			'app.templates' => $appTemplates,
-			'app.layouts' => $application->getDirectory().'layouts'.DIRECTORY_SEPARATOR,
-			'module.templates' => $module->getDirectory().'templates'.DIRECTORY_SEPARATOR,
-			'module.layouts' => $module->getDirectory().'layouts'.DIRECTORY_SEPARATOR,
-			'area.templates' => $area->getDirectory().'templates'.DIRECTORY_SEPARATOR,
-			'area.layouts' => $area->getDirectory().'layouts'.DIRECTORY_SEPARATOR,
-			'current.templates' => $module->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR,
-			'current.layouts' => $module->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'layouts'.DIRECTORY_SEPARATOR
-		);
+		$opt->setInflector($serviceLocator->get('Inflector'));
 
 		$config = $serviceLocator->getConfiguration();
 
@@ -82,6 +73,30 @@ class Services extends Container
 
 		return $opt;
 	} // end getOptService();
+
+	public function getInflectorService(ServiceLocator $serviceLocator)
+	{
+		$inflector = new Inflector($serviceLocator->get('Application'));
+		
+		$areaManager = $serviceLocator->get('AreaManager');
+
+		if($areaManager->getActiveArea() !== null)
+		{
+			$inflector->setArea($areaManager->getActiveArea());
+			$inflector->setModule($areaManager->getActiveModule());
+		}
+		else
+		{
+			$eventDispatcher = $serviceLocator->get('EventDispatcher');
+			$eventDispatcher->connect('web.application.modules-discovered', function(Event $event) use($inflector)
+			{
+				$inflector->setModule($event->getParameter('module'));
+				$inflector->setArea($event->getParameter('area'));
+			});
+		}
+
+		return $inflector;
+	} // end getInflectorService();
 
 	public function getOpfService(ServiceLocator $serviceLocator)
 	{

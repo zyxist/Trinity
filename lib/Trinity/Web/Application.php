@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\Web;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Application as Basement_Application;
 use \Trinity\Basement\ServiceLocator;
 
@@ -100,6 +101,8 @@ abstract class Application extends Basement_Application
 		$response = $serviceLocator->get('Response');
 		$areaManager->setActiveModule($request->getParam('module', 'main'));
 		$module = $areaManager->getActiveModule();
+
+		$eventDispatcher->notify(new Event($this, 'web.application.modules-discovered', array('module' => $module, 'area' => $area)));
 
 		// Get the controller
 		$controller = $serviceLocator->get($area->controllerService);
