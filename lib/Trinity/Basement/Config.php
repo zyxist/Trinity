@@ -56,11 +56,18 @@ class Config
 
 	public function setResolve($name, $value)
 	{
-		if(preg_match('/^%([a-zA-Z0-9\-\.]+)%/', $name, $matches))
+		if(is_array($value))
 		{
-			$this->_opts[$name] = $this->get($matches[1]);
+			foreach($value as &$subitem)
+			{
+				$subitem = $this->_resolve($subitem);
+			}
+			$this->_opts[$name] = $value;
 		}
-		$this->_opts[$name] = $value;
+		else
+		{
+			$this->_opts[$name] = $this->_resolve($value);
+		}
 	} // end setResolve();
 
 	public function isDefined($name)
@@ -82,4 +89,13 @@ class Config
 			$this->_opts = array_merge($this->_opts, $newOptions);
 		}
 	} // end merge();
+
+	private function _resolve($value)
+	{
+		if(preg_match('/%([a-zA-Z0-9\-\.]+)%/', $value, $matches))
+		{
+			return str_replace($matches[0], $this->get($matches[1]), $value);
+		}
+		return $value;
+	} // end _resolve();
 } // end Config;
