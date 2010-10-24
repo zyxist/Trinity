@@ -61,12 +61,14 @@ class Services extends Container
 		));
 
 		// Register helpers.
-		$opt->register(Opt_Class::PHP_FUNCTION, 'baseUrl', '\Trinity\Opt\Helper_Url::baseUrl');
-		$opt->register(Opt_Class::PHP_FUNCTION, 'url', '\Trinity\Opt\Helper_Url::url');
+		$opt->register(Opt_Class::PHP_FUNCTION, 'baseUrl', 'Opt_View::$_global[\'url\']->baseUrl');
+		$opt->register(Opt_Class::PHP_FUNCTION, 'queryPath', 'Opt_View::$_global[\'url\']->queryPath');
+		$opt->register(Opt_Class::PHP_FUNCTION, 'url', 'Opt_View::$_global[\'url\']->assemble');
 		$opt->register(Opt_Class::OPT_FORMAT, 'Flash', '\Trinity\Opt\Format\Flash');
 
 		$session = $serviceLocator->get('Session');
 		\Opt_View::assignGlobal('flash', $serviceLocator->get('FlashHelper'));
+		\Opt_View::assignGlobal('url', $serviceLocator->get('Router'));
 		\Opt_View::setFormatGlobal('flash', 'Global/Flash', false);
 
 		$opt->setup();

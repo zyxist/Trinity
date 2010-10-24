@@ -17,6 +17,7 @@ use \Trinity\Basement\ServiceLocator;
 use \Trinity\WebUtils\Controller\Action;
 use \Trinity\WebUtils\Controller\Group;
 use \Trinity\WebUtils\Helper\Flash;
+use \Trinity\WebUtils\Helper\Url;
 use \Trinity\WebUtils\Facade\Manager as Facade_Manager;
 
 /**
