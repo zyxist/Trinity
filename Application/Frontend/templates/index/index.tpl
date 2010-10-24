@@ -4,4 +4,5 @@
 	<p>The first run at {$date}</p>
 	<p>Counter: {$counter}</p>
 	<p>Second counter: {$counter2}</p>
+	<p>Go to the <a href="parse:url('group': 'index', 'action': 'brick')">bricks</a></p>
 </opt:root>
