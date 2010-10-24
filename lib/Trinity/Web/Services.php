@@ -33,16 +33,65 @@ class Services extends Container
 	public function getConfiguration()
 	{
 		return array(
+			'trinity.web.cache.class' => '\Trinity\Cache\APC',
+			'trinity.web.cache.options' => array(
+				'prefix' => 'trinity',
+				'lifetime' => 86400
+			),
+			'trinity.web.request.kept-args' => 'module,group,action,id',
 			'trinity.web.response.default-content-type' => 'text/html',
 			'trinity.web.response.default-charset' => 'utf-8',
 			'trinity.web.session.handler-service' => null,
-			'trinity.web.router.route-file' => 'config/routes.php',
+			'trinity.web.router.route-file' => '%application.directory%config/routes.php',
 			'trinity.web.areaManager.modules-tied-to-areas' => true,
 			'trinity.web.areaManager.strategy-service' => null,
+			'trinity.web.areaManager.metadata-service' => 'FileMetadataLoader',
+			'trinity.web.fileMetadataLoader.class' => '\Trinity\Web\Area\MetadataLoader\XmlLoader',
+			'trinity.web.fileMetadataLoader.paths' => '%application.directory%config/',
+			'trinity.web.fileMetadataLoader.file' => 'area.xml',
 			'trinity.web.router.query-path' => '/',
 			'trinity.web.router.base-url' => null
 		);
 	} // end getConfiguration();
+
+	/**
+	 * Builds the caching service.
+	 * 
+	 * @param ServiceLocator $serviceLocator
+	 * @return \Trinity\Cache\Cache
+	 */
+	public function getCacheService(ServiceLocator $serviceLocator)
+	{
+		$args = $serviceLocator->getConfiguration();
+		$className = $args->get('trinity.web.cache.class');
+
+		$object = new $className($args->get('trinity.web.cache.options'));
+		if(!$object instanceof \Trinity\Cache\Cache)
+		{
+			throw new Exception('Invalid cache class: '.get_class($object));
+		}
+		return $object;
+	} // end getCacheService();
+
+	/**
+	 * Builds the area metadata loader service.
+	 *
+	 * @param ServiceLocator $serviceLocator
+	 * @return \Trinity\Web\Area\MetadataLoader\FileLoader
+	 */
+	public function getFileMetadataLoaderService(ServiceLocator $serviceLocator)
+	{
+		$args = $serviceLocator->getConfiguration();
+		$className = $args->get('trinity.web.fileMetadataLoader.class');
+
+		$object = new $className($args->get('trinity.web.fileMetadataLoader.paths'));
+		if(!$object instanceof \Trinity\Web\Area\MetadataLoader\FileLoader)
+		{
+			throw new Exception('Invalid area file metadata loader class: '.get_class($object));
+		}
+		$object->setFile($args->get('trinity.web.fileMetadataLoader.file'));
+		return $object;
+	} // end getFileMetadataLoaderService();
 
 	/**
 	 * The service for building the event dispatcher.
@@ -74,9 +123,20 @@ class Services extends Container
 	 */
 	public function getRequestService(ServiceLocator $serviceLocator)
 	{
+		$args = $serviceLocator->getConfiguration();
 		$request = new Request\Http($serviceLocator->get('Visit'));
+
 		$router = $serviceLocator->get('Router');
 		$request->setParams($router->route($request->pathInfo));
+
+		$keptArgs = explode(',', $args->get('trinity.web.request.kept-args'));
+		foreach($keptArgs as $argument)
+		{
+			if($request->hasParam($argument))
+			{
+				$router->setParam($argument, $request->getParam($argument));
+			}
+		}
 
 		return $request;
 	} // end getRequestService();
@@ -139,10 +199,9 @@ class Services extends Container
 	public function getRouterService(ServiceLocator $serviceLocator)
 	{
 		$args = $serviceLocator->getConfiguration();
-		$application = $serviceLocator->get('Application');
-		$router = new Router_Standard($args->get('trinity.web.router.query-path'), $args->get('trinity.web.router.base-url'));
+		$router = new Router_Standard($serviceLocator->get('AreaManager'));
 
-		require($application->getDirectory().$args->get('trinity.web.router.route-file'));
+		require($args->get('trinity.web.router.route-file'));
 
 		return $router;
 	} // end getRouterService();
@@ -156,7 +215,7 @@ class Services extends Container
 	public function getAreaManagerService(ServiceLocator $serviceLocator)
 	{
 		$args = $serviceLocator->getConfiguration();
-		$areaManager = new Area_Manager;
+		$areaManager = new Area_Manager($serviceLocator->get('Cache'), $serviceLocator->get($args->get('trinity.web.areaManager.metadata-service')));
 		$areaManager->setModulesTiedToAreas($args->get('trinity.web.areaManager.modules-tied-to-areas'));
 
 		if($args->get('trinity.web.areaManager.strategy-service') !== null)

@@ -64,6 +64,10 @@ abstract class Application extends Basement_Application
 		}
 
 		$this->_serviceLocator = new ServiceLocator('service locator');
+
+		$config = $this->_serviceLocator->getConfiguration();
+		$config->set('application.directory', $this->getDirectory());
+
 		$this->_serviceLocator->set('Application', $this);
 		$this->_serviceLocator->registerServiceContainer(new Services);
 
