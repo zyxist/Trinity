@@ -11,6 +11,7 @@
  */
 namespace Trinity\Web\Area;
 use \Trinity\Basement\Module;
+use \Trinity\Cache\Cache;
 use \Trinity\Web\Area;
 
 /**
@@ -49,6 +50,36 @@ class Manager
 	 * @var boolean
 	 */
 	protected $_modulesTiedToAreas = true;
+
+	/**
+	 * The area metadata.
+	 * @var array
+	 */
+	protected $_areaMetadata = array();
+	
+	/**
+	 * The metadata loader.
+	 * @var \Trinity\Web\Area\MetadataLoader
+	 */
+	protected $_metadataLoader;
+
+	/**
+	 * The cache system.
+	 * @var \Trinity\Cache\Cache
+	 */
+	protected $_cache;
+
+	/**
+	 * Constructs the area manager.
+	 *
+	 * @param Cache $cache The caching system.
+	 * @param MetadataLoader $metadataLoader The metadata loader.
+	 */
+	public function __construct(Cache $cache, MetadataLoader $metadataLoader)
+	{
+		$this->_cache = $cache;
+		$this->_metadataLoader = $metadataLoader;
+	} // end __construct();
 
 	/**
 	 * Sets if the modules are tied to areas or are free. Implements
@@ -106,13 +137,14 @@ class Manager
 	} // end registerModuleForArea();
 
 	/**
-	 * Selects the active area.
+	 * Selects the active area and injects the metadata to it.
 	 *
 	 * @param Area $area The area
 	 */
 	public function setActiveArea(Area $area)
 	{
 		$this->_activeArea = $area;
+		$area->setMetadata($this->getAreaMetadata($area->getAreaName()));
 	} // end setActiveArea();
 
 	/**
@@ -190,4 +222,32 @@ class Manager
 			throw new Exception('Cannot select the \''.$moduleKey.'\' module: no active area is selected.');
 		}
 	} // end hasModule();
+
+	/**
+	 * Returns the metadata for the given area.
+	 *
+	 * @param string $areaKey The area key.
+	 * @return array
+	 */
+	public function getAreaMetadata($areaKey)
+	{
+		if(!isset($this->_areaMetadata[$areaKey]))
+		{
+			$key = 'trinity:area:metadata:'.$areaKey;
+			if($this->_metadataLoader->isPreloaded() || !$this->_cache->has($key))
+			{
+				$data = $this->_metadataLoader->loadMetadata($areaKey);
+				if($data === null)
+				{
+					throw new \DomainException('Cannot load area metadata: the area \''.$areaKey.'\' has no metadata defined.');
+				}
+				$this->_cache->set($key, $this->_areaMetadata[$areaKey] = $data);
+			}
+			else
+			{
+				$this->_areaMetadata[$areaKey] = $this->_cache->get($key);
+			}
+		}
+		return $this->_areaMetadata[$areaKey];
+	} // end getAreaMetadata();
 } // end Manager;
