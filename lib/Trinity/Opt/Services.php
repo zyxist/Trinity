@@ -65,6 +65,8 @@ class Services extends Container
 		$opt->register(Opt_Class::PHP_FUNCTION, 'queryPath', 'Opt_View::$_global[\'url\']->queryPath');
 		$opt->register(Opt_Class::PHP_FUNCTION, 'url', 'Opt_View::$_global[\'url\']->assemble');
 		$opt->register(Opt_Class::OPT_FORMAT, 'Flash', '\Trinity\Opt\Format\Flash');
+		$opt->register(Opt_Class::OPT_FORMAT, 'ActivePath', '\Trinity\Opt\Format\ActivePath');
+		$opt->register(Opt_Class::OPT_FORMAT, 'NavigationPage', '\Trinity\Opt\Format\NavigationPage');
 
 		$session = $serviceLocator->get('Session');
 		\Opt_View::assignGlobal('flash', $serviceLocator->get('FlashHelper'));
