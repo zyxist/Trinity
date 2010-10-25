@@ -10,6 +10,8 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Navigation;
+use \SplQueue;
+use \Trinity\Cache\Cache;
 
 /**
  * The navigation manager is the entry point to the navigation subsystem.
@@ -35,10 +37,15 @@ class Manager
 	protected $_activePage;
 
 	/**
-	 * The reader object.
-	 * @var \Trinity\Navigation\Reader
+	 * The loader object.
+	 * @var \Trinity\Navigation\Loader
 	 */
-	protected $_reader;
+	protected $_loader;
+
+	/**
+	 * The caching object.
+	 * @var \Trinity\Cache\Cache
+	 */
 
 	/**
 	 * The list of navigation tree hooks.
@@ -47,26 +54,25 @@ class Manager
 	protected $_hooks;
 
 	/**
-	 * Sets the reader responsible for loading the tree structure. Implements
-	 * fluent interface.
-	 * 
-	 * @param Reader $reader The reader object or the reader class name.
-	 * @return \Trinity\Navigation\Manager
+	 * Constructs the area manager.
+	 *
+	 * @param Cache $cache The caching system.
+	 * @param Loader $loader The navigation structure loader.
 	 */
-	public function setReader(Reader $reader)
+	public function __construct(Cache $cache, Loader $loader)
 	{
-		$this->_reader = $reader;
-		return $this;
-	} // end setReader();
+		$this->_cache = $cache;
+		$this->_loader = $loader;
+	} // end __construct();
 
 	/**
-	 * Returns the registered reader object.
+	 * Returns the registered loader object.
 	 * 
-	 * @return Reader
+	 * @return Loader
 	 */
-	public function getReader()
+	public function getLoader()
 	{
-		return $this->_reader;
+		return $this->_loader;
 	} // end getReader();
 
 	public function addHook($name, Hook $hook)
@@ -108,7 +114,7 @@ class Manager
 	 */
 	public function getActivePage()
 	{
-		return $this->_active;
+		return $this->_activePage;
 	} // end getActivePage();
 
 	/**
@@ -119,7 +125,16 @@ class Manager
 	public function discover()
 	{
 		// Build the navigation tree
-		$tree = $this->_reader->buildNavigationTree();
+		if($this->_cache->has('trinity:navigation:'.$this->_loader->getIdentifier()))
+		{
+			$tree = $this->_cache->get('trinity:navigation:'.$this->_loader->getIdentifier());
+		}
+		else
+		{
+			$tree = $this->_loader->buildNavigationTree();
+			$this->_cache->set('trinity:navigation:'.$this->_loader->getIdentifier(), $tree);
+		}
+		
 		if(!$tree instanceof Page)
 		{
 			throw new Exception('The navigation reader returned an invalid tree: object of class \Trinity\Navigation\Page was expected.');
@@ -159,6 +174,10 @@ class Manager
 		{
 			return $this->_activePage;
 		}
+		if($this->_tree === null)
+		{
+			$this->discover();
+		}
 
 		$queue = new SplQueue;
 		$queue->enqueue($this->_tree);
@@ -167,7 +186,7 @@ class Manager
 			$item = $queue->dequeue();
 			if($item->getPageType() == Page::TYPE_REAL)
 			{
-				if($item->controller == 'action')
+				if($item->controller == $controller)
 				{
 					$ok = true;
 					foreach($data as $name => $value)
@@ -180,9 +199,8 @@ class Manager
 					}
 					if($ok)
 					{
-						$this->_navigationManager->setActivePage($item);
+						$this->setActivePage($item);
 						return $item;
-
 					}
 				}
 			}
@@ -202,6 +220,11 @@ class Manager
 	 */
 	public function setActivePage(Page $page)
 	{
+		if($this->_tree === null)
+		{
+			$this->discover();
+		}
+
 		// Mark all the pages on the way to the root
 		$item = $page->getParent();
 		$page->active = true;
@@ -210,15 +233,14 @@ class Manager
 			$page->onActivePath = true;
 			$parent = $item->getParent();
 
-			if($parent === null && $item !== $tree)
+			if($parent === null && $item !== $this->_tree)
 			{
 				throw new Exception('The selected active page is not a part of the navigation tree.');
 			}
 			$item = $parent;
 		}
-
 		$this->_activePage = $page;
 
 		return $this;
-	} // end discover();
+	} // end setActivePage();
 } // end Manager;

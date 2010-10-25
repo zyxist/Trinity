@@ -9,21 +9,35 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Navigation;
+namespace Trinity\Navigation\Loader;
+use \SimpleXmlElement;
+use \SplQueue;
 
 /**
- * Navigation readers read the tree structure from an external source.
+ * The concrete implementation of the navigation structure loader.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-interface Reader
+class PhpLoader extends FileLoader
 {
 	/**
-	 * This method should build and return the root of the navigation tree.
+	 * Builds a navigation tree from a PHP file.
 	 *
 	 * @return \Trinity\Navigation\Page
 	 */
-	public function buildNavigationTree();
-} // end Reader;
+	public function buildNavigationTree()
+	{
+		if($this->_currentFile === null)
+		{
+			throw new \DomainException('Cannot load navigation structure: the file with the structure is not defined.');
+		}
+
+		// This INCLUDE should return the values.
+		include $this->findFile($this->_currentFile);
+
+		// No pages returned.
+		return NULL;
+	} // end buildNavigationTree();
+} // end PhpLoader;
