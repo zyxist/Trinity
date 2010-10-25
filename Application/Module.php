@@ -15,10 +15,12 @@ class Module extends Web_Application
 	{
 		$modules = array();
 		$modules[] = new \Trinity\WebUtils\Module;
+		$modules[] = new \Trinity\Doctrine\Module;
+		$modules[] = new \Trinity\Navigation\Module;
 		$modules[] = new \Trinity\Opt\Module;
 		$modules[] = new \Trinity\Ops\Module;
-		$modules[] = new \Trinity\Doctrine\Module;
-	//	$modules[] = new \Trinity\Navigation\Module;
+		
+		
 	//	$modules[] = new \Trinity\SwiftMailer\Module;
 		$modules[] = $this->getAreaModule();
 		$modules[] = new \Addon\Module;

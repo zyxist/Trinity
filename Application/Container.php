@@ -13,7 +13,8 @@ class Container extends Service_Container
 	public function getConfiguration()
 	{
 		return array(
-			'trinity.opt.layout' => 'area.layouts:layout'
+			'trinity.opt.layout' => 'area.layouts:layout',
+			'trinity.opt.compileMode' => 0,
 		);
 	} // end getConfiguration();
 } // end Container();

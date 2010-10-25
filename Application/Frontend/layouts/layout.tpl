@@ -4,7 +4,7 @@
 <opt:dtd template="html4" />
 <html>
 	<head>
-		<title>Trinity Framework test</title>
+		<title><opt:section name="title" separator="str: / ">{$title.title}</opt:section></title>
 	</head>
 
 	<body>

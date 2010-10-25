@@ -25,4 +25,13 @@ class Module extends Area
 	{
 		return 'frontend';
 	} // end getAreaName();
+
+	public function launch()
+	{
+		parent::launch();
+		$serviceLocator = $this->getServiceLocator();
+		$facadeManager = $serviceLocator->get('Facade');
+		$facadeManager->addFacade('frontend', '\Application\Facade\Standard');
+		$facadeManager->select('frontend');
+	} // end launch();
 } // end Module;
