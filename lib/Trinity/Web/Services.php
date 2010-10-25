@@ -70,6 +70,7 @@ class Services extends Container
 		{
 			throw new Exception('Invalid cache class: '.get_class($object));
 		}
+	//	$object->clean(\Trinity\Cache\Cache::ALL);
 		return $object;
 	} // end getCacheService();
 

@@ -118,7 +118,6 @@ abstract class Application extends Basement_Application
 		{
 			throw new Exception('The selected area controller is not a valid controller instance.');
 		}
-
 		$response->sendResponse();
 	} // end launch();
 } // end Application;
