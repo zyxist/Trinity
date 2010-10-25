@@ -67,23 +67,48 @@ abstract class FileLoader implements MetadataLoader
 		$this->_paths = $paths;
 	} // end __construct();
 
+	/**
+	 * Sets the file name, which the metadata will be loaded from.
+	 * 
+	 * @param string $file The file with the metadata.
+	 */
 	public function setFile($file)
 	{
 		$this->_currentFile = $file;
 	} // end setFile();
 
+	/**
+	 * Returns the file name, which the metadata will be loaded from.
+	 * 
+	 * @return string
+	 */
 	public function getFile()
 	{
-		return $this->_file;
+		return $this->_currentFile;
 	} // end getFile();
 
+	/**
+	 * Returns true, if all the area metadata are preloaded, so we can
+	 * refresh the cache.
+	 * 
+	 * @return boolean
+	 */
 	public function isPreloaded()
 	{
 		return $this->_loaded;
 	} // end isPreloaded();
 
+	/**
+	 * Performs the actual lazy-loading.
+	 */
 	abstract protected function _doLoad();
 
+	/**
+	 * Loads the metadata for the given area.
+	 *
+	 * @param string $areaKey The area key
+	 * @return array
+	 */
 	public function loadMetadata($areaKey)
 	{
 		if($this->_metadata === null)
@@ -117,17 +142,6 @@ abstract class FileLoader implements MetadataLoader
 		}
 		throw new \InvalidArgumentException('The file \''.$filename.'\' does not exist in any of the specified paths.');
 	} // end findFile();
-
-	/**
-	 * Usually, the file loaders do not support lazy-loading of the area
-	 * metadata, so this method always returns false.
-	 * 
-	 * @return boolean
-	 */
-	public function supportsLazyLoading()
-	{
-		return false;
-	} // end supportsLazyLoading();
 
 	/**
 	 * Unsupported method.
