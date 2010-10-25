@@ -59,6 +59,9 @@ class Services extends Container
 
 		$controller->setDefaults($area->defaultAction);
 
+		$serviceLocator->set('Controller', $controller);
+		$serviceLocator->get('EventDispatcher')->notify(new Event($controller, 'web.controller.created', array('name' => 'action')));
+
 		return $controller;
 	} // end getActionControllerService();
 
@@ -77,6 +80,9 @@ class Services extends Container
 
 		$controller->setDefaults($area->defaultGroup, $area->defaultAction);
 
+		$serviceLocator->set('Controller', $controller);
+		$serviceLocator->get('EventDispatcher')->notify(new Event($controller, 'web.controller.created', array('name' => 'group')));
+
 		return $controller;
 	} // end getGroupControllerService();
 
@@ -89,9 +95,10 @@ class Services extends Container
 	 */
 	public function getFacadeService(ServiceLocator $serviceLocator)
 	{
+		$eventDispatcher = $serviceLocator->get('EventDispatcher');
 		$manager = new Facade_Manager;
 
-		$application->getEventDispatcher()->connect('controller.web.dispatch.end', function(Event $event) use($manager) {
+		$eventDispatcher->connect('controller.web.dispatch.end', function(Event $event) use($manager) {
 			$facade = $manager->getSelectedFacadeClass();
 
 			if($facade !== null)
@@ -101,7 +108,7 @@ class Services extends Container
 			}
 		});
 
-		$application->getEventDispatcher()->connect('controller.web.dispatch.begin', function(Event $event) use($manager) {
+		$eventDispatcher->connect('controller.web.dispatch.begin', function(Event $event) use($manager) {
 			$event->getParameter('manager')->facade = $manager;
 		});
 

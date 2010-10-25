@@ -10,7 +10,7 @@
  * and other contributors. See website for details.
  */
 
-namespace Trinity\Web\Facade;
+namespace Trinity\WebUtils\Facade;
 
 /**
  * The facade manager simplifies the management of the available facades

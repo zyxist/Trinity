@@ -110,6 +110,11 @@ class Action extends Web_Controller
 			$this->raiseControllerError($manager);
 		}
 
+		$manager->events->notify(new Event($this, 'controller.dispatch', array(
+			'brick' => $actionObj,
+			'module' => $this->_actionModule,
+			'action' => $action
+		)));
 		$manager->events->notify(new Event($this, 'controller.action.dispatch', array(
 			'brick' => $actionObj,
 			'module' => $this->_actionModule,
@@ -119,6 +124,11 @@ class Action extends Web_Controller
 		$actionObj->dispatch();
 
 		$manager->events->notify(new Event($this, 'controller.action.dispatched', array(
+			'brick' => $actionObj,
+			'module' => $this->_actionModule,
+			'action' => $action
+		)));
+		$manager->events->notify(new Event($this, 'controller.dispatched', array(
 			'brick' => $actionObj,
 			'module' => $this->_actionModule,
 			'action' => $action

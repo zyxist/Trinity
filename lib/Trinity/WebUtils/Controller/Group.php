@@ -133,6 +133,11 @@ class Group extends Web_Controller
 			$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
 		}
 
+		$manager->events->notify(new Event($this, 'controller.dispatch', array(
+			'groupObj' => $groupObj,
+			'group' => $group,
+			'action' => $action
+		)));
 		$manager->events->notify(new Event($this, 'controller.group.dispatch', array(
 			'groupObj' => $groupObj,
 			'group' => $group,
@@ -154,6 +159,11 @@ class Group extends Web_Controller
 		}
 
 		$manager->events->notify(new Event($this, 'controller.group.dispatched', array(
+			'groupObj' => $groupObj,
+			'group' => $group,
+			'action' => $action
+		)));
+		$manager->events->notify(new Event($this, 'controller.dispatched', array(
 			'groupObj' => $groupObj,
 			'group' => $group,
 			'action' => $action
