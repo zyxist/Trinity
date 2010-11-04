@@ -103,7 +103,7 @@ abstract class Application extends Basement_Application
 		// Get the active module
 		$request = $serviceLocator->get('Request');
 		$response = $serviceLocator->get('Response');
-		$areaManager->setActiveModule($request->getParam('module', 'main'));
+		$areaManager->setActiveModule($request->getParam('module', $area->defaultModule));
 		$module = $areaManager->getActiveModule();
 
 		$eventDispatcher->notify(new Event($this, 'web.application.modules-discovered', array('module' => $module, 'area' => $area)));

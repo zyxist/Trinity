@@ -40,6 +40,7 @@ class Services extends Container
 		return array(
 			'application.area.default.defaultAction' => 'index',
 			'application.area.default.defaultGroup' => 'index',
+			'application.area.default.defaultModule' => 'main',
 			'trinity.webUtils.flashHelper.sessionGroup' => 'flash'
 		);
 	} // end getConfiguration();
