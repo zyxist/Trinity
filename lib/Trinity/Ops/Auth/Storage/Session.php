@@ -9,9 +9,9 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Ops\Auth;
+namespace Trinity\Ops\Auth\Storage;
 use \Ops\Auth\Storage;
-use \Trinity\Web\Session;
+use \Trinity\Web\Session as Web_Session;
 use \Trinity\WebUtils\Model\Interfaces\PersistentIdentity as Interface_PersistentIdentity;
 
 /**
@@ -21,17 +21,17 @@ use \Trinity\WebUtils\Model\Interfaces\PersistentIdentity as Interface_Persisten
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Storage_Session implements Storage
+class Session implements Storage
 {
 	/**
 	 * The auth namespace.
-	 * @var \Trinity\Web\Session_Namespace;
+	 * @var \Trinity\Web\Session\Group;
 	 */
-	private $_ns;
+	private $_group;
 
 	/**
 	 * The persistent identity model.
-	 * @var \Trinity\Model\Interface_PersistentIdentity;
+	 * @var \Trinity\WebUtils\Model\Interface_PersistentIdentity;
 	 */
 	private $_persistentIdentity;
 
@@ -40,25 +40,25 @@ class Storage_Session implements Storage
 	 * 
 	 * @param Session $session
 	 */
-	public function __construct(Session $session, Interface_PersistentIdentity $model)
+	public function __construct(Web_Session $session, Interface_PersistentIdentity $model)
 	{
-		$this->_ns = $session->getNamespace('Auth');
+		$this->_group = $session->getGroup('Auth');
 		$this->_persistentIdentity = $model;
 	} // end __construct();
 
 	public function clear()
 	{
-		$this->_ns->userId = null;
-		$this->_ns->accountType = null;
+		$this->_group->userId = null;
+		$this->_group->accountType = null;
 	} // end clear();
 
 	public function read()
 	{
 		try
 		{
-			return $this->_persistentIdentity->getPersistentIdentity($this->_ns->userId, $this->_ns->accountType);
+			return $this->_persistentIdentity->getPersistentIdentity($this->_group->userId, $this->_group->accountType);
 		}
-		catch(\Trinity\Model\Report\NotFound $report)
+		catch(\Trinity\WebUtils\Model\Report\NotFound $report)
 		{
 			$this->clear();
 			return null;
@@ -69,13 +69,13 @@ class Storage_Session implements Storage
 	{
 		if(isset($identity['id']) && isset($identity['accountType']) && $identity['id'] !== null && $identity['accountType'] !== null)
 		{
-			$this->_ns->userId = $identity['id'];
-			$this->_ns->accountType = $identity['accountType'];
+			$this->_group->userId = $identity['id'];
+			$this->_group->accountType = $identity['accountType'];
 		}
 	} // end write();
 
 	public function isEmpty()
 	{
-		return ($this->_ns->userId !== null);
+		return ($this->_group->userId !== null);
 	} // end isEmpty();
 } // end Storage_Session;
