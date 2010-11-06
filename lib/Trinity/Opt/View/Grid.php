@@ -19,7 +19,7 @@ use \Trinity\WebUtils\Model\Interfaces\Editable as Interface_Editable;
 use \Trinity\WebUtils\Model\Interfaces\Removable as Interface_Removable;
 use \Trinity\WebUtils\Model\Interfaces\Movable as Interface_Movable;
 use \Trinity\WebUtils\Model\Interfaces\Paginable as Interface_Paginable;
-use \Opc_Paginator;
+use \Opc\Paginator;
 
 /**
  * This view represents a grid table of rows imported from a
@@ -40,7 +40,7 @@ class Grid extends Html
 	public function __construct(ServiceLocator $serviceLocator)
 	{
 		parent::__construct($serviceLocator);
-		$this->setTemplateName('default', 'app.templates:grid.tpl');
+		$this->setTemplateName('default', 'application.templates:grid.tpl');
 	} // end __construct();
 
 	/**
@@ -55,7 +55,7 @@ class Grid extends Html
 		// Add pagination
 		if($model instanceof Interface_Paginable)
 		{
-			$paginator = Opc_Paginator::create($model->count());
+			$paginator = Paginator::create($this->_serviceLocator->get('Opc'), $model->count());
 			$paginator->page = $this->get('page');
 
 			$model->setLimit($paginator->limit, $paginator->offset);
@@ -97,7 +97,7 @@ class Grid extends Html
 		}
 
 		// Display the layout
-		$layout = $this->_application->getServiceLocator()->get('template.Layout');
+		$layout = $this->_serviceLocator->get('Layout');
 		$layout->appendView($view);
 	} // end dispatch();
 
