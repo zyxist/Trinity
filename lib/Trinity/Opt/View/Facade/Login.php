@@ -11,7 +11,7 @@
  */
 
 namespace Trinity\Opt\View\Facade;
-use \Trinity\Web\View\Html as View_Html;
+use \Trinity\Opt\View\Html as View_Html;
 
 /**
  * One of the default facade views. It passes the currently authenticated
@@ -28,7 +28,7 @@ class Login extends View_Html
 	 */
 	public function dispatch()
 	{
-		$layoutTpl = $this->_application->getServiceLocator()->get('template.Layout')->getLayout();
+		$layoutTpl = $this->_serviceLocator->get('Layout')->getLayout();
 		$layoutTpl->setFormat('auth', 'Array');
 
 		$auth = $this->getModel('auth', 'Ops\\Auth');
@@ -44,11 +44,13 @@ class Login extends View_Html
 
 			if(is_object($identity))
 			{
-				$layoutTpl->setFormat('auth.identity', 'Objective');
+				$layoutTpl->setFormat('auth.credentials', 'Objective');
+				$layoutTpl->setFormat('auth.credentials.user', 'Objective');
 			}
 			else
 			{
-				$layoutTpl->setFormat('auth.identity', 'Array');
+				$layoutTpl->setFormat('auth.credentials', 'Array');
+				$layoutTpl->setFormat('auth.credentials.user', 'Array');
 			}
 		}
 	} // end dispatch();
