@@ -188,6 +188,8 @@ class Services extends Container
 			$session->setSessionHandler($serviceLocator->get($args->get('trinity.web.session.handler-service')));
 		}
 
+		$session->start();
+
 		return $session;
 	} // end getSessionService();
 
