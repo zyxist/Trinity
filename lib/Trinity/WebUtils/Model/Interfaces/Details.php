@@ -9,17 +9,5 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\WebUtils\Model\Report;
-use \Trinity\WebUtils\Model\Report;
 
-/**
- * Reports integrity errors.
- *
- * @author Tomasz Jędrzejewski
- * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
- * @license http://www.invenzzia.org/license/new-bsd New BSD License
- */
-class Integrity extends Report
-{
-	/* null */
-} // end Integrity;
+spl_autoload_call('\\Trinity\\WebUtils\\Model\\Interfaces');

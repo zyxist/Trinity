@@ -9,7 +9,7 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Model\Report;
+namespace Trinity\WebUtils\Model\Report;
 use \Trinity\WebUtils\Model\Report;
 
 /**
