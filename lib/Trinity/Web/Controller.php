@@ -19,6 +19,7 @@ use \Trinity\Basement\Module;
 use \Trinity\Web\Controller\Exception as Controller_Exception;
 use \Trinity\Web\Controller\Manager;
 use \Trinity\Web\Controller\State;
+use \Trinity\Web\Http\Redirect;
 
 /**
  * The default web controller.
@@ -163,16 +164,9 @@ abstract class Controller implements Basement_Controller
 				'manager' => $manager
 			)));
 		}
-		catch(Redirect_Exception $redirect)
+		catch(Redirect $redirect)
 		{
-			$url = $redirect->getRoute();
-
-			if($redirect instanceof Redirect_Flash)
-			{
-				$this->_processFlashMessage($redirect);
-			}
-
-			$response->setRedirect($url, $redirect->getCode());
+			$response->setRedirect($redirect->getMessage(), $redirect->getCode());
 			// TODO: Add a true redirection here
 			$manager->events->notify(new Event($this,'controller.web.dispatch.redirect', array(
 				'controller' => $this,
