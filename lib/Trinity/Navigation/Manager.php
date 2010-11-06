@@ -87,7 +87,7 @@ class Manager
 
 	public function hasHook($name)
 	{
-		return $this->_hooks[(string)$name];
+		return isset($this->_hooks[(string)$name]);
 	} // end hasHook();
 
 	public function getHook($name)
@@ -148,7 +148,7 @@ class Manager
 		{
 			$item = $queue->dequeue();
 			$hookName = $item->hook;
-			if($hookName !== null)
+			if($hookName !== null && $this->hasHook($hookName))
 			{
 				$item->setHook($this->getHook($hookName));
 			}
@@ -178,7 +178,6 @@ class Manager
 		{
 			$this->discover();
 		}
-
 		$queue = new SplQueue;
 		$queue->enqueue($this->_tree);
 		while($queue->count() > 0)
