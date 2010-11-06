@@ -10,7 +10,7 @@
  * and other contributors. See website for details.
  */
 
-namespace Trinity\WebUtils\View;
+namespace Trinity\Opt\View;
 use \Trinity\Basement\ServiceLocator;
 
 /**
@@ -30,7 +30,7 @@ class Form extends Html
 	public function __construct(ServiceLocator $serviceLocator)
 	{
 		parent::__construct($serviceLocator);
-		$this->setTemplateName('default', 'app.templates:form.tpl');
+		$this->setTemplateName('default', 'application.templates:form.tpl');
 	} // end __construct();
 
 	/**
@@ -40,14 +40,14 @@ class Form extends Html
 	{
 		$view = $this->templateFactory('default');
 
-		$model = $this->getModel('form', '\\Opf_Form');
+		$model = $this->getModel('form', '\\Opf\\Form\\Form');
 		$model->setView($view);
 		$model->render();
 
 		$view->title = $this->get('title');
 		$view->formName = $model->getName();
 
-		$layout = $this->_application->getServiceLocator()->get('template.Layout');
+		$layout = $this->_serviceLocator->get('Layout');
 		$layout->appendView($view);
 	} // end dispatch();
 } // end Form;
