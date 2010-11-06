@@ -75,9 +75,10 @@ class Services extends Container
 	 */
 	public function getEntityManagerService(ServiceLocator $serviceLocator)
 	{
-		$config = $serviceLocator->getConfiguration();
+		$trinityConfig = $serviceLocator->getConfiguration();
 
-		if($config->get('trinity.doctrine.cache') !== null)
+		$cache = null;
+		if($trinityConfig->get('trinity.doctrine.cache') !== null)
 		{
 			$cache = $serviceLocator->get('DoctrineCache');
 		}
@@ -89,14 +90,20 @@ class Services extends Container
 			$config->setQueryCacheImpl($cache);
 		}
 
-		$driverImpl = $config->newDefaultAnnotationDriver($config->get('trinity.doctrine.defaultEntityPath'));
+		$driverImpl = $config->newDefaultAnnotationDriver($trinityConfig->get('trinity.doctrine.defaultEntityPath'));
 		$config->setMetadataDriverImpl($driverImpl);
 
-		$config->setAutoGenerateProxyClasses((bool)$config->get('trinity.doctrine.autogenerateProxyClasses'));
-		$config->setProxyDir($config->get('trinity.doctrine.proxyDirectory'));
-		$config->setProxyNamespace($config->get('trinity.doctrine.proxyNamespace'));
+		$config->setAutoGenerateProxyClasses((bool)$trinityConfig->get('trinity.doctrine.autogenerateProxyClasses'));
+		$config->setProxyDir($trinityConfig->get('trinity.doctrine.proxyDirectory'));
+		$config->setProxyNamespace($trinityConfig->get('trinity.doctrine.proxyNamespace'));
 
 		// Create the entity manager
-		return EntityManager::create($this->connection->toArray(), $config);
+		return EntityManager::create(array(
+			'driver' => $trinityConfig->get('application.database.driver'),
+			'host' => $trinityConfig->get('application.database.host'),
+			'user' => $trinityConfig->get('application.database.user'),
+			'password' => $trinityConfig->get('application.database.password'),
+			'dbname' => $trinityConfig->get('application.database.dbname')
+		), $config);
 	} // end getEntityManagerService();
 } // end Services;
