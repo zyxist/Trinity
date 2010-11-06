@@ -99,6 +99,7 @@ abstract class Application extends Basement_Application
 				throw new Exception('No active area is selected.');
 			}
 		}
+		$area->updateMetadata();
 
 		// Get the active module
 		$request = $serviceLocator->get('Request');

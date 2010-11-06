@@ -87,6 +87,25 @@ abstract class Area extends Module
 	} // end getMetadata();
 
 	/**
+	 * Updates the area metadata, so that they can refer to the project
+	 * configuration. This step must be provided as a separate method,
+	 * because it must be fired after all the service containers are loaded.
+	 * Otherwise, the area would not be able to refer to some of the options
+	 * or use invalid values.
+	 */
+	public function updateMetadata()
+	{
+		$configuration = $this->getServiceLocator()->getConfiguration();
+		foreach($this->_metadata as &$value)
+		{
+			if(preg_match('/%([a-zA-Z0-9\-\.]+)%/', $value, $matches))
+			{
+				$value = str_replace($matches[0], $configuration->get($matches[1]), $value);
+			}
+		}
+	} // end updateMetadata();
+
+	/**
 	 * Returns the metadata option. If the option does not exist, the method attempts
 	 * to load it from the global configuration.
 	 *
