@@ -203,6 +203,8 @@ class Layout implements Broker
 		$layout = $this->_layout;
 		$response->setBodyGenerator(function() use($output, $layout)
 		{
+			$opt = \Opl_Registry::get('opt');
+			$opt->setup();
 			$output->render($layout);
 			$output->sendBody();
 		});

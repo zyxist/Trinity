@@ -34,6 +34,7 @@ class Services extends Container
 			'trinity.opt.escape' => true,
 			'trinity.opt.prologRequired' => true,
 			'trinity.opt.compileMode' => 0,
+			'trinity.opc.paginator.decorator' => 'slider'
 		);
 	} // end getConfiguration();
 
@@ -73,8 +74,6 @@ class Services extends Container
 		\Opt_View::assignGlobal('url', $serviceLocator->get('Router'));
 		\Opt_View::setFormatGlobal('flash', 'Global/Flash', false);
 
-		$opt->setup();
-
 		return $opt;
 	} // end getOptService();
 
@@ -104,8 +103,17 @@ class Services extends Container
 
 	public function getOpfService(ServiceLocator $serviceLocator)
 	{
-		return new Opf_Class($serviceLocator->get('Opt'));
+		return new \Opf\Core($serviceLocator->get('Opt'));
 	} // end getOpfService();
+
+	public function getOpcService(ServiceLocator $serviceLocator)
+	{
+		$config = $serviceLocator->getConfiguration();
+		$core = new \Opc\Core();
+		$core->paginatorDecorator = $config->get('trinity.opc.paginator.decorator');
+
+		return $core;
+	} // end getOpcService();
 
 	public function getLayoutService(ServiceLocator $serviceLocator)
 	{
