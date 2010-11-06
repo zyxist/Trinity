@@ -13,6 +13,7 @@ namespace Trinity\Ops;
 use \Ops\Auth;
 use \Trinity\Basement\Service\Container;
 use \Trinity\Basement\ServiceLocator;
+use \Trinity\Ops\Auth\Storage\Session as Storage_Session;
 
 
 /**
