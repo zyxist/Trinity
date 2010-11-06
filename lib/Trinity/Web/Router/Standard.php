@@ -221,7 +221,14 @@ class Standard implements Router_Interface
 		{
 			throw new Router_Exception('The variable list passed to router is not an array.');
 		}
-		$sVars = array_merge($this->_params, $sVars);	
+		$sVars = array_merge($this->_params, $sVars);
+		foreach($sVars as $name => &$var)
+		{
+			if($var === null)
+			{
+				unset($sVars[$name]);
+			}
+		}
 
 		$address = $this->queryPath($area);
 		if($address[strlen($address) - 1] != '/')
