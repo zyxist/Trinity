@@ -10,6 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Opt\Controller\Group;
+use \Opf\Form\Form;
 use \Trinity\Opt\View\Grid as View_Grid;
 use \Trinity\Opt\View\Form as View_Form;
 use \Trinity\Opt\View\Question as View_Question;
@@ -53,7 +54,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 	 *
 	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
 	 * @param string $type The form type to return
-	 * @return \Opf_Form
+	 * @return \Opf\Form\Form
 	 */
 	abstract public function getForm(Manager $manager, $type);
 
@@ -124,8 +125,9 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 		$form = $this->getForm($manager, 'add');
 		$form->setName('add');
 
-		if($form->execute() == \Opf_Form::ACCEPTED)
+		if($form->execute() == Form::ACCEPTED)
 		{
+			
 			$router = $manager->services->get('Router');
 			$flashHelper = $manager->services->get('FlashHelper');
 			try
@@ -168,13 +170,12 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 			$form = $this->getForm($manager, 'edit');
 			$form->setName('edit');
 
-			if($form->execute() == \Opf_Form::ACCEPTED)
+			if($form->execute() == Form::ACCEPTED)
 			{
 				$model->editItem($form->getValue());
 
-				
+				$flashHelper = $manager->services->get('FlashHelper');
 				$flashHelper->addMessage($model->getMessage('crud.message.edited'));
-
 				throw new Redirect($manager->router->assemble(array('action' => 'index')));
 			}
 			else
@@ -216,6 +217,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 		{
 			case 'yes':
 				$flashHelper = $manager->services->get('FlashHelper');
+				$router = $manager->services->get('Router');
 				try
 				{
 					$model->removeItem();
@@ -225,10 +227,11 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 				{
 					$flashHelper->addMessage($model->getMessage($report->getMessage()), 'error');
 				}
-				throw new Redirect($router->assemble(array('action' => 'index')));
+				throw new Redirect($router->assemble(array('action' => 'index', 'id' => null)));
 				break;
 			case 'no':
-				throw new Redirect($router->assemble(array('action' => 'index')));
+				$router = $manager->services->get('Router');
+				throw new Redirect($router->assemble(array('action' => 'index', 'id' => null)));
 			default:
 				$view = $manager->getView('Trinity.Opt.View.Question');
 				$view->set('title', $model->getMessage('crud.remove'));
