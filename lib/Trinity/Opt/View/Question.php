@@ -30,7 +30,7 @@ class Question extends Html
 	public function __construct(ServiceLocator $serviceLocator)
 	{
 		parent::__construct($serviceLocator);
-		$this->setTemplate('app.templates:question.tpl');
+		$this->setTemplateName('default', 'application.templates:question.tpl');
 	} // end __construct();
 
 	/**
@@ -38,13 +38,13 @@ class Question extends Html
 	 */
 	public function dispatch()
 	{
-		$view = $this->getTemplateObject();
+		$view = $this->templateFactory();
 		$model = $this->getModel('item', '\\Trinity\\WebUtils\\Model\\Interfaces\\Brief');
 
 		$data = $model->getBriefInformation();
 		$view->question = sprintf($model->getMessage('crud.question'), $data['title']);
 
-		$layout = $this->_application->getServiceLocator()->get('template.Layout');
+		$layout = $this->_serviceLocator->get('Layout');
 		$layout->appendView($view);
 	} // end dispatch();
 } // end Question;
