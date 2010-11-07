@@ -19,6 +19,7 @@ use \Trinity\WebUtils\Controller\Group;
 use \Trinity\WebUtils\Helper\Flash;
 use \Trinity\WebUtils\Helper\Url;
 use \Trinity\WebUtils\Facade\Manager as Facade_Manager;
+use \Trinity\WebUtils\Translate\CacheWrapper;
 
 /**
  * Defines, how to start the default web stack services and configure them.
@@ -41,7 +42,8 @@ class Services extends Container
 			'application.area.default.defaultAction' => 'index',
 			'application.area.default.defaultGroup' => 'index',
 			'application.area.default.defaultModule' => 'main',
-			'trinity.webUtils.flashHelper.sessionGroup' => 'flash'
+			'trinity.webUtils.flashHelper.sessionGroup' => 'flash',
+			'trinity.web.translation.loaderService' => 'XmlLoaderTranslation'
 		);
 	} // end getConfiguration();
 
@@ -127,4 +129,90 @@ class Services extends Container
 		$session = $serviceLocator->get('Session');
 		return new Flash($session->getGroup($serviceLocator->getConfiguration()->get('trinity.webUtils.flashHelper.sessionGroup')));
 	} // end getFlashHelperService();
+
+
+	public function getXmlLoaderTranslationService(ServiceLocator $serviceLocator)
+	{
+		$config = $serviceLocator->getConfiguration();
+		if($config->isDefined('trinity.web.translation.loader.xml.paths'))
+		{
+			$loader = new \Opc\Translate\XmlLoader($config->get('trinity.web.translation.loader.xml.paths'));
+		}
+		else
+		{
+			$areaManager = $serviceLocator->get('AreaManager');
+			$application = $serviceLocator->get('Application');
+			$area = $areaManager->getActiveArea();
+			$loader = new \Opc\Translate\XmlLoader(array(
+				$areaManager->getActiveModule()->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+				$application->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+			));
+		}
+		return $loader;
+	} // end getXmlLoaderTranslationService();
+
+	public function getYamlLoaderTranslationService(ServiceLocator $serviceLocator)
+	{
+		$config = $serviceLocator->getConfiguration();
+		if($config->isDefined('trinity.web.translation.loader.yaml.paths'))
+		{
+			$loader = new \Opc\Translate\YamlLoader($config->get('trinity.web.translation.loader.yaml.paths'));
+		}
+		else
+		{
+			$areaManager = $serviceLocator->get('AreaManager');
+			$application = $serviceLocator->get('Application');
+			$area = $areaManager->getActiveArea();
+			$loader = new \Opc\Translate\YamlLoader(array(
+				$areaManager->getActiveModule()->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+				$application->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+			));
+		}
+		return $loader;
+	} // end getYamlLoaderTranslationService();
+
+	public function getIniLoaderTranslationService(ServiceLocator $serviceLocator)
+	{
+		$config = $serviceLocator->getConfiguration();
+		if($config->isDefined('trinity.web.translation.loader.ini.paths'))
+		{
+			$loader = new \Opc\Translate\IniLoader($config->get('trinity.web.translation.loader.ini.paths'));
+		}
+		else
+		{
+			$areaManager = $serviceLocator->get('AreaManager');
+			$application = $serviceLocator->get('Application');
+			$area = $areaManager->getActiveArea();
+			$loader = new \Opc\Translate\IniLoader(array(
+				$areaManager->getActiveModule()->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+				$application->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+			));
+		}
+		return $loader;
+	} // end getIniLoaderTranslationService();
+
+	/**
+	 * Constructs the translation service.
+	 *
+	 * @param ServiceLocator $serviceLocator The service locator.
+	 * @return \Opc\Translate
+	 */
+	public function getTranslationService(ServiceLocator $serviceLocator)
+	{
+		$args = $serviceLocator->getConfiguration();
+
+		$translation = new \Opc\Translate(
+			new CacheWrapper($serviceLocator->get('Cache')),
+			$serviceLocator->get($args->get('trinity.web.translation.loaderService'))
+		);
+
+		// TODO: Make it more smart in the future.
+		foreach($args->get('trinity.web.translation.languages') as $locale => $priority)
+		{
+			$translation->addLanguage($locale, $priority);
+		}
+		$opt = $serviceLocator->get('Opt');
+		$opt->setTranslationInterface($translation);
+		return $translation;
+	} // end getTranslationService();
 } // end Services;
