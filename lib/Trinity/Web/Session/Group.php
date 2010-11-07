@@ -127,6 +127,10 @@ class Group implements IteratorAggregate, Countable
 	 */
 	public function count()
 	{
+		if(!isset($_SESSION[$this->_name]))
+		{
+			return 0;
+		}
 		return sizeof($_SESSION[$this->_name]['d']);
 	} // end count();
 
