@@ -153,9 +153,19 @@ class Page implements \Iterator
 	 */
 	public function setPageType($type)
 	{
-		if($type < 0 || $type > 2)
+		switch($type)
 		{
-			throw new Page_Exception('Invalid page type: '.$type);
+			case 0:
+				$this->type = 'real';
+				break;
+			case 1:
+				$this->type = 'url';
+				break;
+			case 2:
+				$this->type = 'structural';
+				break;
+			default:
+				throw new Page_Exception('Invalid page type: '.$type);
 		}
 		$this->_pageType = $type;
 	} // end setPageType();
@@ -523,6 +533,11 @@ class Page implements \Iterator
 	 */
 	public function rewind()
 	{
+		if(is_object($this->_hook) && !$this->_hookReadChildren)
+		{
+			$this->_hook->createPageChildren($this);
+			$this->_hookReadChildren = true;
+		}
 		$this->_iterator = $this->_firstChild;
 		$this->_position = 0;
 	} // end rewind();

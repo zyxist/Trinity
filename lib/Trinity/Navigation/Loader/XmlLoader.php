@@ -74,6 +74,23 @@ class XmlLoader extends FileLoader
 		}
 		
 		$page = new Page;
+
+		if(isset($xmlElement['type']))
+		{
+			switch((string)$xmlElement['type'])
+			{
+				case 'real':
+					$page->setPageType(Page::TYPE_REAL);
+					break;
+				case 'url':
+					$page->setPageType(Page::TYPE_URL);
+					break;
+				case 'fake':
+				case 'structural':
+					$page->setPageType(Page::TYPE_STRUCTURAL);
+			}
+		}
+
 		foreach($xmlElement->options->option as $option)
 		{
 			if(!isset($option['name']))
@@ -82,6 +99,24 @@ class XmlLoader extends FileLoader
 			}
 			$name = (string)$option['name'];
 			$page->$name = $option->__toString();
+		}
+
+		if(isset($xmlElement->routing))
+		{
+			$routingData = array();
+			foreach($xmlElement->routing->option as $option)
+			{
+				$value = $option->__toString();
+				if($value == '')
+				{
+					$routingData[(string)$option['name']] = null;
+				}
+				else
+				{
+					$routingData[(string)$option['name']] = $value;
+				}
+			}
+			$page->routingData = $routingData;
 		}
 
 		if(isset($xmlElement->rendering))

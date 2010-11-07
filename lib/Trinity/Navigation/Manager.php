@@ -75,6 +75,21 @@ class Manager
 		return $this->_loader;
 	} // end getReader();
 
+	/**
+	 * Registers a navigation hook. Hooks can generate some parts of the navigation
+	 * tree on-the-fly. We can use to the dynamic parts, i.e. dependent on the
+	 * selected item or the database content (i.e. category lists). The hook name
+	 * identifies the hook in the tree in order to inform, where to run it.
+	 *
+	 * The method implements fluent interface.
+	 *
+	 * The method throws an exception, if the name is already in use.
+	 *
+	 * @throws \Trinity\Navigation\Exception
+	 * @param string $name The hook name
+	 * @param Hook $hook The hook object
+	 * @return Manager
+	 */
 	public function addHook($name, Hook $hook)
 	{
 		if(isset($this->_hooks[(string)$name]))
@@ -85,11 +100,25 @@ class Manager
 		return $this;
 	} // end addHook();
 
+	/**
+	 * Checks if a navigation hook with the given name is defined.
+	 *
+	 * @param string $name The hook name.
+	 * @return boolean
+	 */
 	public function hasHook($name)
 	{
 		return isset($this->_hooks[(string)$name]);
 	} // end hasHook();
 
+	/**
+	 * Returns the hook object registered under the given name. If the hook
+	 * object does not exist, an exception is thrown.
+	 *
+	 * @throws \Trinity\Navigation\Exception
+	 * @param string $name The hook name
+	 * @return \Trinity\Navigation\Hook
+	 */
 	public function getHook($name)
 	{
 		if(!isset($this->_hooks[(string)$name]))
@@ -188,9 +217,10 @@ class Manager
 				if($item->controller == $controller)
 				{
 					$ok = true;
+					$routingData = $item->routingData;
 					foreach($data as $name => $value)
 					{
-						if($item->$name != $value)
+						if(!isset($routingData[$name]) || $routingData[$name] != $value)
 						{
 							$ok = false;
 							break;
