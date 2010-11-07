@@ -13,27 +13,27 @@ namespace Trinity\WebUtils\Model\Interfaces;
 use \Countable;
 
 /**
- * The interface for displaying a grid of rows.
+ * Allows the model to introduce itself.
  *
  * @author Tomasz Jędrzejewski
  */
-interface Message
+interface Identification
 {
 	/**
-	 * Returns the message with the specified identifier.
+	 * Should return the unique model name that could be used for various
+	 * purposes (i.e. selecting the translation group).
 	 *
-	 * @param string $messageId The message identifier
 	 * @return string
 	 */
-	public function getMessage($messageId);
-} // end Message;
+	public function myName();
+} // end Identification;
 
 /**
  * The interface for displaying a grid of rows.
  *
  * @author Tomasz Jędrzejewski
  */
-interface Grid extends Message
+interface Grid
 {
 	/**
 	 * Returns the column headers.
