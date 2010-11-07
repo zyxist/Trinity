@@ -51,6 +51,7 @@ class Grid extends Html
 		$view = $this->templateFactory();
 
 		$model = $this->getModel('grid', '\\Trinity\\WebUtils\\Model\\Interfaces\\Grid');
+		$translation = $this->_serviceLocator->get('Translation');
 
 		// Add pagination
 		if($model instanceof Interface_Paginable)
@@ -71,7 +72,7 @@ class Grid extends Html
 
 		if(sizeof($items) == 0)
 		{
-			$view->noDataMessage = $model->getMessage('grid.no-data');
+			$view->noDataMessage = $translation->_($model->myName(), 'grid.noData');
 		}
 
 		// Check extra stuff

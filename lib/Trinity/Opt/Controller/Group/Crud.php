@@ -11,6 +11,7 @@
  */
 namespace Trinity\Opt\Controller\Group;
 use \Opf\Form\Form;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Opt\View\Grid as View_Grid;
 use \Trinity\Opt\View\Form as View_Form;
 use \Trinity\Opt\View\Question as View_Question;
@@ -74,7 +75,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 		if(!$model instanceof Interface_Grid)
 		{
 			$manager->events->notify(new Event($this, 'controller.group.crud.error', array(
-				'message' => 'Invalid controller model interface: unsupported contract '.$actionInterface
+				'message' => 'Invalid controller model interface: unsupported contract \Trinity\WebUtils\Model\Interfaces\Grid'
 			)));
 
 			throw new Controller_Exception('The returned model does not implement Grid interface.');
@@ -105,9 +106,10 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 		{
 			$view->setTemplateName('default', $this->templates['index']);
 		}
+		$translation = $manager->services->get('Translation');
 
 		$view->addModel('grid', $model);
-		$view->set('title', $model->getMessage('crud.title'));
+		$view->set('title', $translation->_($model->myName(), 'crud.title'));
 		$view->set('page', $manager->request->getParam('page', 1));
 		return $view;
 	} // end indexAction();
@@ -123,6 +125,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 	{
 		$model = $this->_getCrud($manager, '\\Trinity\\WebUtils\\Model\\Interfaces\\Addable');
 		$form = $this->getForm($manager, 'add');
+		$translation = $manager->services->get('Translation');
 		$form->setName('add');
 
 		if($form->execute() == Form::ACCEPTED)
@@ -133,7 +136,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 			try
 			{
 				$model->addItem($form->getValue());
-				$flashHelper->addMessage($model->getMessage('crud.message.added'));
+				$flashHelper->addMessage($translation->_($model->myName(), 'crud.message.added'));
 			}
 			catch(\Trinity\WebUtils\Model\Report $report)
 			{
@@ -148,7 +151,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 			{
 				$view->setTemplateName('default', $this->templates['add']);
 			}
-			$view->set('title', $model->getMessage('crud.add'));
+			$view->set('title', $translation->_($model->myName(), 'crud.add'));
 			$view->addModel('form', $form);
 			return $view;
 		}
@@ -169,13 +172,14 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 			$model->id = $manager->request->getParam('id');
 			$form = $this->getForm($manager, 'edit');
 			$form->setName('edit');
+			$translation = $manager->services->get('Translation');
 
 			if($form->execute() == Form::ACCEPTED)
 			{
-				$model->editItem($form->getValue());
+				$model->editItem($form->getValue());			
 
 				$flashHelper = $manager->services->get('FlashHelper');
-				$flashHelper->addMessage($model->getMessage('crud.message.edited'));
+				$flashHelper->addMessage($translation->_($model->myName(), 'crud.message.edited'));
 				throw new Redirect($manager->router->assemble(array('action' => 'index')));
 			}
 			else
@@ -185,7 +189,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 				{
 					$view->setTemplateName('default', $this->templates['edit']);
 				}
-				$view->set('title', $model->getMessage('crud.edit'));
+				$view->set('title', $translation->_($model->myName(), 'crud.edit'));
 
 				$form->populate($model->getItemForEdit());
 
@@ -213,6 +217,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 		$model = $this->_getCrud($manager, '\\Trinity\\WebUtils\\Model\\Interfaces\\Removable');
 		$model->id = $manager->request->getParam('id');
 		$answer = $manager->request->getParam('answer');
+		$translation = $manager->services->get('Translation');
 		switch((string)$answer)
 		{
 			case 'yes':
@@ -221,11 +226,11 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 				try
 				{
 					$model->removeItem();
-					$flashHelper->addMessage($model->getMessage('crud.message.removed'));
+					$flashHelper->addMessage($translation->_($model->myName(), 'crud.message.removed'));
 				}
 				catch(\Trinity\WebUtils\Model\Report $report)
 				{
-					$flashHelper->addMessage($model->getMessage($report->getMessage()), 'error');
+					$flashHelper->addMessage($report->getMessage(), 'error');
 				}
 				throw new Redirect($router->assemble(array('action' => 'index', 'id' => null)));
 				break;
@@ -234,7 +239,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 				throw new Redirect($router->assemble(array('action' => 'index', 'id' => null)));
 			default:
 				$view = $manager->getView('Trinity.Opt.View.Question');
-				$view->set('title', $model->getMessage('crud.remove'));
+				$view->set('title', $translation->_($model->myName(), 'crud.remove'));
 				$view->addModel('item', $model);
 				return $view;
 		}

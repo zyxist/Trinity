@@ -39,10 +39,12 @@ class Question extends Html
 	public function dispatch()
 	{
 		$view = $this->templateFactory();
+		$translation = $this->_serviceLocator->get('Translation');
 		$model = $this->getModel('item', '\\Trinity\\WebUtils\\Model\\Interfaces\\Brief');
 
 		$data = $model->getBriefInformation();
-		$view->question = sprintf($model->getMessage('crud.question'), $data['title']);
+		$translation->assign($model->myName(), 'crud.question', array($data['title']));
+		$view->question = $translation->_($model->myName(), 'crud.question');
 
 		$layout = $this->_serviceLocator->get('Layout');
 		$layout->appendView($view);
