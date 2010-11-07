@@ -50,7 +50,8 @@ class Services extends Container
 			'trinity.web.fileMetadataLoader.paths' => '%application.directory%config/',
 			'trinity.web.fileMetadataLoader.file' => 'area.xml',
 			'trinity.web.router.query-path' => '/',
-			'trinity.web.router.base-url' => null
+			'trinity.web.router.base-url' => null,
+			'trinity.opc.paginator.decorator' => 'slider'
 		);
 	} // end getConfiguration();
 
@@ -106,10 +107,25 @@ class Services extends Container
 	} // end getEventDispatcherService();
 
 	/**
+	 * The service for building the OPC core object.
+	 *
+	 * @param ServiceLocator $serviceLocator The service locator.
+	 * @return Opc\Core
+	 */
+	public function getOpcService(ServiceLocator $serviceLocator)
+	{
+		$config = $serviceLocator->getConfiguration();
+		$core = new \Opc\Core();
+		$core->paginatorDecorator = $config->get('trinity.opc.paginator.decorator');
+
+		return $core;
+	} // end getOpcService();
+
+	/**
 	 * The service for building the OPC visit object.
 	 *
 	 * @param ServiceLocator $serviceLocator The service locator.
-	 * @return Opc_Visit
+	 * @return Opc\Visit
 	 */
 	public function getVisitService(ServiceLocator $serviceLocator)
 	{

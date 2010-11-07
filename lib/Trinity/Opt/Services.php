@@ -33,8 +33,7 @@ class Services extends Container
 			'trinity.opt.parser' => 'Opt_Parser_Xml',
 			'trinity.opt.escape' => true,
 			'trinity.opt.prologRequired' => true,
-			'trinity.opt.compileMode' => 0,
-			'trinity.opc.paginator.decorator' => 'slider'
+			'trinity.opt.compileMode' => 0
 		);
 	} // end getConfiguration();
 
@@ -105,15 +104,6 @@ class Services extends Container
 	{
 		return new \Opf\Core($serviceLocator->get('Opt'));
 	} // end getOpfService();
-
-	public function getOpcService(ServiceLocator $serviceLocator)
-	{
-		$config = $serviceLocator->getConfiguration();
-		$core = new \Opc\Core();
-		$core->paginatorDecorator = $config->get('trinity.opc.paginator.decorator');
-
-		return $core;
-	} // end getOpcService();
 
 	public function getLayoutService(ServiceLocator $serviceLocator)
 	{
