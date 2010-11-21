@@ -64,6 +64,7 @@ class Services extends Container
 		$opt->register(Opt_Class::PHP_FUNCTION, 'baseUrl', 'Opt_View::$_global[\'url\']->baseUrl');
 		$opt->register(Opt_Class::PHP_FUNCTION, 'queryPath', 'Opt_View::$_global[\'url\']->queryPath');
 		$opt->register(Opt_Class::PHP_FUNCTION, 'url', 'Opt_View::$_global[\'url\']->assemble');
+		$opt->register(Opt_Class::PHP_FUNCTION, '_', '$this->_tf->_');
 		$opt->register(Opt_Class::OPT_FORMAT, 'Flash', '\Trinity\Opt\Format\Flash');
 		$opt->register(Opt_Class::OPT_FORMAT, 'ActivePath', '\Trinity\Opt\Format\ActivePath');
 		$opt->register(Opt_Class::OPT_FORMAT, 'NavigationPage', '\Trinity\Opt\Format\NavigationPage');
