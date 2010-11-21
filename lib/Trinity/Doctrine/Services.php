@@ -12,6 +12,7 @@
 namespace Trinity\Doctrine;
 use \Trinity\Basement\Service\Container;
 use \Trinity\Basement\ServiceLocator;
+use \Doctrine\DBAL\Types\Type;
 use \Doctrine\ORM\Configuration;
 use \Doctrine\ORM\EntityManager;
 use \Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -97,13 +98,17 @@ class Services extends Container
 		$config->setProxyDir($trinityConfig->get('trinity.doctrine.proxyDirectory'));
 		$config->setProxyNamespace($trinityConfig->get('trinity.doctrine.proxyNamespace'));
 
+		Type::addType('binary', 'Trinity\Doctrine\Type\Binary');
+
 		// Create the entity manager
-		return EntityManager::create(array(
+		$entityManager = EntityManager::create(array(
 			'driver' => $trinityConfig->get('application.database.driver'),
 			'host' => $trinityConfig->get('application.database.host'),
 			'user' => $trinityConfig->get('application.database.user'),
 			'password' => $trinityConfig->get('application.database.password'),
 			'dbname' => $trinityConfig->get('application.database.dbname')
 		), $config);
+		$entityManager->getConnection()->getDatabasePlatform()->registerDoctrineTypeMapping('bytea', 'binary');
+		return $entityManager;
 	} // end getEntityManagerService();
 } // end Services;
