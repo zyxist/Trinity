@@ -104,12 +104,14 @@ abstract class Application extends Module
 			{
 				$serviceLocator->registerServiceContainer($serviceContainer);
 			}
-
-			$module->launch();
 		}
 		if(($serviceContainer = $this->registerServiceContainer()) !== null)
 		{
 			$serviceLocator->registerServiceContainer($serviceContainer);
+		}
+		foreach($this->_modules as $module)
+		{
+			$module->launch();
 		}
 	} // end launch();
 
