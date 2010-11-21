@@ -75,17 +75,6 @@ interface PersistentIdentity
 } // end PersistentIdentity;
 
 /**
- * Interface for communicating with CRUD controllers. It represents entities
- * that can be previewed.
- *
- * @author Tomasz Jędrzejewski
- */
-interface Previewable
-{
-	public function previewItem();
-} // end Previewable;
-
-/**
  * Interface for interaction with forms and various select boxes.
  *
  * @author Tomasz Jędrzejewski
@@ -197,3 +186,51 @@ interface Details
 	 */
 	public function getDetailCategory($categoryKey);
 } // end Details;
+
+/**
+ * Interface for models, where entities can be paginated.
+ *
+ * @author Tomasz Jędrzejewski
+ */
+interface ManyToMany extends Paginable, Identification, Brief
+{
+	/**
+	 * Lists the subitems for the given item in many-to-many relationship.
+	 *
+	 * @return array
+	 */
+	public function listSubitems();
+
+	/**
+	 * Lists the unselected items.
+	 *
+	 * @return array
+	 */
+	public function listUnselected();
+
+	/**
+	 * Adds a new subitem with the given ID to the relationship.
+	 */
+	public function add($id);
+
+	/**
+	 * Removes the subitem with the
+	 */
+	public function remove($id);
+} // end ManyToMany;
+
+/**
+ * Indicates that the modelled entity is connected with a one-to-many
+ * relationship. This interface allows to check if the parent object
+ * actually exists and load it.
+ *
+ * @author Tomasz Jędrzejewski
+ */
+interface HasParent
+{
+	/**
+	 * Returns brief information about the parent.
+	 * @return array
+	 */
+	public function getParentInformation();
+} // end HasParent;

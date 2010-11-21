@@ -13,7 +13,7 @@
 namespace Trinity\Opt\View;
 use \Trinity\Basement\ServiceLocator as ServiceLocator;
 use \Trinity\Web\Controller\Exception as Web_Controller_Exception;
-use \Trinity\WebUtils\Model\Interfaces\Previewable as Interface_Previewable;
+use \Trinity\WebUtils\Model\Interfaces\Details as Interface_Details;
 use \Trinity\WebUtils\Model\Interfaces\Addable as Interface_Addable;
 use \Trinity\WebUtils\Model\Interfaces\Editable as Interface_Editable;
 use \Trinity\WebUtils\Model\Interfaces\Removable as Interface_Removable;
@@ -76,9 +76,9 @@ class Grid extends Html
 		}
 
 		// Check extra stuff
-		if($model instanceof Interface_Previewable)
+		if($model instanceof Interface_Details)
 		{
-			$view->previewAction = true;
+			$view->detailsAction = true;
 		}
 		if($model instanceof Interface_Addable)
 		{

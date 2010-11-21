@@ -37,6 +37,7 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 	 */
 	public $templates = array(
 		'index' => null,
+		'details' => null,
 		'add' => null,
 		'edit' => null,
 		'remove' => null
@@ -156,6 +157,35 @@ abstract class Crud extends WebUtils_Controller_Group_ActionGroup
 			return $view;
 		}
 	} // end addAction();
+
+	/**
+	 * Displays the details of a selected item.
+	 *
+	 * @param \Trinity\Web\Controller\Manager $manager The controller manager
+	 * @return View
+	 */
+	public function detailsAction(Manager $manager)
+	{
+		$model = $this->_getCrud($manager, '\\Trinity\\WebUtils\\Model\\Interfaces\\Details');
+		try
+		{
+			$model->id = $manager->request->getParam('id');
+			$view = $manager->getView('Trinity.Opt.View.Details');
+			if($this->templates['details'] !== null)
+			{
+				$view->setTemplateName('default', $this->templates['details']);
+			}
+			$view->addModel('details', $model);
+
+			return $view;
+		}
+		catch(\Trinity\WebUtils\Model\Report $report)
+		{
+			$flashHelper = $manager->services->get('FlashHelper');
+			$flashHelper->addMessage($report->getMessage(), 'error');
+			throw new Redirect($manager->router->assemble(array('action' => 'index')));
+		}
+	} // end detailsAction();
 
 	/**
 	 * This action processes the row editing.
