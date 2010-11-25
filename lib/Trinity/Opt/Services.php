@@ -83,7 +83,7 @@ class Services extends Container
 		
 		$areaManager = $serviceLocator->get('AreaManager');
 
-		if($areaManager->getActiveArea() !== null)
+		if($areaManager->getActiveArea() !== null && $areaManager->getActiveModule() !== null)
 		{
 			$inflector->setArea($areaManager->getActiveArea());
 			$inflector->setModule($areaManager->getActiveModule());
