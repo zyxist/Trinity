@@ -234,3 +234,25 @@ interface HasParent
 	 */
 	public function getParentInformation();
 } // end HasParent;
+
+/**
+ * Indicates that this model needs the logged user identity in order
+ * to work correctly. The identity should be injected to it.
+ *
+ * @author Tomasz Jędrzejewski
+ */
+interface UsesIdentity
+{
+	/**
+	 * Sets the user identity.
+	 *
+	 * @param array|object $identity The user identity.
+	 */
+	public function setIdentity($identity);
+	/**
+	 * Returns the model identity.
+	 *
+	 * @return array|object
+	 */
+	public function getIdentity();
+} // end UsesIdentity;

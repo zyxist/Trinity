@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\Web\Controller;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\ObjectLocator;
 use \Trinity\Basement\ServiceLocator;
 use \Trinity\Web\Controller\State;
@@ -185,7 +186,12 @@ class Manager
 	 */
 	public function getModel($model, $contracts = null)
 	{
-		return $this->_modelLocator->get($model, $contracts);
+		$event = $this->events->filter(
+			new Event($this, 'model.initialize'),
+			$this->_modelLocator->get($model, $contracts)
+		);
+
+		return $event->getReturnValue();
 	} // end getModel();
 
 	/**
