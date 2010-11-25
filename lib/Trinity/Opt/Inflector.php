@@ -118,6 +118,26 @@ class Inflector implements Opt_Inflector_Interface
 	} // end setModule();
 
 	/**
+	 * Adds the paths of the specified module to the inflector, so that
+	 * they can have their own templates accessible from other modules.
+	 *
+	 * The method implements fluent interface.
+	 * 
+	 * @param Basement_Module $module The module to register.
+	 * @return Inflector
+	 */
+	public function addModule(Basement_Module $module)
+	{
+		$name = \strtolower($module->getName());
+		$this->_paths[$name.'.templates'] = $module->getDirectory().'templates'.DIRECTORY_SEPARATOR;
+		$this->_paths[$name.'.layouts'] = $module->getDirectory().'layouts'.DIRECTORY_SEPARATOR;
+		$this->_mappings[$name.'.templates'] = $module->getName().'_mod_templates_';
+		$this->_mappings[$name.'.layouts'] = $module->getName().'_mod_layouts_';
+
+		return $this;
+	} // end addModule();
+
+	/**
 	 * Sets the active area.
 	 * 
 	 * @param Area $area The area.
