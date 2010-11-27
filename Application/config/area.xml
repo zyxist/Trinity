@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<areas xmlns="http://xml.invenzzia.org/trinity/area">
+	<area name="frontend">
+		<option name="controllerService">GroupController</option>
+		<option name="baseUrl">%application.domain%</option>
+		<option name="queryPath">/index.php</option>
+	</area>
+	<area name="secondary">
+		<option name="controllerService">ActionController</option>
+		<option name="defaultAction">index</option>
+
+		<option name="baseUrl">%application.domain%</option>
+		<option name="queryPath">/secondary.php</option>
+	</area>
+</areas>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns="http://xml.invenzzia.org/trinity/navigation">
+	<options>
+		<option name="title">Frontend</option>
+	</options>
+	<rendering>
+		<class name="title">always</class>
+		<class name="breadcrumbs">always</class>
+	</rendering>
+	<pages>
+		<page type="real">
+			<options>
+				<option name="controller">group</option>
+				<option name="module">main</option>
+				<option name="group">index</option>
+				<option name="action">index</option>
+				<option name="title">Index</option>
+			</options>
+			<rendering>
+				<class name="title">always</class>
+				<class name="breadcrumbs">always</class>
+			</rendering>
+		</page>
+		<page type="real">
+			<options>
+				<option name="controller">group</option>
+				<option name="module">main</option>
+				<option name="group">index</option>
+				<option name="action">bricks</option>
+				<option name="title">Index</option>
+			</options>
+			<rendering>
+				<class name="title">always</class>
+				<class name="breadcrumbs">always</class>
+			</rendering>
+		</page>
+	</pages>
+</root>
