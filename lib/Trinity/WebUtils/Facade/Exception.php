@@ -9,8 +9,8 @@
  * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
  * and other contributors. See website for details.
  */
-namespace Trinity\Web\Facade;
-use \Trinity\Basement\Core_Exception;
+namespace Trinity\WebUtils\Facade;
+use \Trinity\Basement\Exception as BasementException;
 
 /**
  * Exception class for facades.
@@ -19,7 +19,7 @@ use \Trinity\Basement\Core_Exception;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Exception extends Core_Exception
+class Exception extends BasementException
 {
 	/* null */
 } // end Exception;
