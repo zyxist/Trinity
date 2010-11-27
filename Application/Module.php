@@ -6,18 +6,30 @@
  */
 
 namespace Application;
-use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Basement\Module as TrinityModule;
+use \Trinity\Web\Application as Web_Application;
 
-class Module extends TrinityModule
+class Module extends Web_Application
 {
-	/**
-	 * Connect some stuff to the proper elements.
-	 *
-	 * @param BaseApplication $application The application.
-	 */
-	public function onInit(BaseApplication $application)
+
+	public function registerModules()
 	{
-		/* null */
-	} // end onInit();
+		$modules = array();
+		$modules[] = new \Trinity\WebUtils\Module;
+		$modules[] = new \Trinity\Doctrine\Module;
+		$modules[] = new \Trinity\Navigation\Module;
+		$modules[] = new \Trinity\Opt\Module;
+		$modules[] = new \Trinity\Ops\Module;
+		
+		
+	//	$modules[] = new \Trinity\SwiftMailer\Module;
+		$modules[] = $this->getAreaModule();
+		$modules[] = new \Addon\Module;
+
+		return $modules;
+	} // end registerModules();
+
+	public function registerServiceContainer()
+	{
+		return new Container();
+	} // end registerServiceContainer();
 } // end Module;

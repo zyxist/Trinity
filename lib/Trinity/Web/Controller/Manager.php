@@ -11,8 +11,9 @@
  */
 
 namespace Trinity\Web\Controller;
-use \Trinity\Basement\Application as Basement_Application;
-use \Trinity\Basement\Locator_Object;
+use \Symfony\Component\EventDispatcher\Event;
+use \Trinity\Basement\ObjectLocator;
+use \Trinity\Basement\ServiceLocator;
 use \Trinity\Web\Controller\State;
 use \Trinity\Web\Request;
 use \Trinity\Web\Response;
@@ -61,15 +62,9 @@ class Manager
 	/**
 	 * The service locator
 	 *
-	 * @var \Trinity\Basement\Locator_Service
+	 * @var \Trinity\Basement\ServiceLocator
 	 */
 	public $services;
-
-	/**
-	 * The configuration
-	 * @var \Trinity\Utils\Config
-	 */
-	public $config;
 
 	/**
 	 * The router
@@ -85,15 +80,9 @@ class Manager
 
 	/**
 	 * The model locator
-	 * @var \Trinity\Basement\Locator_Object;
+	 * @var \Trinity\Basement\ObjectLocator;
 	 */
 	protected $_modelLocator;
-
-	/**
-	 * The helper locator
-	 * @var \Trinity\Basement\Locator_Object;
-	 */
-	protected $_helperLocator;
 
 	/**
 	 * The view broker.
@@ -113,21 +102,27 @@ class Manager
 	 */
 	private $_models = array();
 
-	public function __construct(Basement_Application $application, Request $request, Response $response, Locator_Object $modelLocator, Locator_Object $helperLocator)
+	/**
+	 * Creates the controller manager.
+	 *
+	 * @param Basement_Application $application
+	 * @param Request $request
+	 * @param Response $response
+	 * @param Locator_Object $modelLocator
+	 */
+	public function __construct(ServiceLocator $serviceLocator, Request $request, Response $response, ObjectLocator $modelLocator)
 	{
-		$this->application = $application;
-		$this->events = $application->getEventDispatcher();
-		$this->services = $application->getServiceLocator();
+		$this->events = $serviceLocator->get('EventDispatcher');
+		$this->services = $serviceLocator;
+		$this->application = $serviceLocator->get('Application');
 
 		$this->request = $request;
 		$this->response = $response;
 
-		$this->router = $this->services->get('web.Router');
-		$this->config = $this->services->get('utils.Config');
-		$this->session = $this->services->get('web.Session');
-		$this->area = $this->services->get('web.Area');
+		$this->router = $this->services->get('Router');
+		$this->session = $this->services->get('Session');
+		$this->areaManager = $this->services->get('AreaManager');
 		$this->_modelLocator = $modelLocator;
-		$this->_helperLocator = $helperLocator;
 	} // end __construct();
 
 	/**
@@ -141,7 +136,6 @@ class Manager
 			$this->response =
 			$this->events =
 			$this->services =
-			$this->config =
 			$this->router =
 			$this->session =
 				null;
@@ -168,7 +162,7 @@ class Manager
 	 * Returns a custom object assigned to the controller manager. An exception
 	 * is thrown, if the object does not exist.
 	 *
-	 * @throws Controller_Exception
+	 * @throws \Trinity\Web\Controller\Exception
 	 * @param string $name The name of the object to load.
 	 * @return object
 	 */
@@ -176,7 +170,7 @@ class Manager
 	{
 		if(!isset($this->_data[$name]))
 		{
-			throw new Controller_Exception('Cannot load the object with name '.$name);
+			throw new Exception('Cannot load the object with name '.$name);
 		}
 		return $this->_data[$name];
 	} // end __get();
@@ -192,7 +186,12 @@ class Manager
 	 */
 	public function getModel($model, $contracts = null)
 	{
-		return $this->_modelLocator->get($model, $contracts);
+		$event = $this->events->filter(
+			new Event($this, 'model.initialize'),
+			$this->_modelLocator->get($model, $contracts)
+		);
+
+		return $event->getReturnValue();
 	} // end getModel();
 
 	/**
@@ -204,7 +203,7 @@ class Manager
 	public function getView($view)
 	{
 		$className = str_replace('.', '\\', $view);
-		return new $className($this->application);
+		return new $className($this->services);
 	} // end getView();
 
 	/**
@@ -267,19 +266,4 @@ class Manager
 
 		$view->dispatch();
 	} // end _processView();
-
-	/**
-	 * Processes the flash message.
-	 *
-	 * @param Redirect_Flash $flash The flash redirection
-	 */
-	protected function _processFlashMessage(Redirect_Flash $flash)
-	{
-		$session = $this->_application->getServiceLocator()->get('web.Session');
-		$ns = $session->getNamespace('flash');
-		$ns->message = $flash->getMessage();
-		$ns->type = $flash->getType();
-		$ns->setLifetime('message', 1);
-		$ns->setLifetime('type', 1);
-	} // end _processFlashMessage();
 } // end Manager;

@@ -11,88 +11,114 @@
  */
 
 namespace Trinity\Web;
-use \Trinity\Basement\Application as Base_Application;
-use \Trinity\Basement\Service_Configurator as Service_Configurator;
-use \Trinity\Basement\Service_Builder_Standard as Service_Builder_Standard;
-use \Trinity\Basement\Module\Manager as Module_Manager;
+use \Symfony\Component\EventDispatcher\Event;
+use \Trinity\Basement\Application as Basement_Application;
+use \Trinity\Basement\ServiceLocator;
 
 /**
- * An interface for web applications.
+ * The basic application code for writing web applications.
  *
  * @author Tomasz Jędrzejewski
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Application extends Base_Application implements Service_Configurator
+abstract class Application extends Basement_Application
 {
 	/**
-	 * The application environment.
-	 * @var string
+	 * The area module, when not using strategies.
+	 * @var Area
 	 */
-	private $_environment;
+	protected $_areaModule = null;
 
 	/**
-	 * The path to the configuration file.
-	 * @var string
-	 */
-	private $_configPath;
-
-	/**
-	 * Initializes a web application.
+	 * This method can be used by the entry script to hard-code area selection
+	 * without a strategy.
 	 *
-	 * @param string $appName The application name
-	 * @param string $environment The environment name to use
-	 * @param string $configPath The path to the configuration
-	 * @param string $modulePath The path to modules.
+	 * @param Area $area The area object.
 	 */
-	public function __construct($appName, $environment, $configPath, $modulePath)
+	public function setAreaModule(Area $area)
 	{
-		$this->_environment = $environment;
-		$this->_configPath = $configPath;
-		$this->setModuleManager(new Module_Manager($appName, $modulePath));
-	} // end __construct();
+		$this->_areaModule = $area;
+	} // end setAreaModule();
 
 	/**
-	 * Returns the service options for utils.Config.
+	 * Returns the area module, when not using strategies.
 	 *
-	 * @param string $serviceName The service name
-	 * @return array
+	 * @return Area
 	 */
-	public function getServiceOptions($serviceName)
+	public function getAreaModule()
 	{
-		if($serviceName == 'utils.Config')
+		return $this->_areaModule;
+	} // end getAreaModule();
+
+	/**
+	 * Returns and optionally constructs the service locator.
+	 *
+	 * @return \Trinity\Basement\ServiceLocator
+	 */
+	public function getServiceLocator()
+	{
+		if($this->_serviceLocator !== null)
 		{
-			return array(
-				'environment' => $this->_environment,
-				'configPath' => $this->_configPath,
-				'configLoader' => $this->getConfigLoader()
-			);
+			return $this->_serviceLocator;
 		}
-		return array();
-	} // end getServiceOptions();
+
+		$this->_serviceLocator = new ServiceLocator('service locator');
+
+		$config = $this->_serviceLocator->getConfiguration();
+		$config->set('application.directory', $this->getDirectory());
+
+		$this->_serviceLocator->set('Application', $this);
+		$this->_serviceLocator->registerServiceContainer(new Services);
+
+		return $this->_serviceLocator;
+	} // end getServiceLocator();
 
 	/**
-	 * The launch procedure.
+	 * Launches the web application.
 	 */
-	protected function _launch()
+	public function launch()
 	{
-		$locator = $this->getServiceLocator();
-		$locator->addServiceGroup('template', '\Trinity\Template\Service\\');
-		$locator->addServiceGroup('web', '\Trinity\Web\Service\\');
-		$locator->addServiceGroup('webUtils', '\Trinity\WebUtils\Service\\');
+		// Do the ordinary stuff
+		parent::launch();
 
-		$locator->addConfigurator('application', $this);
-		$locator->setDefaultConfigurator('application');
-	//	$locator->setServiceBuilder(new Service_Builder_Standard($this->_servicePath));
+		// Now run the web MVC stack.
+		$serviceLocator = $this->getServiceLocator();
+		$eventDispatcher = $serviceLocator->get('EventDispatcher');
+		$areaManager = $serviceLocator->get('AreaManager');
 
-		// Ensure that the configuration will always be loaded in the first place in
-		// order to configure it as a new configurator.
-		$this->getServiceLocator()->get('utils.Config');
+		// Get the active area
+		if(($area = $areaManager->getActiveArea()) === null)
+		{
+			if($areaManager->getAreaStrategy() !== null)
+			{
+				$area = $areaManager->discoverActiveArea();
+			}
+			else
+			{
+				throw new Exception('No active area is selected.');
+			}
+		}
+		$area->updateMetadata();
 
-		// Load the application module.
-		$module = $this->getModuleManager()->getModule('');
+		// Get the active module
+		$request = $serviceLocator->get('Request');
+		$response = $serviceLocator->get('Response');
+		$areaManager->setActiveModule($request->getParam('module', $area->defaultModule));
+		$module = $areaManager->getActiveModule();
 
-		// Now you can do the rest.
-		$obj = $this->getServiceLocator()->get('web.Area');
-	} // end _launch();
+		$eventDispatcher->notify(new Event($this, 'web.application.modules-discovered', array('module' => $module, 'area' => $area)));
+
+		// Get the controller
+		$controller = $serviceLocator->get($area->controllerService);
+		if($controller instanceof Controller)
+		{
+			$controller->dispatch($request, $response);
+		}
+		else
+		{
+			throw new Exception('The selected area controller is not a valid controller instance.');
+		}
+		$response->sendResponse();
+	} // end launch();
 } // end Application;

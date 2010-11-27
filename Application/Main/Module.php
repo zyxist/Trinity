@@ -23,7 +23,7 @@ class Module extends TrinityModule
 
 	/**
 	 * Connect the models to Doctrine.
-	 * 
+	 *
 	 * @param BaseApplication $application The application.
 	 */
 	public function onInit(BaseApplication $application)
@@ -36,17 +36,5 @@ class Module extends TrinityModule
 		$facades = $services->get('web.Facade');
 		$facades->addFacade('default', 'Application.Main.Facade.Standard');
 		$facades->select('default');
-
-		// Configure helpers.
-		$config = $services->get('utils.Config');
-		Helper_Url::setBaseUrl($config->baseUrl);
-		Helper_Styles::setBaseUrl($config->baseUrl);
-		Helper_Styles::setCacheDirectory($config->helpers->styles->cacheDirectory);
-		Helper_Styles::setMinify($config->helpers->styles->minify);
-		Helper_Styles::set('gzip_contents', $config->helpers->styles->gzip);
-		Helper_Javascripts::setBaseUrl($config->baseUrl);
-		Helper_Javascripts::setCacheDirectory($config->helpers->javascripts->cacheDirectory);
-		Helper_Javascripts::setMinify($config->helpers->javascripts->minify);
-		Helper_Javascripts::set('gzip_contents', $config->helpers->javascripts->gzip);
 	} // end onInit();
 } // end Module;

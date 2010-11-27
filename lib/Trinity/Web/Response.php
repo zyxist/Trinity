@@ -19,7 +19,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class Response
+class Response
 {
 	/**
 	 * The HTTP response code.

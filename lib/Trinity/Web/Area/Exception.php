@@ -10,7 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Web\Area;
-use \Trinity\Basement\Core\Exception as Core_Exception;
+use \Trinity\Web\Exception as Web_Exception;
 
 /**
  * Exception class for areas.
@@ -19,7 +19,7 @@ use \Trinity\Basement\Core\Exception as Core_Exception;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-class Exception extends Core_Exception
+class Exception extends Web_Exception
 {
 	/* null */
 } // end Exception;

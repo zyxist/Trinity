@@ -18,7 +18,7 @@ namespace Trinity\Web;
  * @copyright Invenzzia Group <http://www.invenzzia.org/> and contributors.
  * @license http://www.invenzzia.org/license/new-bsd New BSD License
  */
-abstract class Request
+class Request
 {
 	/**
 	 * The name of the module to execute.
@@ -140,4 +140,22 @@ abstract class Request
 	{
 		$this->_params = array();
 	} // end clearParams();
+
+	public function getGet($name, $default = null)
+	{
+		if(!isset($_GET[$name]))
+		{
+			return $default;
+		}
+		return $_GET[$name];
+	} // end getGet();
+
+	public function getPost($name, $default = null)
+	{
+		if(!isset($_POST[$name]))
+		{
+			return $default;
+		}
+		return $_POST[$name];
+	} // end getGet();
 } // end Request;

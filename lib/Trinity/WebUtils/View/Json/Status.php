@@ -1,16 +1,16 @@
 <?php
-/**
- * O-note electronic school book.
+/*
+ *  TRINITY FRAMEWORK <http://www.invenzzia.org>
  *
- * This is a proprietary software. You are not allowed to use, redistribute,
- * modify or sell it without a prior written permission of CleverIT. Please
- * report every abuses to CleverIT <http://www.cleverit.com.pl/>
+ * This file is subject to the new BSD license that is bundled
+ * with this package in the file LICENSE. It is also available through
+ * WWW at this URL: <http://www.invenzzia.org/license/new-bsd>
  *
- * Copyright (c) CleverIT 2010. All rights reserved.
+ * Copyright (c) Invenzzia Group <http://www.invenzzia.org>
+ * and other contributors. See website for details.
  */
 namespace Trinity\WebUtils\View\Json;
-use \Trinity\Basement\Application as BaseApplication;
-use \Trinity\Web\View\Json as View_Json;
+use \Trinity\WebUtils\View\Json as View_Json;
 
 /**
  * The JSON status sender.
@@ -25,15 +25,27 @@ class Status extends View_Json
 	const ERROR = 0;
 	const INVALID_DATA = -1;
 
-	private $_status;
+	/**
+	 * The JSON status.
+	 * @var integer
+	 */
+	protected $_status;
 
+	/**
+	 * Sets the status sent by the view.
+	 * 
+	 * @param integer $status The new status
+	 */
 	public function setStatus($status)
 	{
 		$this->_status = (int)$status;
 	} // end setStatus();
 
+	/**
+	 * Dispatches the view.
+	 */
 	public function dispatch()
 	{
 		$this->setAnswer(array('status' => $this->_status));
 	} // end dispatch();
-} // end LessonReadNotesView;
+} // end Status;

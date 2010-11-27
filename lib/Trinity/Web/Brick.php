@@ -36,6 +36,11 @@ abstract class Brick
 	 */
 	private $_state = null;
 
+	/**
+	 * Creates the brick.
+	 * 
+	 * @param Manager $manager The controller manager.
+	 */
 	public function __construct(Manager $manager)
 	{
 		$this->_manager = $manager;

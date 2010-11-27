@@ -51,26 +51,6 @@ class Action extends Web_Controller
 		return 'action';
 	} // end getName();
 
-	/**
-	 * Sets the module responsible for loading group classes.
-	 *
-	 * @param \Trinity\Basement\Module $module
-	 */
-	public function setActionModule(Module $module)
-	{
-		$this->_actionModule = $module;
-	} // end setActionModule();
-
-	/**
-	 * Returns the group module.
-	 *
-	 * @return \Trinity\Basement\Module
-	 */
-	public function getActionModule()
-	{
-		return $this->_actionModule;
-	} // end getActionModule();
-
 
 	/**
 	 * Sets the default action name.
@@ -98,22 +78,30 @@ class Action extends Web_Controller
 	 */
 	protected function _dispatch(Manager $manager)
 	{
-		if($this->_actionModule === null)
+		if($this->_module === null || $this->_area === null)
 		{
 			$this->raiseControllerError($manager, Web_Controller::ERROR_CONFIGURATION);
 		}
+
 		$action = $manager->request->getParam('action', $this->_defaultAction);
 		$actionProcessed = ucfirst($action).'Action';
-		$actionQualified = $this->_actionModule->getClassName($actionProcessed);
+		$actionQualified = $this->_module->getNamespacePrefix().'\\'.ucfirst($this->_area->getAreaName()).'\\Action\\'.$actionProcessed;
+		$actionFile = $this->_module->getDirectory().ucfirst($this->_area->getAreaName()).DIRECTORY_SEPARATOR.'Action'.DIRECTORY_SEPARATOR.$actionProcessed.'.php';
 
 		if(!ctype_alnum($action))
 		{
 			$this->raiseControllerError($manager, Web_Controller::ERROR_VALIDATION);
 		}
 		// Try to load the action object
-		if(!$this->_actionModule->loadFile($actionProcessed) || !class_exists($actionQualified, false))
+		
+		if(!file_exists($actionFile))
 		{
-			$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+		}
+		require($actionFile);
+		if(!class_exists($actionQualified, false))
+		{
+				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
 		}
 		$actionObj = new $actionQualified($manager);
 
@@ -122,6 +110,11 @@ class Action extends Web_Controller
 			$this->raiseControllerError($manager);
 		}
 
+		$manager->events->notify(new Event($this, 'controller.dispatch', array(
+			'brick' => $actionObj,
+			'module' => $this->_actionModule,
+			'action' => $action
+		)));
 		$manager->events->notify(new Event($this, 'controller.action.dispatch', array(
 			'brick' => $actionObj,
 			'module' => $this->_actionModule,
@@ -131,6 +124,11 @@ class Action extends Web_Controller
 		$actionObj->dispatch();
 
 		$manager->events->notify(new Event($this, 'controller.action.dispatched', array(
+			'brick' => $actionObj,
+			'module' => $this->_actionModule,
+			'action' => $action
+		)));
+		$manager->events->notify(new Event($this, 'controller.dispatched', array(
 			'brick' => $actionObj,
 			'module' => $this->_actionModule,
 			'action' => $action

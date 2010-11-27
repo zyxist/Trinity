@@ -13,7 +13,7 @@
 namespace Trinity\Web;
 
 use \Trinity\Basement\View as Basement_View;
-use \Trinity\Basement\Application as Basement_Application;
+use \Trinity\Basement\ServiceLocator;
 use \Trinity\Web\View\Broker as View_Broker;
 
 /**
@@ -26,21 +26,19 @@ use \Trinity\Web\View\Broker as View_Broker;
 abstract class View extends Basement_View
 {
 	/**
-	 * The application link.
-	 * @var \Trinity\Basement\Application
+	 * The service locator link.
+	 * @var \Trinity\Basement\ServiceLocator
 	 */
-	protected $_application;
-	protected $_helperLocator;
+	protected $_serviceLocator;
 
 	/**
 	 * Constructs the view.
 	 * 
-	 * @param \Trinity\Basement\Application $application The application link.
+	 * @param \Trinity\Basement\ServiceLocator $serviceLocator The service locator
 	 */
-	public function __construct(Basement_Application $application)
+	public function __construct(ServiceLocator $serviceLocator)
 	{
-		$this->_application = $application;
-		$this->_helperLocator = $application->getServiceLocator()->get('template.HelperLocator');
+		$this->_serviceLocator = $serviceLocator;
 	} // end __construct();
 
 	/**
@@ -64,15 +62,4 @@ abstract class View extends Basement_View
 	 * Dispatches the view.
 	 */
 	abstract public function dispatch();
-
-	/**
-	 * Returns helper object.
-	 * 
-	 * @param string $name Helper name.
-	 * @return \Trinity\Template\Helper
-	 */
-	public function getHelper($name)
-	{
-		return $this->_helperLocator->get($name);
-	} // end getHelper();
 } // end View;

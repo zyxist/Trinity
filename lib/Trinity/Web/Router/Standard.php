@@ -11,7 +11,7 @@
  */
 
 namespace Trinity\Web\Router;
-use \Trinity\Web\Area\Strategy_Interface;
+use \Trinity\Web\Area\Manager;
 use \Trinity\Web\Router as Router_Interface;
 use \Trinity\Web\Router\Exception as Router_Exception;
 
@@ -46,34 +46,31 @@ class Standard implements Router_Interface
 	private $_params = array();
 
 	/**
-	 * The area strategy used for building inter-area routes.
-	 * @var \Trinity\Web\Area\Strategy_Interface
+	 * The area manager.
+	 * @var \Trinity\Web\Area\Manager
 	 */
-	private $_areaStrategy;
+	protected $_manager;
 
 	/**
-	 * The query path.
-	 * @var string
+	 * The resolved base URL-s.
+	 * @var array
 	 */
-	private $_queryPath;
+	protected $_baseUrls = array();
 
 	/**
-	 * The base URL.
-	 * @var string
+	 * The resolved query paths.
+	 * @var array
 	 */
-	private $_baseUrl;
+	protected $_queryPaths = array();
 
 	/**
 	 * Creates the router.
 	 *
-	 * @param \Trinity\Web\Area\Strategy_Interface $areaStrategy Area strategy
-	 * @param string $queryPath The query path
+	 * @param \Trinity\Web\Area\Manager $manager The area manager.
 	 */
-	public function __construct($areaStrategy, $queryPath, $baseUrl)
+	public function __construct(Manager $manager)
 	{
-		$this->_areaStrategy = $areaStrategy;
-		$this->_queryPath = $queryPath;
-		$this->_baseUrl = $baseUrl;
+		$this->_manager = $manager;
 	} // end __construct();
 
 	/**
@@ -225,37 +222,20 @@ class Standard implements Router_Interface
 			throw new Router_Exception('The variable list passed to router is not an array.');
 		}
 		$sVars = array_merge($this->_params, $sVars);
-		
-
-		$address = '/';
-		if($fullyQualified)
+		foreach($sVars as $name => &$var)
 		{
-			$baseUrl = $this->_baseUrl.trim($this->_queryPath, '/');
-		}
-		else
-		{
-			$baseUrl = rtrim($this->_queryPath, '/');
-		}
-		
-
-		// Route to other area
-		if($area !== null)
-		{
-			$opts = $this->_areaStrategy->getAreaOptions($area);
-
-			if(isset($opts['baseUrl']))
+			if($var === null)
 			{
-				if($opts['baseUrl'][strlen($opts['baseUrl']) - 1] == '/')
-				{
-					$address = '';
-					$baseUrl = $opts['baseUrl'];
-				}
-			}
-			else
-			{
-				$sVars['area'] = $area;
+				unset($sVars[$name]);
 			}
 		}
+
+		$address = $this->queryPath($area);
+		if($address[strlen($address) - 1] != '/')
+		{
+			$address .= '/';
+		}
+		$initialAddress = $address;
 
 		// Build the argument list
 		foreach($this->patterns as $pattern)
@@ -319,16 +299,16 @@ class Standard implements Router_Interface
 			break;
 		}
 
-		if($address == '/')
+		if($address == $initialAddress)
 		{
-			return rtrim($baseUrl.'?'.http_build_query($vars, ''), '?');
+			return $address.'?'.http_build_query($vars, '');
 		}
 
 		if(sizeof($vars) > 0)
 		{
-			return rtrim($baseUrl.$address.'?'.http_build_query($vars, ''), '/?');
+			return $address.'?'.http_build_query($vars, '');
 		}
-		return rtrim($baseUrl.$address, '/');
+		return $address;
 	} // end assemble();
 
 	/**
@@ -354,4 +334,73 @@ class Standard implements Router_Interface
 			$this->_params[(string)$name] = $value;
 		}
 	} // end setParams();
+
+	/**
+	 * Returns the base URL of the specified area. If the area is
+	 * not specified, it returns the base URL of the current area.
+	 *
+	 * @param string $area Area name.
+	 * @return string
+	 */
+	public function baseUrl($area = null)
+	{
+		// Active area
+		if($area === null)
+		{
+			if(!isset($this->_baseUrls['__DEFAULT__']))
+			{
+				$this->_baseUrls['__DEFAULT__'] = $this->_manager->getActiveArea()->get('baseUrl');
+			}
+			return $this->_baseUrls['__DEFAULT__'];
+		}
+
+		// Other areas
+		if(!isset($this->_baseUrls[$area]))
+		{
+			$metadata = $this->_manager->getAreaMetadata($area);
+			if(!isset($metadata['baseUrl']))
+			{
+				$this->_baseUrls[$area] = $this->baseUrl(null);
+			}
+			else
+			{
+				$this->_baseUrls[$area] = $metadata['baseUrl'];
+			}
+		}
+		return $this->_baseUrls[$area];
+	} // end baseUrl();
+
+	/**
+	 * Returns the query path for the given area.
+	 *
+	 * @param string $area Area name
+	 * @return string
+	 */
+	public function queryPath($area = null)
+	{
+		// Active area
+		if($area === null)
+		{
+			if(!isset($this->_queryPaths['__DEFAULT__']))
+			{
+				$this->_queryPaths['__DEFAULT__'] = $this->_manager->getActiveArea()->get('queryPath');
+			}
+			return $this->_queryPaths['__DEFAULT__'];
+		}
+
+		// Other areas
+		if(!isset($this->_queryPaths[$area]))
+		{
+			$metadata = $this->_manager->getAreaMetadata($area);
+			if(!isset($metadata['queryPath']))
+			{
+				$this->_queryPaths[$area] = $this->baseUrl(null);
+			}
+			else
+			{
+				$this->_queryPaths[$area] = $metadata['queryPath'];
+			}
+		}
+		return $this->_queryPaths[$area];
+	} // end queryPath();
 } // end Standard;
