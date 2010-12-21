@@ -13,12 +13,13 @@
 namespace Trinity\Opt\View;
 use \Trinity\Basement\ServiceLocator as ServiceLocator;
 use \Trinity\Web\Controller\Exception as Web_Controller_Exception;
-use \Trinity\WebUtils\Model\Interfaces\Details as Interface_Details;
-use \Trinity\WebUtils\Model\Interfaces\Addable as Interface_Addable;
-use \Trinity\WebUtils\Model\Interfaces\Editable as Interface_Editable;
-use \Trinity\WebUtils\Model\Interfaces\Removable as Interface_Removable;
-use \Trinity\WebUtils\Model\Interfaces\Movable as Interface_Movable;
-use \Trinity\WebUtils\Model\Interfaces\Paginable as Interface_Paginable;
+use \Trinity\WebUtils\Model\Interfaces\Details;
+use \Trinity\WebUtils\Model\Interfaces\Addable;
+use \Trinity\WebUtils\Model\Interfaces\Editable;
+use \Trinity\WebUtils\Model\Interfaces\Removable;
+use \Trinity\WebUtils\Model\Interfaces\Movable;
+use \Trinity\WebUtils\Model\Interfaces\Paginable;
+use \Trinity\WebUtils\Model\Interfaces\HasParent;
 use \Opc\Paginator;
 
 /**
@@ -54,7 +55,7 @@ class Grid extends Html
 		$translation = $this->_serviceLocator->get('Translation');
 
 		// Add pagination
-		if($model instanceof Interface_Paginable)
+		if($model instanceof Paginable)
 		{
 			$paginator = Paginator::create($this->_serviceLocator->get('Opc'), $model->count());
 			$paginator->page = $this->get('page');
@@ -76,23 +77,28 @@ class Grid extends Html
 		}
 
 		// Check extra stuff
-		if($model instanceof Interface_Details)
+		if($model instanceof HasParent)
+		{
+			$view->parent = $model->getParentInformation();
+			$view->setFormat('parent', 'Objective');
+		}
+		if($model instanceof Details)
 		{
 			$view->detailsAction = true;
 		}
-		if($model instanceof Interface_Addable)
+		if($model instanceof Addable)
 		{
 			$view->addAction = true;
 		}
-		if($model instanceof Interface_Editable)
+		if($model instanceof Editable)
 		{
 			$view->editAction = true;
 		}
-		if($model instanceof Interface_Removable)
+		if($model instanceof Removable)
 		{
 			$view->removeAction = true;
 		}
-		if($model instanceof Interface_Movable)
+		if($model instanceof Movable)
 		{
 			$view->moveActions = true;
 		}
