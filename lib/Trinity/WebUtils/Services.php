@@ -146,6 +146,7 @@ class Services extends Container
 			$loader = new \Opc\Translate\XmlLoader(array(
 				$areaManager->getActiveModule()->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
 				$application->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+				$application->getDirectory().'languages'.DIRECTORY_SEPARATOR,
 			));
 		}
 		return $loader;
@@ -166,6 +167,7 @@ class Services extends Container
 			$loader = new \Opc\Translate\YamlLoader(array(
 				$areaManager->getActiveModule()->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
 				$application->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+				$application->getDirectory().'languages'.DIRECTORY_SEPARATOR,
 			));
 		}
 		return $loader;
@@ -186,6 +188,7 @@ class Services extends Container
 			$loader = new \Opc\Translate\IniLoader(array(
 				$areaManager->getActiveModule()->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
 				$application->getDirectory().ucfirst($area->getAreaName()).DIRECTORY_SEPARATOR.'languages'.DIRECTORY_SEPARATOR,
+				$application->getDirectory().'languages'.DIRECTORY_SEPARATOR,
 			));
 		}
 		return $loader;
