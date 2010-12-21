@@ -50,9 +50,6 @@ class Details extends Html
 		$view->setFormat('category', 'AssociativeArray');
 		$view->setFormat('item', 'AssociativeArray');
 
-		$brief = $model->getBriefInformation();
-		$view->title = $brief['title'];
-
 		$categories = $model->getAvailableDetailCategories();
 		$data = array();
 		$name = $model->myName();
@@ -62,6 +59,16 @@ class Details extends Html
 				'title' => $translation->_($name, 'details.category.'.$category),
 				'item' => $model->getDetailCategory($category)
 			);
+
+			if(isset($data[$category]['item']['title']))
+			{
+				$view->title = $data[$category]['item']['title']['value'];
+			}
+			elseif(isset($data[$category]['item']['name']))
+			{
+				$view->title = $data[$category]['item']['name']['value'];
+			}
+
 			$view->$category = $data[$category];
 		}
 		$view->category = $data;
