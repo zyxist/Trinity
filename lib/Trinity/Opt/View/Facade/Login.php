@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\Opt\View\Facade;
+use \Opt_View;
 use \Trinity\Opt\View\Html as View_Html;
 
 /**
@@ -35,22 +36,24 @@ class Login extends View_Html
 
 		if(!$auth->hasIdentity())
 		{
-			$layoutTpl->auth = array('identity' => false, 'credentials' => null);
-			$layoutTpl->setFormat('auth', 'Array');
+			Opt_View::assignGlobal('auth', array('identity' => false, 'credentials' => null));
+			Opt_View::setFormatGlobal('auth', 'Global/Array', false);
 		}
 		else
 		{
-			$layoutTpl->auth = array('identity' => true, 'credentials' => $identity = $auth->getIdentity());
+			Opt_View::assignGlobal('auth', array('identity' => true, 'credentials' => $identity = $auth->getIdentity()));
 
 			if(is_object($identity))
 			{
-				$layoutTpl->setFormat('auth.credentials', 'Objective');
-				$layoutTpl->setFormat('auth.credentials.user', 'Objective');
+				Opt_View::setFormatGlobal('auth', 'Global/Array', false);
+				Opt_View::setFormatGlobal('auth.credentials', 'Objective', false);
+				Opt_View::setFormatGlobal('auth.credentials.user', 'Objective', false);
 			}
 			else
 			{
-				$layoutTpl->setFormat('auth.credentials', 'Array');
-				$layoutTpl->setFormat('auth.credentials.user', 'Array');
+				Opt_View::setFormatGlobal('auth', 'Global/Array', false);
+				Opt_View::setFormatGlobal('auth.credentials', 'Array', false);
+				Opt_View::setFormatGlobal('auth.credentials.user', 'Array', false);
 			}
 		}
 	} // end dispatch();
