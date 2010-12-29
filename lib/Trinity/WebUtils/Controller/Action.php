@@ -18,6 +18,7 @@ use \Trinity\Web\Controller\Manager;
 use \Trinity\Web\Brick;
 use \Trinity\Web\View;
 use \Trinity\Web\Controller_Exception;
+use \Trinity\Web\Http\Error as HttpError;
 
 /**
  * This controller implements an one-step layout with single, self-contained
@@ -90,24 +91,24 @@ class Action extends Web_Controller
 
 		if(!ctype_alnum($action))
 		{
-			$this->raiseControllerError($manager, Web_Controller::ERROR_VALIDATION);
+			throw new HttpError('Invalid action name.', HttpError::BAD_REQUEST);
 		}
 		// Try to load the action object
 		
 		if(!file_exists($actionFile))
 		{
-				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+			throw new HttpError('Action \''.$action.'\' not found.', HttpError::NOT_FOUND);
 		}
 		require($actionFile);
 		if(!class_exists($actionQualified, false))
 		{
-				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+			throw new HttpError('Action \''.$action.'\' not found.', HttpError::NOT_FOUND);
 		}
 		$actionObj = new $actionQualified($manager);
 
 		if(!$actionObj instanceof Brick)
 		{
-			$this->raiseControllerError($manager);
+			throw new HttpError('Invalid action interface.', HttpError::INTERNAL_ERROR);
 		}
 
 		$manager->events->notify(new Event($this, 'controller.dispatch', array(
