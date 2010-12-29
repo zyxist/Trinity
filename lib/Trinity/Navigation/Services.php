@@ -54,7 +54,7 @@ class Services extends Container
 			$eventDispatcher = $serviceLocator->get('EventDispatcher');
 			$eventDispatcher->connect('web.application.modules-discovered', function(Event $event) use($xmlLoader)
 			{
-				$xmlLoader->setFile($event->getParameter('area')->getAreaName().'.xml');
+				$xmlLoader->setFile($event->get('area')->getAreaName().'.xml');
 			});
 		}
 		else
@@ -82,7 +82,7 @@ class Services extends Container
 			$eventDispatcher = $serviceLocator->get('EventDispatcher');
 			$eventDispatcher->connect('web.application.modules-discovered', function(Event $event) use($phpLoader)
 			{
-				$phpLoader->setFile($event->getParameter('area')->getAreaName().'.php');
+				$phpLoader->setFile($event->get('area')->getAreaName().'.php');
 			});
 		}
 		else

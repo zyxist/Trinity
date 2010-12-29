@@ -106,13 +106,13 @@ class Services extends Container
 
 			if($facade !== null)
 			{
-				$facadeBrick = $event->getParameter('manager')->getBrick($facade);
-				$facadeBrick->dispatch($event->getParameter('manager'));
+				$facadeBrick = $event->get('manager')->getBrick($facade);
+				$facadeBrick->dispatch($event->get('manager'));
 			}
 		});
 
 		$eventDispatcher->connect('controller.web.dispatch.begin', function(Event $event) use($manager) {
-			$event->getParameter('manager')->facade = $manager;
+			$event->get('manager')->facade = $manager;
 		});
 
 		return $manager;

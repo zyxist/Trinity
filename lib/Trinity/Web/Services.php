@@ -176,7 +176,7 @@ class Services extends Container
 		$eventDispatcher = $serviceLocator->get('EventDispatcher');
 		$processingFunc = function(Event $event) use($response)
 		{
-			$manager = $event->getParameter('manager');
+			$manager = $event->get('manager');
 			$viewBroker = $manager->getViewBroker();
 		//	$viewBroker->setRequest($args['manager']->request);
 			$viewBroker->setResponse($manager->response);

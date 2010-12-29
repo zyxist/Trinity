@@ -95,8 +95,8 @@ class Services extends Container
 			$eventDispatcher = $serviceLocator->get('EventDispatcher');
 			$eventDispatcher->connect('web.application.modules-discovered', function(Event $event) use($inflector)
 			{
-				$inflector->setModule($event->getParameter('module'));
-				$inflector->setArea($event->getParameter('area'));
+				$inflector->setModule($event->get('module'));
+				$inflector->setArea($event->get('area'));
 			});
 		}
 
