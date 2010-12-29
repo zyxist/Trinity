@@ -98,9 +98,22 @@ abstract class Area extends Module
 		$configuration = $this->getServiceLocator()->getConfiguration();
 		foreach($this->_metadata as &$value)
 		{
-			if(preg_match('/%([a-zA-Z0-9\-\.]+)%/', $value, $matches))
+			if(is_scalar($value))
 			{
-				$value = str_replace($matches[0], $configuration->get($matches[1]), $value);
+				if(preg_match('/%([a-zA-Z0-9\-\.]+)%/', $value, $matches))
+				{
+					$value = str_replace($matches[0], $configuration->get($matches[1]), $value);
+				}
+			}
+			else
+			{
+				foreach($value as &$subvalue)
+				{
+					if(preg_match('/%([a-zA-Z0-9\-\.]+)%/', $subvalue, $matches))
+					{
+						$subvalue = str_replace($matches[0], $configuration->get($matches[1]), $subvalue);
+					}
+				}
 			}
 		}
 	} // end updateMetadata();
@@ -150,7 +163,7 @@ abstract class Area extends Module
 		return $this->_metadata[$name];
 	} // end get();
 
-	public function isDefined($name)
+	public function has($name)
 	{
 		if(!isset($this->_metadata[$name]))
 		{
@@ -167,5 +180,5 @@ abstract class Area extends Module
 			return false;
 		}
 		return true;
-	} // end isDefined();
+	} // end has();
 } // end Area;

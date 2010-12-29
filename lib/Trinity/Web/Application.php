@@ -107,7 +107,23 @@ abstract class Application extends Basement_Application
 			$request = $serviceLocator->get('Request');
 			$response = $serviceLocator->get('Response');
 
-			$areaManager->setActiveModule($request->getParam('module', $area->defaultModule));
+			$params = $request->getParams();
+			if(empty($params))
+			{
+				if($area->has('defaultRoute'))
+				{
+					$request->setParams($area->get('defaultRoute'));
+				}
+				else
+				{
+					$config = $serviceLocator->getConfiguration();
+					$request->setParams(array(
+						'module' => $config->get('trinity.web.controller.defaultModule')
+					));
+				}
+			}
+
+			$areaManager->setActiveModule($request->getParam('module'));
 			$module = $areaManager->getActiveModule();
 
 			$eventDispatcher->notify(new Event($this, 'web.application.modules-discovered', array('module' => $module, 'area' => $area)));
