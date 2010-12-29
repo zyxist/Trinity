@@ -20,6 +20,7 @@ use \Trinity\Web\Controller\Exception as Controller_Exception;
 use \Trinity\Web\Controller\Manager;
 use \Trinity\Web\Controller\State;
 use \Trinity\Web\Http\Redirect;
+use \Trinity\Web\Http\Error as HttpError;
 
 /**
  * The default web controller.
@@ -174,6 +175,20 @@ abstract class Controller implements Basement_Controller
 				'redirect' => $redirect
 			)));
 		}
+		catch(HttpError $httpError)
+		{
+			$state = new State;
+			$state->exception = $httpError;
+			$config = $manager->services->getConfiguration();
+			// TODO: setErrorBrick() should be used here.
+			$brick = $manager->getBrick($config->get('trinity.web.controller.httpErrorBrick'), $state);
+			$brick->dispatch();
+
+			$manager->events->notify(new Event($this,'controller.web.dispatch.error', array(
+				'controller' => $this,
+				'manager' => $manager
+			)));
+		}
 	} // end dispatch();
 
 	/**
@@ -209,6 +224,11 @@ abstract class Controller implements Basement_Controller
 	 */
 	public function raiseControllerError(Manager $manager, $errorType = self::ERROR_GENERIC)
 	{
+		switch($errorType)
+		{
+			case self::ERROR_NOT_FOUND:
+				throw new HttpError();
+		}
 		$messageMap = array(
 			self::ERROR_GENERIC => 'internal problem.',
 			self::ERROR_NOT_FOUND => 'the requested controller action has not been found.',

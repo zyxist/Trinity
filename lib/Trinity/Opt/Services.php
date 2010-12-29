@@ -33,7 +33,9 @@ class Services extends Container
 			'trinity.opt.parser' => 'Opt_Parser_Xml',
 			'trinity.opt.escape' => true,
 			'trinity.opt.prologRequired' => true,
-			'trinity.opt.compileMode' => 0
+			'trinity.opt.compileMode' => 0,
+
+			'trinity.web.controller.httpErrorBrick' => 'Trinity.Opt.Brick.HttpError'
 		);
 	} // end getConfiguration();
 

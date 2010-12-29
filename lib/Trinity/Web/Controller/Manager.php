@@ -254,7 +254,6 @@ class Manager
 	public function processView(View $view)
 	{
 		$broker = $this->getViewBroker();
-
 		if($broker === null)
 		{
 			$this->setViewBroker($view->getViewBroker());

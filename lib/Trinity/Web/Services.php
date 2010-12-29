@@ -174,7 +174,8 @@ class Services extends Container
 
 		// Connect some events
 		$eventDispatcher = $serviceLocator->get('EventDispatcher');
-		$eventDispatcher->connect('controller.web.dispatch.end', function(Event $event) use($response){
+		$processingFunc = function(Event $event) use($response)
+		{
 			$manager = $event->getParameter('manager');
 			$viewBroker = $manager->getViewBroker();
 		//	$viewBroker->setRequest($args['manager']->request);
@@ -183,7 +184,10 @@ class Services extends Container
 			{
 				$viewBroker->display();
 			}
-		}, 10);
+		};
+
+		$eventDispatcher->connect('controller.web.dispatch.end', $processingFunc, 10);
+		$eventDispatcher->connect('controller.web.dispatch.error', $processingFunc, 10);
 
 		return $response;
 	} // end getResponseService();
