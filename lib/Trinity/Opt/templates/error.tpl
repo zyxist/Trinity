@@ -4,11 +4,12 @@
 <opt:dtd template="xhtml11" />
 <html>
   <head>
-	<title>Error 404</title>
+	<title>Trinity error {$error.code}</title>
   </head>
   <body>
-	<h3>Error 404</h3>
+	<h3>Error {$error.code}</h3>
 
-	<p>We are sorry, but Trinity cannot process the requested action: not found</p>
+	<p>{$error.message}</p>
   </body>
 </html>
+</opt:root>

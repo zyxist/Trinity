@@ -106,7 +106,27 @@ class HttpError extends View implements Broker
 		$model = $this->getModel('error');
 
 		$opt = $this->_serviceLocator->get('Opt');
-		$this->_templateObject = new \Opt_View('trinity.templates:error/'.$model->getCode());
-		$this->_templateObject->message = $this->_responseCode = (int)$model->getCode();
+
+		$this->_responseCode = (int)$model->getCode();
+
+		if($model->getCode() == 500)
+		{
+			$this->_templateObject = new \Opt_View('trinity.templates:internal.tpl');
+			$this->_templateObject->error = array(
+				'code' => 500,
+				'class' => get_class($model),
+				'message' => $model->getMessage(),
+				'backtrace' => $model->getTraceAsString(),
+			);
+		}
+		else
+		{
+			$this->_templateObject = new \Opt_View('trinity.templates:error.tpl');
+			$this->_templateObject->error = array(
+				'code' => $model->getCode(),
+				'message' => $model->getMessage(),
+				'backtrace' => $model->getTraceAsString(),
+			);
+		}
 	} // end dispatch();
 } // end HttpError;

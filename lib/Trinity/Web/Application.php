@@ -79,46 +79,98 @@ abstract class Application extends Basement_Application
 	 */
 	public function launch()
 	{
-		// Do the ordinary stuff
-		parent::launch();
-
-		// Now run the web MVC stack.
-		$serviceLocator = $this->getServiceLocator();
-		$eventDispatcher = $serviceLocator->get('EventDispatcher');
-		$areaManager = $serviceLocator->get('AreaManager');
-
-		// Get the active area
-		if(($area = $areaManager->getActiveArea()) === null)
+		try
 		{
-			if($areaManager->getAreaStrategy() !== null)
+			// Do the ordinary stuff
+			parent::launch();
+
+			// Now run the web MVC stack.
+			$serviceLocator = $this->getServiceLocator();
+			$eventDispatcher = $serviceLocator->get('EventDispatcher');
+			$areaManager = $serviceLocator->get('AreaManager');
+
+			// Get the active area
+			if(($area = $areaManager->getActiveArea()) === null)
 			{
-				$area = $areaManager->discoverActiveArea();
+				if($areaManager->getAreaStrategy() !== null)
+				{
+					$area = $areaManager->discoverActiveArea();
+				}
+				else
+				{
+					throw new Exception('No active area is selected.');
+				}
+			}
+			$area->updateMetadata();
+
+			// Get the active module
+			$request = $serviceLocator->get('Request');
+			$response = $serviceLocator->get('Response');
+
+			$areaManager->setActiveModule($request->getParam('module', $area->defaultModule));
+			$module = $areaManager->getActiveModule();
+
+			$eventDispatcher->notify(new Event($this, 'web.application.modules-discovered', array('module' => $module, 'area' => $area)));
+
+			// Get the controller
+			$controller = $serviceLocator->get($area->controllerService);
+			if($controller instanceof Controller)
+			{
+				$controller->dispatch($request, $response);
 			}
 			else
 			{
-				throw new Exception('No active area is selected.');
+				throw new Exception('The selected area controller is not a valid controller instance.');
 			}
+			$response->sendResponse();
 		}
-		$area->updateMetadata();
-
-		// Get the active module
-		$request = $serviceLocator->get('Request');
-		$response = $serviceLocator->get('Response');
-		$areaManager->setActiveModule($request->getParam('module', $area->defaultModule));
-		$module = $areaManager->getActiveModule();
-
-		$eventDispatcher->notify(new Event($this, 'web.application.modules-discovered', array('module' => $module, 'area' => $area)));
-
-		// Get the controller
-		$controller = $serviceLocator->get($area->controllerService);
-		if($controller instanceof Controller)
+		catch(Exception $exception)
 		{
-			$controller->dispatch($request, $response);
+			$this->processException($exception);
 		}
-		else
-		{
-			throw new Exception('The selected area controller is not a valid controller instance.');
-		}
-		$response->sendResponse();
 	} // end launch();
+
+	/**
+	 * Processes all the system errors.
+	 * 
+	 * @param Exception $exception The exception to process
+	 */
+	public function processException(Exception $exception)
+	{
+		$this->panic($exception);
+		/*
+		try
+		{
+			
+		}
+		catch(Exception $exception)
+		{
+			// Oops, the situation is really critical.
+			
+		}
+		 */
+	} // end processException();
+
+	/**
+	 * Processes the critical situations.
+	 * 
+	 * @param Exception $exception
+	 */
+	public function panic(Exception $exception)
+	{
+		header('Content-type: text\html;charset=utf-8');
+?>
+<html>
+  <head>
+	<title>Internal Trinity error</title>
+  </head>
+  <body>
+	<h3>Internal Trinity error</h3>
+	<p><?php echo $exception->getMessage(); ?></p>
+	<p><?php echo get_class($exception); ?></p>
+	<?php var_dump($exception->getTrace()); ?>
+  </body>
+</html>
+<?php
+	} // end panic();
 } // end Application;

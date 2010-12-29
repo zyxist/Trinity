@@ -31,7 +31,9 @@ class Error extends \Exception
 	const GONE = 410;
 	const PRECONDITION_FAILED = 412;
 
+	const INTERNAL_ERROR = 500;
 	const NOT_IMPLEMENTED = 501;
+	const SERVICE_UNAVAILABLE = 503;
 
 	/**
 	 * Constructs the HTTP error exception. By convention, exception code =
