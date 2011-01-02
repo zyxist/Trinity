@@ -148,7 +148,7 @@ abstract class View
 	 * @param string $name The model name
 	 * @param Model $model The model object
 	 */
-	public function replaceModel($name, Model $model)
+	public function replaceModel($name, $model)
 	{
 		$this->_models[$name] = $model;
 	} // end replaceModel();
