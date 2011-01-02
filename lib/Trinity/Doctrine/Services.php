@@ -13,6 +13,7 @@ namespace Trinity\Doctrine;
 use \Trinity\Basement\Service\Container;
 use \Trinity\Basement\ServiceLocator;
 use \Doctrine\DBAL\Types\Type;
+use \Doctrine\DBAL\DriverManager;
 use \Doctrine\ORM\Configuration;
 use \Doctrine\ORM\EntityManager;
 use \Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -67,6 +68,24 @@ class Services extends Container
 		}
 		return $cache;
 	} // end getDoctrineCacheService();
+
+	/**
+	 * Creates the connection object for Doctrine
+	 *
+	 * @param ServiceLocator $serviceLocator
+	 * @return \Doctrine\Common\Cache
+	 */
+	public function getDoctrineConnectionService(ServiceLocator $serviceLocator)
+	{
+		$trinityConfig = $serviceLocator->getConfiguration();
+		return DriverManager::getConnection(array(
+			'driver' => $trinityConfig->get('application.database.driver'),
+			'host' => $trinityConfig->get('application.database.host'),
+			'user' => $trinityConfig->get('application.database.user'),
+			'password' => $trinityConfig->get('application.database.password'),
+			'dbname' => $trinityConfig->get('application.database.dbname')
+		));
+	} // end getDoctrineConnectionService();
 
 	/**
 	 * Builds the Doctrine entity manager.
