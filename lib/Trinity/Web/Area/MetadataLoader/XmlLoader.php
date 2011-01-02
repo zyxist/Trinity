@@ -53,18 +53,28 @@ class XmlLoader extends FileLoader
 					throw new \DomainException('Cannot load area metadata: missing \'name\' attribute in the <option> element.');
 				}
 				$optionName = (string)$option['name'];
-				$value = $option->__toString();
 				if(isset($option['type']))
 				{
 					switch((string)$option['type'])
 					{
 						case 'boolean':
-							$output[$areaName][$optionName] = (boolean)$value;
+							$output[$areaName][$optionName] = (boolean)$option->__toString();
 							break;
 						case 'integer':
-							$output[$areaName][$optionName] = (int)$value;
+							$output[$areaName][$optionName] = (int)$option->__toString();
+							break;
+						case 'compound':
+							$data = array();
+
+							foreach($option->key as $key)
+							{
+								$data[(string)$key['name']] = $key->__toString();
+							}
+
+							$output[$areaName][$optionName] = $data;
 							break;
 						case 'class':
+							$value = $option->__toString();
 							if(!\is_callable($value, true))
 							{
 								throw new \DomainException('Cannot load area metadata: invalid class syntax in option \''.$option['name'].'\' in area \''.$area['name'].'\'');
@@ -72,12 +82,12 @@ class XmlLoader extends FileLoader
 							$output[$areaName][$optionName] = $value;
 							break;
 						default:
-							$output[$areaName][$optionName] = $value;
+							$output[$areaName][$optionName] = $option->__toString();
 					}
 				}
 				else
 				{
-					$output[$areaName][$optionName] = $value;
+					$output[$areaName][$optionName] = $option->__toString();
 				}
 			}
 		}

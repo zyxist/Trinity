@@ -33,7 +33,9 @@ class Services extends Container
 			'trinity.opt.parser' => 'Opt_Parser_Xml',
 			'trinity.opt.escape' => true,
 			'trinity.opt.prologRequired' => true,
-			'trinity.opt.compileMode' => 0
+			'trinity.opt.compileMode' => 0,
+
+			'trinity.web.controller.httpErrorBrick' => 'Trinity.Opt.Brick.HttpError'
 		);
 	} // end getConfiguration();
 
@@ -93,8 +95,8 @@ class Services extends Container
 			$eventDispatcher = $serviceLocator->get('EventDispatcher');
 			$eventDispatcher->connect('web.application.modules-discovered', function(Event $event) use($inflector)
 			{
-				$inflector->setModule($event->getParameter('module'));
-				$inflector->setArea($event->getParameter('area'));
+				$inflector->setModule($event->get('module'));
+				$inflector->setArea($event->get('area'));
 			});
 		}
 

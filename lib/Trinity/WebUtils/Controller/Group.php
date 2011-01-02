@@ -20,6 +20,7 @@ use \Trinity\Web\Controller_Exception as Web_Controller_Exception;
 use \Trinity\Web\Request as Request_Abstract;
 use \Trinity\Web\Response as Response_Abstract;
 use \Trinity\Web\Controller\Manager;
+use \Trinity\Web\Http\Error as HttpError;
 use \Trinity\WebUtils\View\ActionGroup as View_ActionGroup;
 
 /**
@@ -116,12 +117,12 @@ class Group extends Web_Controller
 		// Try to load the group object
 		if(!file_exists($groupFile))
 		{
-				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+			throw new HttpError('Controller group not found: '.$group, HttpError::NOT_FOUND);
 		}
 		require($groupFile);
 		if(!class_exists($groupQualified, false))
 		{
-				$this->raiseControllerError($manager, Web_Controller::ERROR_NOT_FOUND);
+			throw new HttpError('Controller group not found: '.$group, HttpError::NOT_FOUND);
 		}
 
 		$groupObj = new $groupQualified($manager, $this, $action);

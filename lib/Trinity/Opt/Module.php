@@ -30,4 +30,16 @@ class Module extends Basement_Module
 	{
 		return new Services;
 	} // end registerServiceContainer();
+
+	/**
+	 * Launches the module.
+	 */
+	public function launch()
+	{
+		$this->_name = 'trinity';
+
+		$serviceLocator = $this->getServiceLocator();
+		$opt = $serviceLocator->get('Opt');
+		$opt->getInflector()->addModule($this);
+	} // end launch();
 } // end Module;
