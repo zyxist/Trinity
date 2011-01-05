@@ -11,6 +11,7 @@
  */
 
 namespace Trinity\Web;
+use \Symfony\Component\EventDispatcher\EventDispatcher;
 use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Application as Basement_Application;
 use \Trinity\Basement\ServiceLocator;
@@ -69,6 +70,7 @@ abstract class Application extends Basement_Application
 		$config->set('application.directory', $this->getDirectory());
 
 		$this->_serviceLocator->set('Application', $this);
+		$this->_serviceLocator->set('EventDispatcher', new EventDispatcher());
 		$this->_serviceLocator->registerServiceContainer(new Services);
 
 		return $this->_serviceLocator;

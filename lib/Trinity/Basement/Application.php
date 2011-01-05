@@ -10,6 +10,7 @@
  * and other contributors. See website for details.
  */
 namespace Trinity\Basement;
+use \Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * The application class providing the basic services and the general
@@ -74,6 +75,7 @@ abstract class Application extends Module
 
 		$this->_serviceLocator = new ServiceLocator('service locator');
 		$this->_serviceLocator->set('Application', $this);
+		$this->_serviceLocator->set('EventDispatcher', new EventDispatcher());
 
 		return $this;
 	} // end getServiceLocator();
