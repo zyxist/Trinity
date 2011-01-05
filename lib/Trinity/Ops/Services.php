@@ -11,6 +11,7 @@
  */
 namespace Trinity\Ops;
 use \Ops\Auth;
+use \Symfony\Component\EventDispatcher\Event;
 use \Trinity\Basement\Service\Container;
 use \Trinity\Basement\ServiceLocator;
 use \Trinity\Ops\Auth\Storage\Session as Storage_Session;
@@ -44,6 +45,8 @@ class Services extends Container
 		$modeller = $serviceLocator->getConfiguration()->get('trinity.ops.authModel');
 		$auth = new Auth;
 		$auth->setStorage(new Storage_Session($serviceLocator->get('Session'), new $modeller($serviceLocator)));
+
+		$serviceLocator->get('EventDispatcher')->notify(new Event($auth, 'auth.created'));
 
 		return $auth;
 	} // end getAuthService();
