@@ -51,7 +51,8 @@ class Services extends Container
 			'trinity.web.fileMetadataLoader.file' => 'area.xml',
 			'trinity.web.router.query-path' => '/',
 			'trinity.web.router.base-url' => null,
-			'trinity.opc.paginator.decorator' => 'slider'
+			'trinity.opc.paginator.decorator' => 'slider',
+			'trinity.opc.paginator.itemsPerPage' => 10
 		);
 	} // end getConfiguration();
 
@@ -96,17 +97,6 @@ class Services extends Container
 	} // end getFileMetadataLoaderService();
 
 	/**
-	 * The service for building the event dispatcher.
-	 *
-	 * @param ServiceLocator $serviceLocator The service locator.
-	 * @return EventDispatcher 
-	 */
-	public function getEventDispatcherService(ServiceLocator $serviceLocator)
-	{
-		return new EventDispatcher;
-	} // end getEventDispatcherService();
-
-	/**
 	 * The service for building the OPC core object.
 	 *
 	 * @param ServiceLocator $serviceLocator The service locator.
@@ -117,6 +107,7 @@ class Services extends Container
 		$config = $serviceLocator->getConfiguration();
 		$core = new \Opc\Core();
 		$core->paginatorDecorator = $config->get('trinity.opc.paginator.decorator');
+		$core->itemsPerPage = $config->get('trinity.opc.paginator.itemsPerPage');
 
 		return $core;
 	} // end getOpcService();
